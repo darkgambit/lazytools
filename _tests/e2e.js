@@ -70,13 +70,45 @@ let pass = 0, fail = 0;
   const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--disable-gpu'] });
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 
+  /* Error collection is scoped to FIRST-PARTY origins on purpose.
+
+     This site embeds third-party scripts by design: Cloudflare Web Analytics on every page,
+     and ad-network code once the slots are filled. Those requests fail for reasons that have
+     nothing to do with this site — ad blockers, corporate DNS filters, and (on a non-standard
+     localhost port) Cloudflare's own RUM endpoint echoing `Access-Control-Allow-Origin:
+     http://127.0.0.1` WITHOUT the port, which fails the CORS preflight for http://127.0.0.1:8788.
+
+     Counting that noise as a defect made all 21 page checks report FAIL while every functional
+     assertion in them still passed (`cards=17`, `ads=3`, `ld=3`, correct results). A suite that
+     cries wolf on a third-party CDN gets ignored, which is worse than not having it.
+
+     So a failure only counts against this site when it comes from this site's own origin.
+     Known third-party noise is still collected and printed, never hidden — and the beacon's
+     presence is asserted positively below, so filtering the noise does not lose the coverage. */
+  const THIRD_PARTY = [
+    'cloudflareinsights.com',      // Cloudflare Web Analytics
+    'highperformanceformat.com',   // Adsterra banner / native tags
+    'profitabledisplaynetwork.com',
+    'effectivegatecpm.com',
+  ];
+  const isThirdParty = (s) => THIRD_PARTY.some((h) => s.includes(h));
+
   async function newPage() {
     const page = await ctx.newPage();
-    const errs = [];
+    const errs = [];        // first-party — these fail the suite
+    const noise = [];       // known third-party — reported only
+    const bucket = (s) => (isThirdParty(s) ? noise : errs);
     page.on('pageerror', (e) => errs.push('pageerror: ' + e.message));
-    page.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
-    page.on('requestfailed', (r) => errs.push('reqfail: ' + r.url()));
-    return { page, errs };
+    page.on('console', (m) => {
+      if (m.type() !== 'error') return;
+      const text = m.text();
+      // A failed subresource logs a generic "Failed to load resource" message, so the
+      // message text alone is not enough — the source URL identifies the culprit.
+      const src = (m.location && m.location().url) || '';
+      bucket(text + ' ' + src).push('console: ' + text + (src ? ' [' + src + ']' : ''));
+    });
+    page.on('requestfailed', (r) => bucket(r.url()).push('reqfail: ' + r.url()));
+    return { page, errs, noise };
   }
   const report = (ok, label, detail) => {
     ok ? pass++ : fail++;
@@ -85,12 +117,13 @@ let pass = 0, fail = 0;
 
   // ---------- home ----------
   try {
-    const { page, errs } = await newPage();
+    const { page, errs, noise } = await newPage();
     const homeResp = await page.goto(nav('index.html'), { waitUntil: 'load' });
     const homeDirect = !!homeResp && homeResp.status() === 200 && page.url() === nav('index.html');
     const title = await page.title();
     const cards = await page.locator('.tool-card[data-slug]').count();
     const slots = await page.locator('.ad-slot[data-slot]').count();
+    const beacon = await page.locator("script[src*='cloudflareinsights.com/beacon.min.js']").count();
     await page.fill('#tool-search', 'bmi');
     await page.waitForTimeout(150);
     const visible = await page.locator('.tool-card[data-slug]:visible').count();
@@ -106,9 +139,11 @@ let pass = 0, fail = 0;
     await page.locator('#theme-btn').click();
     const t1 = await page.evaluate(() => document.documentElement.classList.contains('light'));
     report(title.includes('LazyTools') && cards >= 14 && slots >= 1 && visible === 1 &&
-           first === 'bmi-calculator' && noResults && fin >= 3 && t0 !== t1 && errs.length === 0 && homeDirect,
-      'home', `cards=${cards} search->${first} noResults=${noResults} finance=${fin} theme=${t0}->${t1} direct=${homeDirect} errs=${errs.length}`);
+           first === 'bmi-calculator' && noResults && fin >= 3 && t0 !== t1 && errs.length === 0 &&
+           homeDirect && beacon === 1,
+      'home', `cards=${cards} search->${first} noResults=${noResults} finance=${fin} theme=${t0}->${t1} direct=${homeDirect} beacon=${beacon} errs=${errs.length} 3rdparty=${noise.length}`);
     errs.forEach((e) => console.log('        ' + e));
+    noise.forEach((e) => console.log('        (third-party, ignored) ' + e));
     await page.close();
   } catch (e) { report(false, 'home', e.message.split('\n')[0]); }
 
@@ -116,7 +151,7 @@ let pass = 0, fail = 0;
   for (const rel of Object.keys(fill)) {
     const label = rel.replace('tools/', '').replace('.html', '');
     try {
-      const { page, errs } = await newPage();
+      const { page, errs, noise } = await newPage();
       const resp = await page.goto(nav(rel), { waitUntil: 'load' });
       // the canonical URL must be served directly: 200, no redirect
       const direct = !!resp && resp.status() === 200 && page.url() === nav(rel);
@@ -139,10 +174,15 @@ let pass = 0, fail = 0;
       const faqs = await page.locator('.faq details').count();
       const ld = await page.locator('script[type="application/ld+json"]').count();
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+      // Analytics must reach EVERY page, not just the homepage — a page missing the beacon
+      // is invisible traffic. Asserted positively so filtering third-party noise loses nothing.
+      const beacon = await page.locator("script[src*='cloudflareinsights.com/beacon.min.js']").count();
       report(!/NaN|undefined|Infinity|^—$|^$/.test(val) && slots === 3 && demo + (slots - demo) === 3 &&
-             related >= 1 && faqs >= 3 && ld === 3 && !!canonical && errs.length === 0 && initialErrs === 0 && direct,
-        label, `result="${val.slice(0, 24)}" ads=${slots} related=${related} faq=${faqs} ld=${ld} direct=${direct} errs=${errs.length}`);
+             related >= 1 && faqs >= 3 && ld === 3 && !!canonical && errs.length === 0 && initialErrs === 0 &&
+             direct && beacon === 1,
+        label, `result="${val.slice(0, 24)}" ads=${slots} related=${related} faq=${faqs} ld=${ld} direct=${direct} beacon=${beacon} errs=${errs.length}`);
       errs.forEach((e) => console.log('        ' + e));
+      noise.forEach((e) => console.log('        (third-party, ignored) ' + e));
       await page.close();
     } catch (e) { report(false, label, e.message.split('\n')[0]); }
   }

@@ -34,10 +34,10 @@ SITE_URL     = "https://lazytools.pages.dev"
 CONTACT_EMAIL = "kingripper9@gmail.com"
 
 # Cloudflare Web Analytics (chosen 2026-09-28). Cookieless, so no consent banner is needed
-# and privacy.html already covers aggregate analytics. Paste the snippet from the Cloudflare
-# dashboard here after the first deploy, then re-run the build. An empty string emits no
-# analytics tag at all, so this is safe to leave blank until Step 5.
-ANALYTICS_CODE = ""
+# and privacy.html already covers aggregate analytics. An empty string emits no analytics tag
+# at all, so blank is safe to ship. Injected into every page's <head> via the __ANALYTICS__
+# token in head() — never paste a tracking snippet into a page by hand, the pages are generated.
+ANALYTICS_CODE = """<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "acfbc9d4873643d981ed1837233ae31c"}'></script>"""
 
 # IndexNow — instant "these URLs changed" pings to Bing, Yandex, Seznam and Naver. No account
 # required: ownership is proven by serving https://<host>/<key>.txt containing exactly this key,
@@ -178,6 +178,10 @@ def verification_tags():
 # renders third-party ad code into. The iframe is capped at 100% width, so a 728px leaderboard
 # simply clips on a phone rather than breaking the layout.
 AD_SIZES = {"top": (728, 90), "middle": (300, 250), "bottom": (300, 250)}
+
+# Adsterra publisher account ID (owner, 2026-09-28). Used ONLY by ads_txt() below — the ad
+# CODE itself never lives here, it goes in assets/ads.js. Leave blank to omit the ads.txt line.
+ADSTERRA_PUBLISHER_ID = "6084129"
 
 def ad(slot):
     w, h = AD_SIZES.get(slot, (300, 250))
@@ -357,9 +361,9 @@ def privacy_page():
   <h2 class="section">What the tools collect</h2>
   <p>Nothing. All calculators, converters and generators run in your browser. The numbers, dates, passwords and text you enter never leave your device.</p>
   <h2 class="section">Server logs &amp; analytics</h2>
-  <p>Like virtually every website, our hosting provider records basic, aggregate technical logs (IP address, browser type, pages requested) for security and performance. We may use privacy-friendly analytics to count page views in aggregate. This data cannot be used to identify you personally.</p>
+  <p>Like virtually every website, our hosting provider records basic, aggregate technical logs (IP address, browser type, pages requested) for security and performance. We also use <strong>Cloudflare Web Analytics</strong> to count page views. It is <strong>cookieless</strong>: it sets no cookies, stores no identifiers in your browser and does not track you across other websites. The figures we see are aggregate — we cannot identify you from them.</p>
   <h2 class="section">Advertising cookies</h2>
-  <p>This site displays ads from third-party ad networks (such as Adsterra and/or Google AdSense). These partners may set cookies or use similar technologies to show you more relevant ads and measure performance. You can opt out of personalised advertising through your browser settings, or via your ad provider's opt-out page. Visiting an ad partner's site is governed by that partner's own privacy policy.</p>
+  <p>This site displays ads from third-party ad networks (such as Adsterra and/or Google AdSense). These partners may set cookies or use similar technologies to show you more relevant ads and measure performance. You can opt out of personalised advertising through your browser settings, or via your ad provider's opt-out page. Visiting an ad partner's site is governed by that partner's own privacy policy — for example, see <a href="https://adsterra.com/privacy-policy/" rel="noopener" target="_blank">Adsterra's privacy policy</a>.</p>
   <h2 class="section">Affiliate links</h2>
   <p>Some outbound links may be affiliate links. If you make a purchase or sign up after clicking one, we may earn a commission at no extra cost to you. Affiliate partners may set their own cookies to attribute the referral.</p>
   <h2 class="section">Your choices</h2>
@@ -415,10 +419,25 @@ def robots():
             "\nSitemap: " + SITE_URL + "/sitemap.xml\n")
 
 def ads_txt():
-    return ("# ads.txt — LazyTools\n"
-            "# After an ad network approves you, add ONE line per network here, then redeploy.\n"
-            "# Adsterra example:  atterraform.com, YOUR_ZONE_ID, DIRECT\n"
-            "# AdSense example:   google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0\n")
+    """ads.txt — the IAB file buyers check before bidding on our inventory.
+
+    A missing or wrong line does not break the site; it makes buyers bid lower (or not at
+    all), so it costs revenue silently. One line per network, never more than one line for
+    the same network, and the domain must be the ADVERTISING SYSTEM's domain.
+
+    ⚠️ VERIFY THE EXACT STRING in the Adsterra dashboard (Websites → your site → ads.txt).
+    Adsterra's ad-serving hostnames seen in its own tags are highperformanceformat.com,
+    profitabledisplaynetwork.com and effectivegatecpm.com. If the dashboard shows one of
+    those instead of adsterra.com, change the first field below to match — the ID stays.
+    """
+    lines = ["# ads.txt — LazyTools",
+             "# One line per ad network. Format: <advertising system domain>, <publisher id>, DIRECT"]
+    if ADSTERRA_PUBLISHER_ID:
+        lines.append("adsterra.com, " + ADSTERRA_PUBLISHER_ID + ", DIRECT")
+    else:
+        lines.append("# Adsterra: set ADSTERRA_PUBLISHER_ID in _generator/build.py to enable.")
+    lines.append("# AdSense (later):  google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0")
+    return "\n".join(lines) + "\n"
 
 def headers_file():
     """Cloudflare Pages `_headers`: security headers only.

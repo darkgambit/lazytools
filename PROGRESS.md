@@ -67,7 +67,11 @@ the first Adsterra payout (not before signup).
 - **Adsterra** — 🔶 **publisher account exists (ID `6084129`), `ads.txt` line deployed.**
   ⏭ **The one thing I still need: the 3 ad-unit codes.** Ad Units → Create → copy each code.
   See the format guidance below before you create them.
-- **Affiliate signups** — see Step 7 below.
+- **Affiliate signups** — 🔶 **Amazon Associates is wired in and live** (tag `lazytool-20`,
+  8 links on 4 pages). But read the caveat in Step 7 first: **Amazon cannot bank-transfer to
+  Libya**, and the 180-day / 3-sale clock is already running. ⏭ Confirm your payout method in
+  the Associates dashboard. The other programs in Step 7 pay by crypto or wire and are the
+  better bet.
 
 ---
 
@@ -462,18 +466,65 @@ ad code cannot blank the site, and the suite proves both that and that the ad ac
 
 ---
 
-## Step 7 — affiliate shortlist (prepared, waiting on your signups)
+## Step 7 — affiliate links
 
-Pages that monetise well: **Invoice Generator**, **Loan/Compound Interest**, **Password
-Generator**, **BMI/Water Intake**, and the About page.
+### ✅ Amazon Associates — LIVE (2026-09-28), with one serious caveat
 
-**Payout reality first (this is the part that bites):** for countries without easy access to
-US/EU banking, the rails that clear reliably are **crypto (USDT)** and **SWIFT wire**;
-Payoneer is accepted by some networks but is the exception, not the rule. Network minimums
-typically cluster at **$50–100**, and published terms (net-15/net-30) describe when a network
-*may* release payment — expect an extra **5–15 business days** of KYC/compliance hold.
-**Adsterra itself** supports wire, Payoneer (limited), WebMoney and crypto, which is why it is
-the right first network.
+**Tag `lazytool-20`. 8 links across 4 tool pages, deployed and verified live.** BMI → body
+scale and tape measure; Water Intake → insulated bottle; Sleep Cycle → blackout curtains and
+white noise machine; Password Generator → hardware security key and password manager. Every link
+carries the tag, is marked `rel="sponsored noopener nofollow"`, and sits under the required
+disclosure *"As an Amazon Associate I earn from qualifying purchases."* — which also appears on
+/about and /privacy. Three guards in `check_static.py` fail the build if a link loses its tag,
+if a page with links loses the disclosure, or if a price or star rating ever appears in a gear
+block. All three were negative-tested, so the guards are proven able to fail.
+
+The other 13 tool pages have no affiliate links at all — `gear_block()` renders only for tools
+that define one, so nothing was forced and no page ships an empty heading.
+
+**⚠️ THE CAVEAT — read this before counting on Amazon money.**
+
+**Amazon cannot pay a Libya-based publisher by bank transfer.** Amazon's international direct
+deposit covers exactly 52 countries: the **US** (USD), the **UK** (GBP/EUR) and the
+**Eurozone** (EUR). That list is in Amazon's own Fx4Cash FAQ, and Libya is not on it. The
+remaining options are a **paper cheque** (minimum **$100**, and cashing a foreign cheque in
+Libya is impractical) or an **Amazon gift card** — which is *credit*, not cash, and only useful
+if you can actually spend it on amazon.com. **Confirm your payout method in the Associates
+dashboard before investing any effort here.**
+
+**⚠️ THE 180-DAY CLOCK IS ALREADY RUNNING.** A new Associates account gets **180 days from the
+date you applied** to refer **3 qualifying sales**. Miss it and the application is withdrawn —
+and Amazon does **not** reinstate that ID. You reapply and get a **new tag**, and every link
+still carrying the old tag earns nothing. That is exactly why `AMAZON_TAG` is a single constant:
+blank it and every link and its section disappears together.
+
+Your own purchases do not count, and neither do purchases by friends or family you ask — both
+violate the agreement. The site currently has essentially no traffic, so **3 sales in 180 days is
+unlikely without the week-1 growth work in the 30-day plan.** Realistically: treat Amazon as a
+bonus if it happens, not as the plan.
+
+**Three Amazon rules baked into the code, each a closure trigger if broken:**
+
+- **No prices and no star ratings.** Showing either without pulling it live from an Amazon API is
+  a listed reason for closure. The product data carries a name and a reason to recommend it.
+- **Links are `/s?k=<query>&tag=…` search links, not `/dp/<ASIN>` product links.** Inventing an
+  ASIN would send visitors to the wrong product — worse than a search page. Add an `"asin"` key to
+  any entry once you have a real one from SiteStripe and it becomes a product link.
+- **`rel="sponsored"`** on every affiliate link — that is Google's requirement, not Amazon's, and
+  an unmarked paid link is a ranking risk.
+
+**Not verified:** I could not confirm the links resolve — amazon.com returns **503** to automated
+requests from this machine (bot mitigation, not a broken URL). The format is Amazon's own and the
+tag is correct, but **click one yourself** to be certain.
+
+### Other programs — still the better payout bet for Libya
+
+Payout reality for countries without easy access to US/EU banking: the rails that clear reliably
+are **crypto (USDT)** and **SWIFT wire**; Payoneer is accepted by some networks but is the
+exception. Minimums cluster at **$50–100**, and published net-15/net-30 terms describe when a
+network *may* release payment — expect an extra **5–15 business days** of KYC hold. **Adsterra**
+supports wire, Payoneer (limited), WebMoney and crypto, which is why it is the right first
+network.
 
 **Candidates, best fit first** — verify Libya eligibility and the payout rail *before*
 generating any volume:
@@ -795,3 +846,40 @@ has not.
 - Verified after deploy: deploy contract PASSED · e2e 25/25 ×5 (emulator) and 25/25 live ·
   ads 10/10 ×5 and 10/10 live. Commit `96bf176`.
 - **Awaiting the owner:** the 3 Adsterra ad-unit codes.
+
+### 2026-09-28 — Step 7: Amazon Associates wired in (with a payout warning)
+- **Tag `lazytool-20`.** `AMAZON_TAG` is a single constant in `build.py`, deliberately: Amazon
+  does not reinstate an Associates ID withdrawn for missing the 3-sales-in-180-days bar, so a
+  reapplication means a **new tag** and every old link earning nothing. Blanking the constant
+  removes all links and their sections together.
+- **8 links across 4 tool pages** — BMI, Water Intake, Sleep Cycle, Password Generator. Chosen
+  where the recommendation is genuinely useful; the other 13 pages get nothing, because
+  `gear_block()` renders only for tools that define a `gear` list.
+- **Compliance baked in**: required disclosure above the links (and on /about + /privacy),
+  `rel="sponsored noopener nofollow"`, and **no prices or star ratings anywhere** — both are
+  listed reasons for account closure unless pulled live from an Amazon API.
+- **Three new guards in `check_static.py`**, all negative-tested: untagged link, missing
+  disclosure, price/rating in a gear block. The first is the dangerous one — an untagged link
+  still sends visitors to Amazon and earns nothing, with no error and no symptom.
+  The guard matches `class="gear-link"`, not the amazon.com domain: `/privacy` links to Amazon's
+  *help* pages for legal reference, which is informational and must not carry a tracking tag.
+  Matching the domain flagged that as a defect — a false positive the negative test surfaced.
+- **New e2e check** asserting the links render, are clickable, carry a tag, and that the
+  disclosure is *visible* rather than merely present in the source. The tag is read from the
+  links rather than hardcoded, so the test cannot drift from config.
+- **Fixed a real intermittent failure in `check_ads.js`.** Measured: with the analytics beacon's
+  network fetch allowed, `load` took **3046 ms**; aborted, **234 ms**. Each scenario uses a fresh
+  context, so that cold third-party fetch was paid on every load and any stall held `load` open —
+  surfacing as `page.goto: Timeout 30000ms exceeded` that looked like an ad-code bug. The suite
+  now aborts the analytics host (it tests ads, not analytics) and waits for `domcontentloaded`,
+  since every assertion reads DOM state after a settle period. Stable across 10 runs. `e2e.js`
+  never hit this because it reuses one context, so the beacon is cached after the first page.
+- Verified after deploy: deploy contract PASSED · e2e **26/26 ×5** and 26/26 live · ads
+  **10/10 ×10** and 10/10 live · static 0 issues · 8 affiliate links live with the correct tag
+  and disclosure, and zero leakage onto pages without gear. Commit `a3ddf8b`.
+- **⚠️ The finding that matters most:** Amazon's international direct deposit covers 52 countries
+  — US, UK and Eurozone only. **Libya is not among them.** Realistically a Libya-based publisher
+  is looking at a gift card (credit, not cash) or a $100-minimum paper cheque. Documented above;
+  the other Step 7 programs pay by crypto or wire and are the better bet.
+- **Not verified:** amazon.com returns 503 to automated requests from this machine, so I could
+  not confirm the links resolve end to end. Format and tag are correct; the owner should click one.

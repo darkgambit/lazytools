@@ -38,6 +38,12 @@ CONTACT_EMAIL = "kingripper9@gmail.com"
 # dashboard here after the first deploy, then re-run the build. An empty string emits no
 # analytics tag at all, so this is safe to leave blank until Step 5.
 ANALYTICS_CODE = ""
+
+# IndexNow — instant "these URLs changed" pings to Bing, Yandex, Seznam and Naver. No account
+# required: ownership is proven by serving https://<host>/<key>.txt containing exactly this key,
+# so main() generates that file and it must stay publicly readable (do NOT add it to the
+# robots.txt Disallow list). Submit with:  python _generator/indexnow.py
+INDEXNOW_KEY = "d328e91fa97904481ce908132cc8af34"
 # ---------------------------------------------------------------------------- #
 
 BUILD_DATE = datetime.date.today().strftime("%d %B %Y")
@@ -438,6 +444,9 @@ def main():
         f.write(ads_txt()); wrote.append("ads.txt")
     with open(os.path.join(ROOT, "_headers"), "w", encoding="utf-8") as f:
         f.write(headers_file()); wrote.append("_headers")
+    # IndexNow ownership proof — the filename IS the key, and the body must be the key too.
+    with open(os.path.join(ROOT, INDEXNOW_KEY + ".txt"), "w", encoding="utf-8") as f:
+        f.write(INDEXNOW_KEY); wrote.append(INDEXNOW_KEY + ".txt")
 
     print("Built %d files:" % len(wrote))
     for w in wrote:

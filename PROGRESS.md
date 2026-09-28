@@ -27,7 +27,7 @@ A device-flow login is running and waiting for you. Codes expire after about 15 
 lapses I just issue a new one.
 
 1. Open **https://github.com/login/device**
-2. Enter the one-time code **`1BBF-B91F`** (already copied to your clipboard)
+2. Enter the one-time code **`7895-9A85`** (already copied to your clipboard)
 3. Approve the GitHub CLI
 
 Then say "done" and I will create the public repo and push. **Never paste a password or an OTP

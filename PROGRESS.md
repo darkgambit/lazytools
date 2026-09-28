@@ -4,8 +4,9 @@ Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ign
 
 | Step | What | Status | Date |
 |---|---|---|---|
-| 0 | INFO.md (personal data, git-ignored) | ⏸ **blocked on you** | 2026-09-28 |
+| 0 | INFO.md (personal data, git-ignored) | 🔄 **partial** — name/email/contact set; 3 fields still needed | 2026-09-28 |
 | 1 | Finalize site — build, verify, git init, v1 commit | ✅ done | 2026-09-28 |
+| 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
 | 1b | Production-readiness pass (URLs, OG, headers, guards) | ✅ done | 2026-09-28 |
 | 2 | GitHub: gh auth + public repo + push | ⏸ **blocked on you** (gh installed, not logged in) | — |
 | 3 | Deploy free (Cloudflare Pages) + verify live | ⏸ blocked on step 2 | — |
@@ -22,16 +23,14 @@ Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
 
 ## ⏸ BLOCKED ON YOU — do these and I continue automatically
 
-**1. Fill `INFO.md`** (reply in chat and I'll write the file for you):
+**1. Fill `INFO.md`** — ✅ **partly done.** Name, email and contact email are in, and are now
+wired into the build (About + Privacy carry a working `mailto:`). Still needed:
 
 | Field | Needed for | Needed now? |
 |---|---|---|
-| `name` | account signups | yes |
-| `email` | GitHub, Adsterra, Search Console | yes |
-| `contact_email` | shown publicly on the About page | yes |
-| `github_username` | repo naming / login | if you have one |
-| `domain` | real URL instead of `*.pages.dev` | no — say "none" |
-| `payout_wallet` | Adsterra payouts (USDT TRC-20 etc.) | later, before first payout |
+| `domain` | real URL instead of `*.pages.dev` | **yes** — decides whether `SITE_URL` is permanent |
+| `github_username` | repo naming / login | optional — `gh auth status` reveals it after login |
+| `payout_wallet` | Adsterra payouts (USDT TRC-20 etc.) | later, before the first payout |
 
 **2. Then, one at a time (I'll prompt you for each):**
 
@@ -116,9 +115,27 @@ python _tests/check_deploy.py      # deploy contract: 200s, no redirects, header
   trailing-slash bug is caught) — after the first version of the guard silently missed it.
 
 ### Git
-`main` branch, 5 commits (latest: `a693739` growth cycle 1). `INFO.md` and `.workbuddy-ai/` are git-ignored (verified with
-`git check-ignore`). Commit identity is currently the placeholder **"LazyTools Builder"** —
-I'll re-author it to yours before the first push.
+`main` branch, **1 commit** (`254ca7d`), 42 files tracked, authored as
+**the owner \<kingripper9@gmail.com\>**. `INFO.md`, `.workbuddy-ai/` and `.wrangler/` are
+git-ignored (verified with `git check-ignore`, and the staged file list is asserted clean of
+personal files before every commit).
+
+> ### ⚠️ Repository incident — 2026-09-28
+> While re-authoring the original 6 commits to the real git identity, I ran
+> `git rebase --root --exec 'git commit --amend --reset-author'`. **It destroyed the entire
+> `.git` directory** — `fatal: not a git repository`. The working tree survived completely
+> intact (every file, including the regenerated `og-image.png`), but the object store was gone
+> and could not be recovered; a filesystem search found no surviving `packed-refs`, `ORIG_HEAD`
+> or stray `.git` anywhere under the home directory.
+>
+> **Damage: zero content lost, zero public history lost** — the repo had never been pushed, so
+> no one ever saw those commits. The history was rebuilt as a single honest commit describing
+> the full verified state, which is what the first push would have looked like anyway.
+>
+> **Lesson: do not attempt history rewriting in this environment.** `git rebase --root`,
+> `git filter-branch` and friends are not safe here. Set the git identity *before* the first
+> commit and never re-author afterwards — the identity was already correct for the new commit,
+> which is the one that mattered.
 
 ### Tooling notes
 - `gh` (GitHub CLI 2.101.0) installed via winget, **not on the Git Bash PATH**:
@@ -126,6 +143,42 @@ I'll re-author it to yours before the first push.
 - No browser is bundled; `playwright-core` drives your installed Chrome.
 - `jsdom` is installed but **does not auto-select the first `<option>`** of a dynamically
   filled `<select>` (real browsers do) — it produced a false failure. Trust the real browser.
+
+---
+
+## ✅ Step 1c — real site config, OG card, README corrections (2026-09-28)
+
+### Configured (no longer placeholders)
+- **`CONTACT_EMAIL`** is the real address, so About and Privacy render a working `mailto:`.
+  Verified **on the served pages** via the emulator, not just in the source.
+- **`SITE_URL`** is `https://lazytools.pages.dev` — **provisional**. Every canonical, the
+  sitemap, `robots.txt` and `og:image` derive from it, so it must be corrected to the real
+  production hostname at the first Cloudflare Pages deploy, then rebuilt and redeployed.
+
+### `og-image.png` was stale, and would keep going stale
+The shipped card said **"14 tools"** while the site had 17. It is baked into a PNG, so no
+rebuild could ever fix it — and the growth loop adds tools regularly, so the number was
+guaranteed to rot again. Replaced the one-off card with **`_generator/make_og.py`**, which
+derives both the tool count *and* the emoji row from the tool data and screenshots the card
+headless. Re-running it after a growth cycle is now always correct.
+Verified output: 1200×630, 115 KB, "17 fast, private calculators, converters & generators."
+
+### README corrected
+- 14 → 17 tools, and the three new tools listed.
+- **The RPM claim was wrong.** It quoted **$2.50–$12.50** per 1,000 pageviews, which is AdSense
+  money with premium US/UK finance traffic. A new Adsterra site with mixed-geo traffic should be
+  budgeted at **$0.50–$3.00**, so its "10k pageviews ≈ $50" was optimistic by **2–10×**. The
+  README now points at the earnings table above instead of quoting a number that flatters.
+
+### Verified after all changes
+`check_static.py` 0 issues (319 refs, 17 JS blocks) · `e2e.js` **25/25** · `check_deploy.py`
+**PASSED** (20 sitemap URLs all 200 with matching canonicals, security headers present, repo-only
+paths disallowed, unknown path → 404) · `mailto:` present on `/about` and `/privacy` as served.
+
+### Emulator gotcha (cost me one failed run)
+Starting `wrangler pages dev` detached in a subshell makes it die as soon as the Bash command
+returns, so a *later* command sees a dead server and every URL returns **502**. Run the server,
+the readiness poll and the check **in the same shell invocation**.
 
 ---
 
@@ -315,3 +368,14 @@ has not.
   methods), and that Adsterra monetizes Blogspot sites — i.e. free hosting is not automatically
   disqualifying, but the `*.pages.dev` URL should still be confirmed at submission.
 - Nothing deployed or published; still waiting on `INFO.md`.
+
+### 2026-09-28 — Step 1c: real config wired in + repo incident
+- You supplied **name: [scrubbed]**, **email / contact_email: kingripper9@gmail.com**. Wrote them
+  into `INFO.md` (still git-ignored) and wired `CONTACT_EMAIL` into the build, so About and
+  Privacy now serve a real `mailto:`. Set `SITE_URL` to the provisional production hostname.
+- Regenerated the OG card via the new `_generator/make_og.py` (was stale at "14 tools").
+- Corrected the README's tool count and its optimistic RPM claim.
+- **Lost the 6-commit history to a `git rebase --root` accident** (see "Repository incident").
+  No content and no public history lost; repo rebuilt as one honest commit, now authored as
+  the owner. Verified again after rebuilding: 25/25 E2E, static 0 issues, deploy contract PASSED.
+- Still needed from you: **`domain`** (or "none"), and `payout_wallet` before the first payout.

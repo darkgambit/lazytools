@@ -174,8 +174,15 @@ def verification_tags():
         out.append('<meta name="msvalidate.01" content="' + BING_VERIFICATION + '">')
     return ("\n    " + "\n    ".join(out)) if out else ""
 
+# Intended ad dimensions per slot. assets/ads.js uses these to size the isolation iframe it
+# renders third-party ad code into. The iframe is capped at 100% width, so a 728px leaderboard
+# simply clips on a phone rather than breaking the layout.
+AD_SIZES = {"top": (728, 90), "middle": (300, 250), "bottom": (300, 250)}
+
 def ad(slot):
-    return '<div class="ad-slot" data-slot="' + slot + '" aria-label="Advertisement"></div>'
+    w, h = AD_SIZES.get(slot, (300, 250))
+    return ('<div class="ad-slot" data-slot="' + slot + '" data-w="' + str(w) +
+            '" data-h="' + str(h) + '" aria-label="Advertisement"></div>')
 
 def tool_card(t, rel):
     return ('<a class="tool-card" href="' + rel + "tools/" + t["slug"] + '.html" '
@@ -234,9 +241,9 @@ def tool_page(t):
   <h1>__ICON__ __NAME__</h1>
   <p class="lead">__LEAD__</p>
 </div>
-<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+__AD_TOP__
 __BODY__
-<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+__AD_MIDDLE__
 <section class="content">
   <h2 class="section">About the __NAME__</h2>
   __ABOUT__
@@ -249,7 +256,7 @@ __BODY__
   <h2 class="section">Related tools</h2>
   <div class="tool-grid">__RELT__</div>
 </section>
-<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+__AD_BOTTOM__
 </main>
 <script>__JS__</script>
 </body>
@@ -258,7 +265,9 @@ __BODY__
     html = (html.replace("__REL__", rel).replace("__CAT__", t["cat"]).replace("__NAME__", t["name"])
                 .replace("__ICON__", t["icon"]).replace("__LEAD__", t["lead"])
                 .replace("__BODY__", t["body"]).replace("__ABOUT__", about)
-                .replace("__FAQS__", faqs).replace("__RELT__", relhtml).replace("__JS__", t["js"]))
+                .replace("__FAQS__", faqs).replace("__RELT__", relhtml).replace("__JS__", t["js"])
+                .replace("__AD_TOP__", ad("top")).replace("__AD_MIDDLE__", ad("middle"))
+                .replace("__AD_BOTTOM__", ad("bottom")))
     return html
 
 # --------------------------------------------------------------------------- #
@@ -288,7 +297,7 @@ def home_page():
   <div class="chips">__CHIPS__</div>
   <div class="tool-grid">__CARDS__</div>
   <p class="no-results" id="no-results">No tools match that search — try another word. 🤔</p>
-  <div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+  __AD_TOP__
 </div>
 <section class="container content">
   <h2 class="section">Why LazyTools?</h2>
@@ -301,9 +310,9 @@ def home_page():
   <h2 class="section">How LazyTools keeps the lights on</h2>
   <p>The tools are free because the site shows unobtrusive ads and occasional affiliate links. That's the whole business model — no data selling, no subscriptions. If a tool saved you time, sharing it with a friend is the best thank-you.</p>
 </section>
-<div class="container"><div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div></div>
+<div class="container">__AD_BOTTOM__</div>
 </main>
-""" .replace("__N__", str(len(TOOLS))).replace("__CHIPS__", chips).replace("__CARDS__", cards)
+""" .replace("__N__", str(len(TOOLS))).replace("__CHIPS__", chips).replace("__CARDS__", cards).replace("__AD_TOP__", ad("top")).replace("__AD_BOTTOM__", ad("bottom"))
     return html + footer(rel) + "</body>\n</html>"
 
 # --------------------------------------------------------------------------- #

@@ -1,0 +1,4 @@
+# ads.txt — LazyTools
+# After an ad network approves you, add ONE line per network here, then redeploy.
+# Adsterra example:  atterraform.com, YOUR_ZONE_ID, DIRECT
+# AdSense example:   google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

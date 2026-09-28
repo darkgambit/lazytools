@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unit Converter — Length, Weight, Volume, Temperature & More | LazyTools</title>
+    <meta name="description" content="Free unit converter for length, weight, volume, area, speed, data storage and temperature. Metric ↔ imperial, instant results, works offline.">
+    <meta name="keywords" content="unit converter, metric to imperial, length converter, weight converter, temperature converter, data storage converter">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/unit-converter">
+    <meta property="og:type" content="website"><meta property="og:title" content="Unit Converter — Length, Weight, Volume, Temperature & More | LazyTools"><meta property="og:description" content="Free unit converter for length, weight, volume, area, speed, data storage and temperature. Metric ↔ imperial, instant results, works offline."><meta property="og:url" content="https://lazytools.pages.dev/tools/unit-converter"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Unit Converter — Length, Weight, Volume, Temperature & More | LazyTools"><meta name="twitter:description" content="Free unit converter for length, weight, volume, area, speed, data storage and temperature. Metric ↔ imperial, instant results, works offline."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Unit Converter", "url": "https://lazytools.pages.dev/tools/unit-converter", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free unit converter for length, weight, volume, area, speed, data storage and temperature. Metric ↔ imperial, instant results, works offline.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How accurate are the conversions?", "acceptedAnswer": {"@type": "Answer", "text": "Conversion factors are the exact internationally defined values (for example 1 inch = 2.54 cm exactly, 1 pound = 0.45359237 kg exactly). Results are shown to a sensible number of digits."}}, {"@type": "Question", "name": "Why does temperature need special handling?", "acceptedAnswer": {"@type": "Answer", "text": "Unlike length or weight, temperature scales have different zero points, not just different unit sizes. Converting °C to °F needs multiplication and addition — that's why “wind chill” and oven settings confuse everyone."}}, {"@type": "Question", "name": "What's the difference between GB and GiB?", "acceptedAnswer": {"@type": "Answer", "text": "A gigabyte (GB) is 1,000,000,000 bytes; a gibibyte (GiB) is 1,073,741,824 bytes (1024³). That ~7% gap is why a “500 GB” drive shows as ~465 GiB in your operating system."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Unit Converter", "item": "https://lazytools.pages.dev/tools/unit-converter"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Utilities › Unit Converter</nav>
+<div class="tool-hero">
+  <span class="badge">Utilities</span>
+  <h1>🔄 Unit Converter</h1>
+  <p class="lead">Convert between metric, imperial and everyday units across seven categories — including the tricky one, temperature. Results update as you type.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="uc-cat">Category</label>
+      <select id="uc-cat" onchange="ucFill()">
+        <option value="length">Length</option>
+        <option value="weight">Weight & mass</option>
+        <option value="volume">Volume</option>
+        <option value="area">Area</option>
+        <option value="speed">Speed</option>
+        <option value="data">Data storage</option>
+        <option value="temperature">Temperature</option>
+      </select>
+    </div>
+    <div class="field"><label for="uc-val">Value</label><input type="number" id="uc-val" value="1" step="any" oninput="runUC()"></div>
+    <div class="field"><label for="uc-from">From</label><select id="uc-from" onchange="runUC()"></select></div>
+    <div class="field"><label for="uc-to">To</label><select id="uc-to" onchange="runUC()"></select></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-primary" type="button" onclick="runUC()">Convert</button>
+    <button class="btn-ghost" type="button" onclick="ucSwap()">⇄ Swap units</button>
+  </div>
+  <div class="results show" id="uc-res"><p class="big-result" id="uc-out">—</p></div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Unit Converter</h2>
+  <p>Unit conversion is a daily necessity in a world split between metric and imperial: recipes from another continent, fuel efficiency quotes in miles per gallon versus litres per 100 km, screen sizes in inches, body weight in kilograms versus stones, and data plans in megabytes.</p><p>This converter uses exact internationally-defined factors and handles the one category that doesn't convert by simple multiplication — temperature — with the correct offset formulas in both directions.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How accurate are the conversions?</summary><p>Conversion factors are the exact internationally defined values (for example 1 inch = 2.54 cm exactly, 1 pound = 0.45359237 kg exactly). Results are shown to a sensible number of digits.</p></details><details><summary>Why does temperature need special handling?</summary><p>Unlike length or weight, temperature scales have different zero points, not just different unit sizes. Converting °C to °F needs multiplication and addition — that's why “wind chill” and oven settings confuse everyone.</p></details><details><summary>What's the difference between GB and GiB?</summary><p>A gigabyte (GB) is 1,000,000,000 bytes; a gibibyte (GiB) is 1,073,741,824 bytes (1024³). That ~7% gap is why a “500 GB” drive shows as ~465 GiB in your operating system.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/password-generator.html" data-slug="password-generator" data-cat="Utilities" data-name="Password Generator" data-keywords="Strong random passwords generated locally with crypto-grade randomness. password generator, strong password, random password, secure password generator, create password"><span class="ico">🔐</span><h3>Password Generator</h3><p>Strong random passwords generated locally with crypto-grade randomness.</p></a><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+var UC = {
+  length: { meter:1, kilometer:1000, centimeter:0.01, millimeter:0.001, micrometer:1e-6, mile:1609.344, yard:0.9144, foot:0.3048, inch:0.0254, 'nautical mile':1852 },
+  weight: { kilogram:1, gram:0.001, milligram:1e-6, 'metric ton':1000, pound:0.45359237, ounce:0.028349523125, stone:6.35029318, 'US ton':907.18474 },
+  volume: { liter:1, milliliter:0.001, 'cubic meter':1000, 'US gallon':3.785411784, 'US quart':0.946352946, 'US pint':0.473176473, 'US cup':0.2365882365, 'US fluid ounce':0.0295735295625, 'imperial gallon':4.54609 },
+  area: { 'square meter':1, 'square kilometer':1e6, 'square centimeter':0.0001, 'square foot':0.09290304, 'square yard':0.83612736, acre:4046.8564224, hectare:10000, 'square mile':2589988.110336 },
+  speed: { 'meter per second':1, 'kilometer per hour':0.2777777778, 'mile per hour':0.44704, knot:0.5144444444, 'foot per second':0.3048 },
+  data: { byte:1, bit:0.125, kilobyte:1000, megabyte:1e6, gigabyte:1e9, terabyte:1e12, kibibyte:1024, mebibyte:1048576, gibibyte:1073741824 },
+  temperature: { 'Celsius (°C)':1, 'Fahrenheit (°F)':1, 'Kelvin (K)':1 }
+};
+function ucFill(){
+  var cat = $id('uc-cat').value;
+  var units = Object.keys(UC[cat]);
+  var from = $id('uc-from'), to = $id('uc-to');
+  from.innerHTML = ''; to.innerHTML = '';
+  units.forEach(function(u){
+    from.appendChild(new Option(u, u));
+    to.appendChild(new Option(u, u));
+  });
+  if(cat === 'temperature'){ to.value = 'Fahrenheit (°F)'; }
+  else { if(units.indexOf('foot') > -1) to.value = 'foot'; else to.value = units[Math.min(1, units.length - 1)]; }
+  runUC();
+}
+function ucSwap(){
+  var f = $id('uc-from'), t = $id('uc-to');
+  var tmp = f.value; f.value = t.value; t.value = tmp;
+  runUC();
+}
+function toC(v, u){
+  if(u.indexOf('Fahrenheit') === 0) return (v - 32) * 5 / 9;
+  if(u.indexOf('Kelvin') === 0) return v - 273.15;
+  return v;
+}
+function fromC(c, u){
+  if(u.indexOf('Fahrenheit') === 0) return c * 9 / 5 + 32;
+  if(u.indexOf('Kelvin') === 0) return c + 273.15;
+  return c;
+}
+function runUC(){
+  var cat = $id('uc-cat').value;
+  var v = parseFloat($id('uc-val').value);
+  var fu = $id('uc-from').value, tu = $id('uc-to').value;
+  if(isNaN(v)){ $id('uc-out').textContent = '—'; return; }
+  var r;
+  if(cat === 'temperature'){
+    r = fromC(toC(v, fu), tu);
+  } else {
+    r = v * UC[cat][fu] / UC[cat][tu];
+  }
+  $id('uc-out').textContent = fmt(v) + ' ' + fu + ' = ' + fmt(r) + ' ' + tu;
+}
+ucFill();
+</script>
+</body>
+</html>

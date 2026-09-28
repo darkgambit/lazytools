@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Percentage Calculator — Percent Of, Percent Change & More | LazyTools</title>
+    <meta name="description" content="Free percentage calculator: find X% of a number, work out what percent one number is of another, and calculate percentage increase or decrease. Instant and private.">
+    <meta name="keywords" content="percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/percentage-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Percentage Calculator — Percent Of, Percent Change & More | LazyTools"><meta property="og:description" content="Free percentage calculator: find X% of a number, work out what percent one number is of another, and calculate percentage increase or decrease. Instant and private."><meta property="og:url" content="https://lazytools.pages.dev/tools/percentage-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Percentage Calculator — Percent Of, Percent Change & More | LazyTools"><meta name="twitter:description" content="Free percentage calculator: find X% of a number, work out what percent one number is of another, and calculate percentage increase or decrease. Instant and private."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Percentage Calculator", "url": "https://lazytools.pages.dev/tools/percentage-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free percentage calculator: find X% of a number, work out what percent one number is of another, and calculate percentage increase or decrease. Instant and private.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I calculate a percentage of a number?", "acceptedAnswer": {"@type": "Answer", "text": "Multiply the number by the percentage and divide by 100. For example, 15% of 200 = 200 × 15 ÷ 100 = 30. Calculator 1 above does this for you."}}, {"@type": "Question", "name": "How is percentage change calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Subtract the original from the new value, divide by the absolute value of the original, and multiply by 100. Going from 80 to 100 is a 25% increase; from 100 to 80 is a 20% decrease."}}, {"@type": "Question", "name": "Where are percentage calculations actually used?", "acceptedAnswer": {"@type": "Answer", "text": "Everywhere: discounts and sales tax while shopping, tips at restaurants, interest on savings and loans, exam scores, body-fat targets, battery levels, and reading business reports."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Percentage Calculator", "item": "https://lazytools.pages.dev/tools/percentage-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Everyday › Percentage Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Everyday</span>
+  <h1>💯 Percentage Calculator</h1>
+  <p class="lead">Three quick calculators for the three percentage questions everyone asks: a percent of a number, “X is what percent of Y?”, and percentage change between two values.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <p class="panel-title">1 · Find a percentage of a number</p>
+  <div class="grid-2">
+    <div class="field"><label for="p1a">Percentage (%)</label><input type="number" id="p1a" placeholder="e.g. 15" step="any"></div>
+    <div class="field"><label for="p1b">of number</label><input type="number" id="p1b" placeholder="e.g. 200" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runP1()">Calculate</button></div>
+  <div class="results" id="p1-res"><p class="big-result" id="p1-out"></p></div>
+</div>
+
+<div class="panel">
+  <p class="panel-title">2 · X is what percent of Y?</p>
+  <div class="grid-2">
+    <div class="field"><label for="p2a">Number (X)</label><input type="number" id="p2a" placeholder="e.g. 30" step="any"></div>
+    <div class="field"><label for="p2b">of number (Y)</label><input type="number" id="p2b" placeholder="e.g. 150" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runP2()">Calculate</button></div>
+  <div class="results" id="p2-res"><p class="big-result" id="p2-out"></p></div>
+</div>
+
+<div class="panel">
+  <p class="panel-title">3 · Percentage change from X to Y</p>
+  <div class="grid-2">
+    <div class="field"><label for="p3a">From (original)</label><input type="number" id="p3a" placeholder="e.g. 80" step="any"></div>
+    <div class="field"><label for="p3b">To (new)</label><input type="number" id="p3b" placeholder="e.g. 100" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runP3()">Calculate change</button></div>
+  <div class="results" id="p3-res"><p class="big-result" id="p3-out"></p></div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Percentage Calculator</h2>
+  <p>Percentages are the most-used bit of school maths in adult life — and the easiest to get wrong under pressure. A discount that says “30% off, plus an extra 20% off the reduced price” is not 50% off, and percentage increases and decreases do not cancel out symmetrically.</p><p>Having the three standard formulas in one place — percent of a number, the reverse “what percent is X of Y”, and percentage change — covers almost every everyday case, from splitting a restaurant bill to checking whether your salary raise beat inflation. For shopping in particular, the <a href="discount-calculator.html">discount calculator</a> handles the sale-price, “what discount did I actually get” and original-price versions in a single step.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How do I calculate a percentage of a number?</summary><p>Multiply the number by the percentage and divide by 100. For example, 15% of 200 = 200 × 15 ÷ 100 = 30. Calculator 1 above does this for you.</p></details><details><summary>How is percentage change calculated?</summary><p>Subtract the original from the new value, divide by the absolute value of the original, and multiply by 100. Going from 80 to 100 is a 25% increase; from 100 to 80 is a 20% decrease.</p></details><details><summary>Where are percentage calculations actually used?</summary><p>Everywhere: discounts and sales tax while shopping, tips at restaurants, interest on savings and loans, exam scores, body-fat targets, battery levels, and reading business reports.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/date-calculator.html" data-slug="date-calculator" data-cat="Everyday" data-name="Date Calculator" data-keywords="Days between two dates (with business days), or add / subtract days, weeks, months and years. date calculator, days between dates, date difference, add days to date, business days calculator, working days"><span class="ico">📅</span><h3>Date Calculator</h3><p>Days between two dates (with business days), or add / subtract days, weeks, months and years.</p></a><a class="tool-card" href="../tools/discount-calculator.html" data-slug="discount-calculator" data-cat="Everyday" data-name="Discount Calculator" data-keywords="Percent off, the price you pay and what you saved — plus two reverse modes. discount calculator, percent off calculator, sale price calculator, how much do i save, 20 percent off, original price calculator, percentage discount"><span class="ico">🏷️</span><h3>Discount Calculator</h3><p>Percent off, the price you pay and what you saved — plus two reverse modes.</p></a><a class="tool-card" href="../tools/bmi-calculator.html" data-slug="bmi-calculator" data-cat="Health" data-name="BMI Calculator" data-keywords="Body Mass Index in metric or imperial units, with your healthy weight range. bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories"><span class="ico">⚖️</span><h3>BMI Calculator</h3><p>Body Mass Index in metric or imperial units, with your healthy weight range.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function runP1(){
+  var a = readNum('p1a', 'percentage'), b = readNum('p1b', 'number');
+  if(a === null || b === null) return;
+  var r = a / 100 * b;
+  $id('p1-out').textContent = fmt(a) + '% of ' + fmt(b) + ' = ' + fmt(r);
+  showRes('p1-res');
+}
+function runP2(){
+  var a = readNum('p2a', 'X'), b = readNum('p2b', 'Y');
+  if(a === null || b === null) return;
+  if(b === 0){ alert('The second number cannot be zero.'); return; }
+  var r = a / b * 100;
+  $id('p2-out').textContent = fmt(a) + ' is ' + fmt(r) + '% of ' + fmt(b);
+  showRes('p2-res');
+}
+function runP3(){
+  var a = readNum('p3a', 'original'), b = readNum('p3b', 'new');
+  if(a === null || b === null) return;
+  if(a === 0){ alert('The original number cannot be zero.'); return; }
+  var r = (b - a) / Math.abs(a) * 100;
+  var dir = r >= 0 ? 'increase' : 'decrease';
+  $id('p3-out').textContent = fmt(Math.abs(r)) + '% ' + dir + ' (' + fmt(a) + ' → ' + fmt(b) + ')';
+  showRes('p3-res');
+}
+</script>
+</body>
+</html>

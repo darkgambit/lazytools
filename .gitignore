@@ -1,0 +1,23 @@
+# ---- personal data — NEVER commit ----
+INFO.md
+
+# ---- local agent workspace / memory — must not be deployed publicly ----
+.workbuddy-ai/
+.claude/
+
+# ---- OS cruft ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- dependencies / build output ----
+node_modules/
+.wrangler/
+.netlify/
+__pycache__/
+*.pyc
+
+# ---- editor ----
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Discount Calculator — Percent Off & Sale Price | LazyTools</title>
+    <meta name="description" content="Free discount calculator: work out the sale price after a percent-off discount, how much money you save, the discount between two prices, and the original price from a sale price. Instant and private.">
+    <meta name="keywords" content="discount calculator, percent off calculator, sale price calculator, how much do i save, 20 percent off, original price calculator, percentage discount">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/discount-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Discount Calculator — Percent Off & Sale Price | LazyTools"><meta property="og:description" content="Free discount calculator: work out the sale price after a percent-off discount, how much money you save, the discount between two prices, and the original price from a sale price. Instant and private."><meta property="og:url" content="https://lazytools.pages.dev/tools/discount-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Discount Calculator — Percent Off & Sale Price | LazyTools"><meta name="twitter:description" content="Free discount calculator: work out the sale price after a percent-off discount, how much money you save, the discount between two prices, and the original price from a sale price. Instant and private."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Discount Calculator", "url": "https://lazytools.pages.dev/tools/discount-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free discount calculator: work out the sale price after a percent-off discount, how much money you save, the discount between two prices, and the original price from a sale price. Instant and private.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I work out 20% off?", "acceptedAnswer": {"@type": "Answer", "text": "Multiply the price by 0.20 to get the saving, then subtract it — or multiply by 0.80 to get the final price in one step. An item priced 120 with 20% off costs 96 and saves 24."}}, {"@type": "Question", "name": "Is 20% off and then another 20% off the same as 40% off?", "acceptedAnswer": {"@type": "Answer", "text": "No, and this is the trick that shop promotions rely on. Successive discounts multiply: 0.80 × 0.80 = 0.64, so the real total discount is 36%, not 40%. Run the first result back through the calculator to check any 'extra 20%' offer."}}, {"@type": "Question", "name": "Why does the reverse mode need a discount below 100%?", "acceptedAnswer": {"@type": "Answer", "text": "Because the original price is found by dividing by (1 − rate). At exactly 100% off that divisor is zero, so the original price is undefined; above 100% the formula returns a negative price. Real discounts are always below 100%."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Discount Calculator", "item": "https://lazytools.pages.dev/tools/discount-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Everyday › Discount Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Everyday</span>
+  <h1>🏷️ Discount Calculator</h1>
+  <p class="lead">Three ways to do discount maths: take a percentage off a price, work out the discount between an original and a sale price, and go backwards from a sale price to the original.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <h3 class="panel-title">1. Take a percentage off a price</h3>
+  <div class="grid-2">
+    <div class="field"><label for="d1-price">Original price</label><input type="number" id="d1-price" placeholder="e.g. 120" min="0" step="any"></div>
+    <div class="field"><label for="d1-pct">Discount (%)</label><input type="number" id="d1-pct" value="20" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runD1()">Calculate sale price</button></div>
+  <div class="results" id="d1-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="d1-final">—</b><span>You pay</span></div>
+      <div class="stat"><b id="d1-save">—</b><span>You save</span></div>
+    </div>
+    <p class="big-result" id="d1-out">—</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">2. What discount did I actually get?</h3>
+  <div class="grid-2">
+    <div class="field"><label for="d2-orig">Original price</label><input type="number" id="d2-orig" placeholder="e.g. 120" min="0" step="any"></div>
+    <div class="field"><label for="d2-sale">Price you paid</label><input type="number" id="d2-sale" placeholder="e.g. 84" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runD2()">Calculate discount</button></div>
+  <div class="results" id="d2-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="d2-pct">—</b><span>Discount</span></div>
+      <div class="stat"><b id="d2-save">—</b><span>You saved</span></div>
+    </div>
+    <p class="big-result" id="d2-out">—</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">3. What was the original price?</h3>
+  <div class="grid-2">
+    <div class="field"><label for="d3-sale">Sale price</label><input type="number" id="d3-sale" placeholder="e.g. 84" min="0" step="any"></div>
+    <div class="field"><label for="d3-pct">Discount (%)</label><input type="number" id="d3-pct" value="30" min="0" max="99" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runD3()">Find original price</button></div>
+  <div class="results" id="d3-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="d3-orig">—</b><span>Original price</span></div>
+      <div class="stat"><b id="d3-save">—</b><span>You saved</span></div>
+    </div>
+    <p class="big-result" id="d3-out">—</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Discount Calculator</h2>
+  <p>Discount maths is the most common piece of mental arithmetic people get wrong, and it is not the shopper's fault — the two-step version (find the saving, then subtract) is easy to muddle under time pressure, and 'extra 20% off sale prices' is genuinely not the same as 40%.</p><p>This calculator covers all three questions that actually come up: the sale price from a percentage, the percentage from two prices, and the original price when all you can see is the sale ticket. Results are plain numbers, so they work in any currency.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How do I work out 20% off?</summary><p>Multiply the price by 0.20 to get the saving, then subtract it — or multiply by 0.80 to get the final price in one step. An item priced 120 with 20% off costs 96 and saves 24.</p></details><details><summary>Is 20% off and then another 20% off the same as 40% off?</summary><p>No, and this is the trick that shop promotions rely on. Successive discounts multiply: 0.80 × 0.80 = 0.64, so the real total discount is 36%, not 40%. Run the first result back through the calculator to check any 'extra 20%' offer.</p></details><details><summary>Why does the reverse mode need a discount below 100%?</summary><p>Because the original price is found by dividing by (1 − rate). At exactly 100% off that divisor is zero, so the original price is undefined; above 100% the formula returns a negative price. Real discounts are always below 100%.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a><a class="tool-card" href="../tools/date-calculator.html" data-slug="date-calculator" data-cat="Everyday" data-name="Date Calculator" data-keywords="Days between two dates (with business days), or add / subtract days, weeks, months and years. date calculator, days between dates, date difference, add days to date, business days calculator, working days"><span class="ico">📅</span><h3>Date Calculator</h3><p>Days between two dates (with business days), or add / subtract days, weeks, months and years.</p></a><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function runD1(){
+  var p = readNum('d1-price', 'the original price'); if(p === null) return;
+  var pct = readNum('d1-pct', 'the discount percentage'); if(pct === null) return;
+  var save = p * pct / 100;
+  $id('d1-final').textContent = fmt(p - save);
+  $id('d1-save').textContent = fmt(save);
+  $id('d1-out').textContent = fmt(p) + ' less ' + fmt(pct, 2) + '% = ' + fmt(p - save);
+  showRes('d1-res');
+}
+function runD2(){
+  var o = readNum('d2-orig', 'the original price'); if(o === null) return;
+  var s = readNum('d2-sale', 'the price you paid'); if(s === null) return;
+  if(o <= 0){ alert('The original price must be greater than zero.'); return; }
+  var save = o - s, pct = save / o * 100;
+  $id('d2-pct').textContent = fmt(pct, 2) + '%';
+  $id('d2-save').textContent = fmt(save);
+  $id('d2-out').textContent = fmt(s) + ' is ' + fmt(pct, 2) + '% off ' + fmt(o);
+  showRes('d2-res');
+}
+function runD3(){
+  var s = readNum('d3-sale', 'the sale price'); if(s === null) return;
+  var pct = readNum('d3-pct', 'the discount percentage'); if(pct === null) return;
+  if(pct >= 100){ alert('A discount of 100% or more leaves no original price to find.'); return; }
+  var o = s / (1 - pct / 100);
+  $id('d3-orig').textContent = fmt(o);
+  $id('d3-save').textContent = fmt(o - s);
+  $id('d3-out').textContent = 'A price of ' + fmt(s) + ' after ' + fmt(pct, 2) + '% off started at ' + fmt(o);
+  showRes('d3-res');
+}
+</script>
+</body>
+</html>

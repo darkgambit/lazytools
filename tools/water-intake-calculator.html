@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Water Intake Calculator — How Much Water Should You Drink? | LazyTools</title>
+    <meta name="description" content="Free water intake calculator: get a personalized daily hydration goal based on your body weight, exercise minutes and climate — in litres, glasses and bottles.">
+    <meta name="keywords" content="water intake calculator, how much water should i drink, daily water intake, hydration calculator, water per day">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/water-intake-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Water Intake Calculator — How Much Water Should You Drink? | LazyTools"><meta property="og:description" content="Free water intake calculator: get a personalized daily hydration goal based on your body weight, exercise minutes and climate — in litres, glasses and bottles."><meta property="og:url" content="https://lazytools.pages.dev/tools/water-intake-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Water Intake Calculator — How Much Water Should You Drink? | LazyTools"><meta name="twitter:description" content="Free water intake calculator: get a personalized daily hydration goal based on your body weight, exercise minutes and climate — in litres, glasses and bottles."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Water Intake Calculator", "url": "https://lazytools.pages.dev/tools/water-intake-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free water intake calculator: get a personalized daily hydration goal based on your body weight, exercise minutes and climate — in litres, glasses and bottles.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much water should I drink per day?", "acceptedAnswer": {"@type": "Answer", "text": "A common guideline is about 35 ml per kilogram of body weight — roughly 2.5 litres for a 70 kg adult — plus more for exercise and hot weather. Around 20% of your fluid intake normally comes from food."}}, {"@type": "Question", "name": "Do coffee and tea count?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Despite their mild diuretic reputation, caffeinated drinks still hydrate you on balance. Water is still the cheapest and healthiest default."}}, {"@type": "Question", "name": "Can I drink too much water?", "acceptedAnswer": {"@type": "Answer", "text": "Rarely, but yes — extreme intake in a short time can dilute blood sodium (hyponatremia). Spread intake across the day and drink to thirst, especially if you have kidney or heart conditions."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Water Intake Calculator", "item": "https://lazytools.pages.dev/tools/water-intake-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Health › Water Intake Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Health</span>
+  <h1>💧 Water Intake Calculator</h1>
+  <p class="lead">Get a personalized daily water goal based on your body weight, how much you exercise, and how hot your climate is — shown in litres, glasses and bottles.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="w-units">Units</label>
+      <select id="w-units" onchange="wUnits()">
+        <option value="metric">Metric (kg)</option>
+        <option value="imperial">Imperial (lb)</option>
+      </select>
+    </div>
+    <div class="field"><label for="w-kg" id="w-wlabel">Body weight (kg)</label><input type="number" id="w-kg" value="70" min="0" step="any"></div>
+    <div class="field"><label for="w-ex">Exercise (minutes per day)</label><input type="number" id="w-ex" value="30" min="0" step="any"></div>
+    <div class="field"><label for="w-climate">Climate</label>
+      <select id="w-climate">
+        <option value="0">Temperate / cool</option>
+        <option value="0.35">Warm</option>
+        <option value="0.7" selected>Hot (desert, summer)</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runWater()">Calculate my goal</button></div>
+  <div class="results" id="w-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="w-liters">—</b><span>Litres per day</span></div>
+      <div class="stat"><b id="w-glasses">—</b><span>250 ml glasses</span></div>
+      <div class="stat"><b id="w-bottles">—</b><span>500 ml bottles</span></div>
+    </div>
+    <p class="note">Rule of thumb used: ~35 ml per kg of body weight, +350 ml per 30 min of exercise, + a climate adjustment. Food also supplies ~20% of your fluids. This is general guidance, not medical advice — kidney or heart conditions may require different limits.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Water Intake Calculator</h2>
+  <p>Hydration needs are not one-size-fits-all: they scale with body mass, sweat losses from activity, and climate — which is why a one-line “8 glasses a day” rule fails desert dwellers and office workers alike.</p><p>This calculator starts from the widely used weight-based guideline (about 35 ml per kg), adds sweat replacement for exercise, and layers on a climate adjustment — then translates the result into glasses and bottles, the units people actually track.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How much water should I drink per day?</summary><p>A common guideline is about 35 ml per kilogram of body weight — roughly 2.5 litres for a 70 kg adult — plus more for exercise and hot weather. Around 20% of your fluid intake normally comes from food.</p></details><details><summary>Do coffee and tea count?</summary><p>Yes. Despite their mild diuretic reputation, caffeinated drinks still hydrate you on balance. Water is still the cheapest and healthiest default.</p></details><details><summary>Can I drink too much water?</summary><p>Rarely, but yes — extreme intake in a short time can dilute blood sodium (hyponatremia). Spread intake across the day and drink to thirst, especially if you have kidney or heart conditions.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/sleep-cycle-calculator.html" data-slug="sleep-cycle-calculator" data-cat="Health" data-name="Sleep Cycle Calculator" data-keywords="Best bedtimes to wake up refreshed, based on 90-minute sleep cycles. sleep cycle calculator, best bedtime, what time should i sleep, 90 minute sleep cycle, wake up refreshed, sleep calculator"><span class="ico">😴</span><h3>Sleep Cycle Calculator</h3><p>Best bedtimes to wake up refreshed, based on 90-minute sleep cycles.</p></a><a class="tool-card" href="../tools/bmi-calculator.html" data-slug="bmi-calculator" data-cat="Health" data-name="BMI Calculator" data-keywords="Body Mass Index in metric or imperial units, with your healthy weight range. bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories"><span class="ico">⚖️</span><h3>BMI Calculator</h3><p>Body Mass Index in metric or imperial units, with your healthy weight range.</p></a><a class="tool-card" href="../tools/hours-calculator.html" data-slug="hours-calculator" data-cat="Business" data-name="Hours Calculator" data-keywords="Hours between two times, plus a weekly time-card total in decimal hours for payroll. hours calculator, time card calculator, work hours calculator, hours between two times, decimal hours, payroll hours, timesheet calculator"><span class="ico">⏱️</span><h3>Hours Calculator</h3><p>Hours between two times, plus a weekly time-card total in decimal hours for payroll.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function wUnits(){
+  var imp = $id('w-units').value === 'imperial';
+  $id('w-wlabel').textContent = imp ? 'Body weight (lb)' : 'Body weight (kg)';
+}
+function runWater(){
+  var w = readNum('w-kg', 'body weight');
+  var ex = parseFloat($id('w-ex').value) || 0;
+  if(w === null || w <= 0){ alert('Enter a positive body weight.'); return; }
+  var kg = $id('w-units').value === 'imperial' ? w * 0.45359237 : w;
+  var climate = parseFloat($id('w-climate').value) || 0;
+  var liters = (kg * 0.035) + (ex / 30) * 0.35 + climate;
+  $id('w-liters').textContent = fmt(liters, 1) + ' L';
+  $id('w-glasses').textContent = fmt(liters * 1000 / 250, 0);
+  $id('w-bottles').textContent = fmt(liters * 1000 / 500, 1);
+  showRes('w-res');
+}
+</script>
+</body>
+</html>

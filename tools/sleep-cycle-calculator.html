@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sleep Cycle Calculator — Best Time to Sleep & Wake Up | LazyTools</title>
+    <meta name="description" content="Free sleep cycle calculator: find the best bedtime to wake up refreshed, or the ideal wake-up time if you go to bed now. Based on 90-minute sleep cycles.">
+    <meta name="keywords" content="sleep cycle calculator, best bedtime, what time should i sleep, 90 minute sleep cycle, wake up refreshed, sleep calculator">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/sleep-cycle-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Sleep Cycle Calculator — Best Time to Sleep & Wake Up | LazyTools"><meta property="og:description" content="Free sleep cycle calculator: find the best bedtime to wake up refreshed, or the ideal wake-up time if you go to bed now. Based on 90-minute sleep cycles."><meta property="og:url" content="https://lazytools.pages.dev/tools/sleep-cycle-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Sleep Cycle Calculator — Best Time to Sleep & Wake Up | LazyTools"><meta name="twitter:description" content="Free sleep cycle calculator: find the best bedtime to wake up refreshed, or the ideal wake-up time if you go to bed now. Based on 90-minute sleep cycles."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Sleep Cycle Calculator", "url": "https://lazytools.pages.dev/tools/sleep-cycle-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free sleep cycle calculator: find the best bedtime to wake up refreshed, or the ideal wake-up time if you go to bed now. Based on 90-minute sleep cycles.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How long is a sleep cycle?", "acceptedAnswer": {"@type": "Answer", "text": "A full cycle from light sleep through deep sleep to REM sleep lasts about 90 minutes in adults, though it varies from person to person and through the night (typically 80–120 minutes)."}}, {"@type": "Question", "name": "Why do I feel worse after 9 hours of sleep than after 7.5?", "acceptedAnswer": {"@type": "Answer", "text": "Waking mid-cycle — especially during deep sleep — causes sleep inertia, the heavy groggy feeling. 7.5 hours is five complete cycles, while 9 hours of fragmented sleep may still cut a cycle in half."}}, {"@type": "Question", "name": "Is 6 hours of sleep enough?", "acceptedAnswer": {"@type": "Answer", "text": "For most adults, no — 6 hours is the bare minimum and most people do best on 7–9 hours. Use the 4-cycle (6 h) option only when you must, and catch up the next night."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Sleep Cycle Calculator", "item": "https://lazytools.pages.dev/tools/sleep-cycle-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Health › Sleep Cycle Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Health</span>
+  <h1>😴 Sleep Cycle Calculator</h1>
+  <p class="lead">You wake up feeling groggy when your alarm interrupts deep sleep. Sleep happens in ~90-minute cycles — this calculator finds bedtimes and wake times that land at the end of a cycle.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <p class="panel-title">I want to wake up at…</p>
+  <div class="grid-2">
+    <div class="field"><label for="wake-time">Wake-up time</label><input type="time" id="wake-time" value="07:00"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runWake()">Show best bedtimes</button></div>
+  <div class="results" id="wake-res">
+    <ul class="sleep-list" id="wake-list"></ul>
+    <p class="note">Assumes ~15 minutes to fall asleep. 6 cycles = 9 h · 5 cycles = 7.5 h · 4 cycles = 6 h.</p>
+  </div>
+</div>
+
+<div class="panel">
+  <p class="panel-title">I'm going to bed now…</p>
+  <div class="grid-2">
+    <div class="field"><label for="bed-time">Bedtime (leave empty for “right now”)</label><input type="time" id="bed-time"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runBed()">Show ideal wake times</button></div>
+  <div class="results" id="bed-res">
+    <ul class="sleep-list" id="bed-list"></ul>
+    <p class="note">Wake up at the end of a cycle and you avoid sleep inertia — that heavy, groggy feeling.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Sleep Cycle Calculator</h2>
+  <p>Alarm clocks don't know where you are in your sleep cycle. If they ring during deep (slow-wave) sleep you wake up groggy even after a long night; if they ring between cycles you can feel fine after less sleep. That mismatch is called sleep inertia.</p><p>This calculator works backwards from your wake-up time in 90-minute steps and adds ~15 minutes of falling-asleep time, giving you several bedtimes that should end a cycle right as your alarm rings. It's a simple heuristic — but a genuinely useful one that millions of people search for every week.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How long is a sleep cycle?</summary><p>A full cycle from light sleep through deep sleep to REM sleep lasts about 90 minutes in adults, though it varies from person to person and through the night (typically 80–120 minutes).</p></details><details><summary>Why do I feel worse after 9 hours of sleep than after 7.5?</summary><p>Waking mid-cycle — especially during deep sleep — causes sleep inertia, the heavy groggy feeling. 7.5 hours is five complete cycles, while 9 hours of fragmented sleep may still cut a cycle in half.</p></details><details><summary>Is 6 hours of sleep enough?</summary><p>For most adults, no — 6 hours is the bare minimum and most people do best on 7–9 hours. Use the 4-cycle (6 h) option only when you must, and catch up the next night.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/bmi-calculator.html" data-slug="bmi-calculator" data-cat="Health" data-name="BMI Calculator" data-keywords="Body Mass Index in metric or imperial units, with your healthy weight range. bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories"><span class="ico">⚖️</span><h3>BMI Calculator</h3><p>Body Mass Index in metric or imperial units, with your healthy weight range.</p></a><a class="tool-card" href="../tools/water-intake-calculator.html" data-slug="water-intake-calculator" data-cat="Health" data-name="Water Intake Calculator" data-keywords="Personalized daily water goal based on weight, activity and climate. water intake calculator, how much water should i drink, daily water intake, hydration calculator, water per day"><span class="ico">💧</span><h3>Water Intake Calculator</h3><p>Personalized daily water goal based on weight, activity and climate.</p></a><a class="tool-card" href="../tools/word-counter.html" data-slug="word-counter" data-cat="Text" data-name="Word Counter" data-keywords="Live word, character, sentence and paragraph counts with reading time. word counter, character count, letter count, sentence counter, reading time calculator, words per page"><span class="ico">✍️</span><h3>Word Counter</h3><p>Live word, character, sentence and paragraph counts with reading time.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function fmtT(mins){
+  mins = ((mins % 1440) + 1440) % 1440;
+  var h = Math.floor(mins / 60), m = mins % 60;
+  var ap = h < 12 ? 'AM' : 'PM';
+  var h12 = h % 12; if(h12 === 0) h12 = 12;
+  return h12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+}
+function runWake(){
+  var t = $id('wake-time').value;
+  if(!t){ alert('Pick a wake-up time.'); return; }
+  var p = t.split(':');
+  var target = (+p[0]) * 60 + (+p[1]);
+  var html = '';
+  for(var c = 6; c >= 3; c--){
+    var bed = target - c * 90 - 15;
+    html += '<li><b>' + fmtT(bed) + '</b><span>' + c + ' cycles · ' + (c * 1.5) + ' h of sleep</span></li>';
+  }
+  $id('wake-list').innerHTML = html;
+  showRes('wake-res');
+}
+function runBed(){
+  var t = $id('bed-time').value;
+  var base;
+  if(t){ var p = t.split(':'); base = (+p[0]) * 60 + (+p[1]); }
+  else { var now = new Date(); base = now.getHours() * 60 + now.getMinutes(); }
+  var html = '';
+  for(var c = 3; c <= 6; c++){
+    var w = base + 15 + c * 90;
+    html += '<li><b>' + fmtT(w) + '</b><span>' + c + ' cycles · ' + (c * 1.5) + ' h of sleep</span></li>';
+  }
+  $id('bed-list').innerHTML = html;
+  showRes('bed-res');
+}
+</script>
+</body>
+</html>

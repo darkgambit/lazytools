@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+# repo-only files — reachable, but must never be indexed
+Disallow: /_tests/
+Disallow: /_generator/
+Disallow: /README.md
+Disallow: /PROGRESS.md
+Disallow: /CLAUDE-CODE-PROMPT.md
+Disallow: /.gitignore
+
+Sitemap: https://lazytools.pages.dev/sitemap.xml

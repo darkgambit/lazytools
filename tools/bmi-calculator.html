@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BMI Calculator — Body Mass Index (Metric & Imperial) | LazyTools</title>
+    <meta name="description" content="Free BMI calculator in metric and imperial units. Get your Body Mass Index, WHO category, and the healthy weight range for your height — instantly and privately.">
+    <meta name="keywords" content="bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/bmi-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="BMI Calculator — Body Mass Index (Metric & Imperial) | LazyTools"><meta property="og:description" content="Free BMI calculator in metric and imperial units. Get your Body Mass Index, WHO category, and the healthy weight range for your height — instantly and privately."><meta property="og:url" content="https://lazytools.pages.dev/tools/bmi-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="BMI Calculator — Body Mass Index (Metric & Imperial) | LazyTools"><meta name="twitter:description" content="Free BMI calculator in metric and imperial units. Get your Body Mass Index, WHO category, and the healthy weight range for your height — instantly and privately."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "BMI Calculator", "url": "https://lazytools.pages.dev/tools/bmi-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free BMI calculator in metric and imperial units. Get your Body Mass Index, WHO category, and the healthy weight range for your height — instantly and privately.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is a healthy BMI?", "acceptedAnswer": {"@type": "Answer", "text": "The WHO classifies 18.5–24.9 as the healthy range for adults. Below 18.5 is underweight, 25–29.9 is overweight, and 30+ falls into obesity classes."}}, {"@type": "Question", "name": "Is BMI accurate?", "acceptedAnswer": {"@type": "Answer", "text": "As a population-level screening tool, yes. For individuals it has well-known blind spots: it can flag muscular athletes as overweight and miss unhealthy fat distribution. Waist size and body composition tell a more complete story."}}, {"@type": "Question", "name": "What BMI should children use?", "acceptedAnswer": {"@type": "Answer", "text": "Children and teenagers need age- and sex-specific percentile charts, not the adult cut-offs used here. Consult a paediatrician or a child-specific calculator."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "BMI Calculator", "item": "https://lazytools.pages.dev/tools/bmi-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Health › BMI Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Health</span>
+  <h1>⚖️ BMI Calculator</h1>
+  <p class="lead">Enter your height and weight to get your Body Mass Index, your WHO weight category, and the weight range that is considered healthy for your height.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="bmi-units">Units</label>
+      <select id="bmi-units" onchange="bmiUnits()">
+        <option value="metric">Metric (cm, kg)</option>
+        <option value="imperial">Imperial (ft/in, lb)</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid-2" id="bmi-metric" style="margin-top:14px">
+    <div class="field"><label for="bmi-h">Height (cm)</label><input type="number" id="bmi-h" value="170" min="0" step="any"></div>
+    <div class="field"><label for="bmi-w">Weight (kg)</label><input type="number" id="bmi-w" value="70" min="0" step="any"></div>
+  </div>
+  <div class="grid-2" id="bmi-imperial" style="display:none;margin-top:14px">
+    <div class="field"><label for="bmi-ft">Height (feet)</label><input type="number" id="bmi-ft" value="5" min="0" step="any"></div>
+    <div class="field"><label for="bmi-in">Height (inches)</label><input type="number" id="bmi-in" value="7" min="0" step="any"></div>
+    <div class="field"><label for="bmi-lb">Weight (pounds)</label><input type="number" id="bmi-lb" value="154" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runBMI()">Calculate BMI</button></div>
+  <div class="results" id="bmi-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="bmi-val">—</b><span>Your BMI</span></div>
+      <div class="stat"><b id="bmi-cat">—</b><span>Category</span></div>
+      <div class="stat"><b id="bmi-range">—</b><span>Healthy weight range</span></div>
+    </div>
+    <div class="gauge"><i id="bmi-mark"></i></div>
+    <div class="gauge-labels"><span>12</span><span>18.5</span><span>25</span><span>30</span><span>40</span></div>
+    <p class="note">BMI is a rough screening tool, not a diagnosis. It does not distinguish muscle from fat and is less reliable for athletes, children, pregnancy and older adults. Talk to a doctor about your individual situation.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the BMI Calculator</h2>
+  <p>BMI (Body Mass Index) divides your weight by the square of your height (kg/m²). It was designed in the 1830s as a population statistic, and it remains the fastest universal screening number for weight-related health risk — which is exactly why doctors, insurers, gyms and diet apps still ask for it.</p><p>The healthy-weight range shown alongside your BMI is simply your height multiplied by the healthy BMI band (18.5–24.9), converted back into your chosen units — the number most people are actually looking for when they search for a BMI calculator.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>What is a healthy BMI?</summary><p>The WHO classifies 18.5–24.9 as the healthy range for adults. Below 18.5 is underweight, 25–29.9 is overweight, and 30+ falls into obesity classes.</p></details><details><summary>Is BMI accurate?</summary><p>As a population-level screening tool, yes. For individuals it has well-known blind spots: it can flag muscular athletes as overweight and miss unhealthy fat distribution. Waist size and body composition tell a more complete story.</p></details><details><summary>What BMI should children use?</summary><p>Children and teenagers need age- and sex-specific percentile charts, not the adult cut-offs used here. Consult a paediatrician or a child-specific calculator.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/sleep-cycle-calculator.html" data-slug="sleep-cycle-calculator" data-cat="Health" data-name="Sleep Cycle Calculator" data-keywords="Best bedtimes to wake up refreshed, based on 90-minute sleep cycles. sleep cycle calculator, best bedtime, what time should i sleep, 90 minute sleep cycle, wake up refreshed, sleep calculator"><span class="ico">😴</span><h3>Sleep Cycle Calculator</h3><p>Best bedtimes to wake up refreshed, based on 90-minute sleep cycles.</p></a><a class="tool-card" href="../tools/water-intake-calculator.html" data-slug="water-intake-calculator" data-cat="Health" data-name="Water Intake Calculator" data-keywords="Personalized daily water goal based on weight, activity and climate. water intake calculator, how much water should i drink, daily water intake, hydration calculator, water per day"><span class="ico">💧</span><h3>Water Intake Calculator</h3><p>Personalized daily water goal based on weight, activity and climate.</p></a><a class="tool-card" href="../tools/hours-calculator.html" data-slug="hours-calculator" data-cat="Business" data-name="Hours Calculator" data-keywords="Hours between two times, plus a weekly time-card total in decimal hours for payroll. hours calculator, time card calculator, work hours calculator, hours between two times, decimal hours, payroll hours, timesheet calculator"><span class="ico">⏱️</span><h3>Hours Calculator</h3><p>Hours between two times, plus a weekly time-card total in decimal hours for payroll.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function bmiUnits(){
+  var imp = $id('bmi-units').value === 'imperial';
+  $id('bmi-metric').style.display = imp ? 'none' : '';
+  $id('bmi-imperial').style.display = imp ? '' : 'none';
+}
+function runBMI(){
+  var hcm, wkg, unit = $id('bmi-units').value;
+  if(unit === 'metric'){
+    hcm = readNum('bmi-h', 'height'); wkg = readNum('bmi-w', 'weight');
+  } else {
+    var ft = readNum('bmi-ft', 'feet'), inch = parseFloat($id('bmi-in').value) || 0;
+    var lb = readNum('bmi-lb', 'weight');
+    if(ft === null || lb === null) return;
+    hcm = (ft * 12 + inch) * 2.54;
+    wkg = lb * 0.45359237;
+  }
+  if(hcm === null || wkg === null || hcm <= 0 || wkg <= 0){ alert('Height and weight must be positive numbers.'); return; }
+  var h = hcm / 100;
+  var bmi = wkg / (h * h);
+  var cat, col;
+  if(bmi < 18.5){ cat = 'Underweight'; col = '#60a5fa'; }
+  else if(bmi < 25){ cat = 'Healthy'; col = '#4ade80'; }
+  else if(bmi < 30){ cat = 'Overweight'; col = '#fbbf24'; }
+  else { cat = 'Obese'; col = '#f87171'; }
+  var lo = 18.5 * h * h, hi = 24.9 * h * h;
+  var range = (unit === 'metric')
+    ? fmt(lo, 1) + ' – ' + fmt(hi, 1) + ' kg'
+    : fmt(lo / 0.45359237, 1) + ' – ' + fmt(hi / 0.45359237, 1) + ' lb';
+  $id('bmi-val').textContent = fmt(bmi, 1);
+  $id('bmi-cat').textContent = cat;
+  $id('bmi-cat').style.color = col;
+  $id('bmi-range').textContent = range;
+  var pct = Math.min(Math.max((bmi - 12) / (40 - 12) * 100, 0), 100);
+  $id('bmi-mark').style.left = pct + '%';
+  showRes('bmi-res');
+}
+</script>
+</body>
+</html>

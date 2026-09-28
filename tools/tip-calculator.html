@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tip Calculator — Tip Amount, Total & Bill Split | LazyTools</title>
+    <meta name="description" content="Free tip calculator: enter the bill, pick a tip percentage and split between friends to get the tip, total and each person's share instantly.">
+    <meta name="keywords" content="tip calculator, gratuity calculator, bill splitter, how much to tip, split the bill">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/tip-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Tip Calculator — Tip Amount, Total & Bill Split | LazyTools"><meta property="og:description" content="Free tip calculator: enter the bill, pick a tip percentage and split between friends to get the tip, total and each person's share instantly."><meta property="og:url" content="https://lazytools.pages.dev/tools/tip-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Tip Calculator — Tip Amount, Total & Bill Split | LazyTools"><meta name="twitter:description" content="Free tip calculator: enter the bill, pick a tip percentage and split between friends to get the tip, total and each person's share instantly."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Tip Calculator", "url": "https://lazytools.pages.dev/tools/tip-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free tip calculator: enter the bill, pick a tip percentage and split between friends to get the tip, total and each person's share instantly.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much should I tip?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on the country. In the United States 15–20% of the pre-tax bill is standard for restaurants. In most of Europe a 10% service charge is either included or a small extra is appreciated. In many Asian countries tipping is not expected at all."}}, {"@type": "Question", "name": "Should I tip on the pre-tax or post-tax amount?", "acceptedAnswer": {"@type": "Answer", "text": "Convention is to tip on the pre-tax subtotal in countries that add sales tax at the register. In countries where prices include tax, the printed total is what you tip on."}}, {"@type": "Question", "name": "How do I split a bill fairly?", "acceptedAnswer": {"@type": "Answer", "text": "The simplest approach is to split the total evenly as this calculator does. For very uneven orders, have each person add roughly 120% of their own dish (to cover tax and tip)."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Tip Calculator", "item": "https://lazytools.pages.dev/tools/tip-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Finance › Tip Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Finance</span>
+  <h1>💵 Tip Calculator</h1>
+  <p class="lead">Enter the bill, choose a tip percentage, and say how many people are splitting — you'll get the tip, the total, and each person's share instantly.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="tip-bill">Bill amount</label><input type="number" id="tip-bill" placeholder="e.g. 84.50" min="0" step="any"></div>
+    <div class="field"><label for="tip-pct">Tip (%)</label><input type="number" id="tip-pct" value="15" min="0" step="any"></div>
+    <div class="field"><label for="tip-people">Split between (people)</label><input type="number" id="tip-people" value="1" min="1" step="1"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-ghost" type="button" onclick="tipQuick(10)">10%</button>
+    <button class="btn-primary" type="button" onclick="tipQuick(15)">15%</button>
+    <button class="btn-ghost" type="button" onclick="tipQuick(18)">18%</button>
+    <button class="btn-ghost" type="button" onclick="tipQuick(20)">20%</button>
+    <button class="btn-ghost" type="button" onclick="tipQuick(25)">25%</button>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runTip()">Calculate</button></div>
+  <div class="results" id="tip-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="tip-amt">—</b><span>Tip</span></div>
+      <div class="stat"><b id="tip-total">—</b><span>Total bill</span></div>
+      <div class="stat"><b id="tip-each">—</b><span>Per person (total)</span></div>
+      <div class="stat"><b id="tip-eachtip">—</b><span>Tip per person</span></div>
+    </div>
+    <p class="note">Typical etiquette: 15–20% in the US, 10% or rounding up in much of Europe and the Middle East, and no tipping in Japan. When in doubt, ask a local.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Tip Calculator</h2>
+  <p>Tipping math is done at the worst possible moment: the bill has arrived, the waiter is hovering, and everyone at the table is suddenly a mathematician. A tip calculator removes the fumbling and the arguments.</p><p>The per-person figures make group meals painless, and the quick-percentage buttons cover the common etiquette standards so you can adapt quickly whether you are dining in New York, Berlin or Tripoli. If the bill also carries sales tax or VAT, the <a href="sales-tax-calculator.html">sales tax calculator</a> separates the tax from the food so you can tip on the right number.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How much should I tip?</summary><p>It depends on the country. In the United States 15–20% of the pre-tax bill is standard for restaurants. In most of Europe a 10% service charge is either included or a small extra is appreciated. In many Asian countries tipping is not expected at all.</p></details><details><summary>Should I tip on the pre-tax or post-tax amount?</summary><p>Convention is to tip on the pre-tax subtotal in countries that add sales tax at the register. In countries where prices include tax, the printed total is what you tip on.</p></details><details><summary>How do I split a bill fairly?</summary><p>The simplest approach is to split the total evenly as this calculator does. For very uneven orders, have each person add roughly 120% of their own dish (to cover tax and tip).</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a><a class="tool-card" href="../tools/loan-calculator.html" data-slug="loan-calculator" data-cat="Finance" data-name="Loan Calculator" data-keywords="Monthly payment and total interest for any loan — plus extra-payment savings. loan calculator, monthly payment calculator, mortgage payment calculator, car loan calculator, extra payment savings, amortization"><span class="ico">🏦</span><h3>Loan Calculator</h3><p>Monthly payment and total interest for any loan — plus extra-payment savings.</p></a><a class="tool-card" href="../tools/sales-tax-calculator.html" data-slug="sales-tax-calculator" data-cat="Finance" data-name="Sales Tax Calculator" data-keywords="Add sales tax, VAT or GST to a price — or strip it back out of a tax-inclusive total. sales tax calculator, reverse sales tax calculator, add tax to price, remove tax from total, vat calculator, gst calculator, tax inclusive price, pre-tax amount"><span class="ico">🧮</span><h3>Sales Tax Calculator</h3><p>Add sales tax, VAT or GST to a price — or strip it back out of a tax-inclusive total.</p></a><a class="tool-card" href="../tools/bmi-calculator.html" data-slug="bmi-calculator" data-cat="Health" data-name="BMI Calculator" data-keywords="Body Mass Index in metric or imperial units, with your healthy weight range. bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories"><span class="ico">⚖️</span><h3>BMI Calculator</h3><p>Body Mass Index in metric or imperial units, with your healthy weight range.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function tipQuick(p){ $id('tip-pct').value = p; runTip(); }
+function runTip(){
+  var bill = readNum('tip-bill', 'bill amount');
+  var pct = readNum('tip-pct', 'tip');
+  var people = parseInt($id('tip-people').value, 10);
+  if(bill === null || pct === null) return;
+  if(isNaN(people) || people < 1){ alert('At least one person is paying!'); return; }
+  var tip = bill * pct / 100;
+  var total = bill + tip;
+  $id('tip-amt').textContent = fmt(tip);
+  $id('tip-total').textContent = fmt(total);
+  $id('tip-each').textContent = fmt(total / people);
+  $id('tip-eachtip').textContent = fmt(tip / people);
+  showRes('tip-res');
+}
+</script>
+</body>
+</html>

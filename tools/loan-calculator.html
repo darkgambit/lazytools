@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loan Calculator — Monthly Payment & Total Interest | LazyTools</title>
+    <meta name="description" content="Free loan calculator: estimate monthly payments and total interest for any loan, and see how much an extra monthly payment saves you. Works for car loans, personal loans and mortgages.">
+    <meta name="keywords" content="loan calculator, monthly payment calculator, mortgage payment calculator, car loan calculator, extra payment savings, amortization">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/loan-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Loan Calculator — Monthly Payment & Total Interest | LazyTools"><meta property="og:description" content="Free loan calculator: estimate monthly payments and total interest for any loan, and see how much an extra monthly payment saves you. Works for car loans, personal loans and mortgages."><meta property="og:url" content="https://lazytools.pages.dev/tools/loan-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Loan Calculator — Monthly Payment & Total Interest | LazyTools"><meta name="twitter:description" content="Free loan calculator: estimate monthly payments and total interest for any loan, and see how much an extra monthly payment saves you. Works for car loans, personal loans and mortgages."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Loan Calculator", "url": "https://lazytools.pages.dev/tools/loan-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free loan calculator: estimate monthly payments and total interest for any loan, and see how much an extra monthly payment saves you. Works for car loans, personal loans and mortgages.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the monthly payment formula?", "acceptedAnswer": {"@type": "Answer", "text": "Payment = P · r / (1 − (1+r)^−n), where P is the loan amount, r the monthly rate (annual ÷ 12) and n the number of months. It is the standard amortization formula used by banks worldwide."}}, {"@type": "Question", "name": "Why do extra payments help so much?", "acceptedAnswer": {"@type": "Answer", "text": "Every extra unit of currency goes straight to principal, which reduces the balance interest is charged on for all remaining months. On long loans the effect compounds dramatically — often saving thousands in interest."}}, {"@type": "Question", "name": "Does this work for mortgages?", "acceptedAnswer": {"@type": "Answer", "text": "Yes for the principal-and-interest part. Full mortgage payments also include property taxes and insurance, and your bank may charge fees — add those separately."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Loan Calculator", "item": "https://lazytools.pages.dev/tools/loan-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Finance › Loan Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Finance</span>
+  <h1>🏦 Loan Calculator</h1>
+  <p class="lead">Enter a loan amount, interest rate and term to get the monthly payment and total interest — then see how much an extra monthly payment saves you and shortens the loan.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="ln-p">Loan amount</label><input type="number" id="ln-p" value="20000" min="1" step="any"></div>
+    <div class="field"><label for="ln-r">Annual interest rate (%)</label><input type="number" id="ln-r" value="6" min="0" step="any"></div>
+    <div class="field"><label for="ln-y">Term (years)</label><input type="number" id="ln-y" value="5" min="1" step="any"></div>
+    <div class="field"><label for="ln-x">Extra monthly payment (optional)</label><input type="number" id="ln-x" value="0" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runLoan()">Calculate payment</button></div>
+  <div class="results" id="ln-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="ln-pay">—</b><span>Monthly payment</span></div>
+      <div class="stat"><b id="ln-int">—</b><span>Total interest (with extra)</span></div>
+      <div class="stat"><b id="ln-save">—</b><span>Interest saved by extra payments</span></div>
+      <div class="stat"><b id="ln-time">—</b><span>Payoff time (with extra)</span></div>
+    </div>
+    <div class="bar-stack"><i id="ln-bar-p" style="background:#8fa4ff;width:50%"></i><i id="ln-bar-i" style="background:#f5b53f;width:50%"></i></div>
+    <div class="legend"><span><i style="background:#8fa4ff"></i>Principal</span><span><i style="background:#f5b53f"></i>Interest</span></div>
+    <p class="note">Principal & interest only — taxes, insurance and fees are not included. Even 25–50 extra per month can cut years off a long loan.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Loan Calculator</h2>
+  <p>A loan is one of the few big financial decisions where five minutes with a calculator can save you thousands. The monthly payment formula is fixed, but the trade-offs — shorter term versus lower payment, extra payments versus investing the money — are yours to explore.</p><p>The extra-payment simulation on this page runs a real month-by-month amortization, the same way your bank does, so the interest saved and payoff time reflect what actually happens to your balance, not a rough approximation.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>What is the monthly payment formula?</summary><p>Payment = P · r / (1 − (1+r)^−n), where P is the loan amount, r the monthly rate (annual ÷ 12) and n the number of months. It is the standard amortization formula used by banks worldwide.</p></details><details><summary>Why do extra payments help so much?</summary><p>Every extra unit of currency goes straight to principal, which reduces the balance interest is charged on for all remaining months. On long loans the effect compounds dramatically — often saving thousands in interest.</p></details><details><summary>Does this work for mortgages?</summary><p>Yes for the principal-and-interest part. Full mortgage payments also include property taxes and insurance, and your bank may charge fees — add those separately.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a><a class="tool-card" href="../tools/tip-calculator.html" data-slug="tip-calculator" data-cat="Finance" data-name="Tip Calculator" data-keywords="Tip amount, total and per-person split in one tap. tip calculator, gratuity calculator, bill splitter, how much to tip, split the bill"><span class="ico">💵</span><h3>Tip Calculator</h3><p>Tip amount, total and per-person split in one tap.</p></a><a class="tool-card" href="../tools/sales-tax-calculator.html" data-slug="sales-tax-calculator" data-cat="Finance" data-name="Sales Tax Calculator" data-keywords="Add sales tax, VAT or GST to a price — or strip it back out of a tax-inclusive total. sales tax calculator, reverse sales tax calculator, add tax to price, remove tax from total, vat calculator, gst calculator, tax inclusive price, pre-tax amount"><span class="ico">🧮</span><h3>Sales Tax Calculator</h3><p>Add sales tax, VAT or GST to a price — or strip it back out of a tax-inclusive total.</p></a><a class="tool-card" href="../tools/invoice-generator.html" data-slug="invoice-generator" data-cat="Business" data-name="Invoice Generator" data-keywords="Create a clean, professional invoice and save it as PDF — free, no signup. invoice generator, free invoice maker, create invoice online, invoice pdf, invoice template"><span class="ico">🧾</span><h3>Invoice Generator</h3><p>Create a clean, professional invoice and save it as PDF — free, no signup.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function runLoan(){
+  var P = readNum('ln-p', 'loan amount'), R = readNum('ln-r', 'interest rate'), Y = readNum('ln-y', 'term');
+  var X = parseFloat($id('ln-x').value) || 0;
+  if(P === null || R === null || Y === null) return;
+  if(P <= 0 || Y <= 0 || R < 0){ alert('Check the loan amount, rate and term.'); return; }
+  var r = R / 100 / 12;
+  var n = Math.round(Y * 12);
+  var pay = (r === 0) ? P / n : P * r / (1 - Math.pow(1 + r, -n));
+  var bal = P, months = 0, paid = 0;
+  var capped = false;
+  while(bal > 0.005 && months < 1200){
+    var interest = bal * r;
+    var principal = pay + X - interest;
+    if(principal <= 0){ capped = true; break; }
+    if(principal > bal) principal = bal;
+    bal -= principal; paid += principal + interest; months++;
+  }
+  var baseInterest = pay * n - P;
+  var saved = Math.max(0, baseInterest - (paid - P));
+  $id('ln-pay').textContent = fmt(pay) + (X > 0 ? ' + ' + fmt(X) : '');
+  $id('ln-int').textContent = fmt(Math.max(0, paid - P));
+  $id('ln-save').textContent = fmt(saved);
+  $id('ln-time').textContent = capped ? 'Never (extra too small)' : Math.floor(months / 12) + ' y ' + (months % 12) + ' m';
+  var tp = Math.min(P / paid * 100, 100);
+  $id('ln-bar-p').style.width = tp + '%';
+  $id('ln-bar-i').style.width = (100 - tp) + '%';
+  showRes('ln-res');
+}
+runLoan();
+</script>
+</body>
+</html>

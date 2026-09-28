@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Date Calculator — Days Between Dates & Date Add/Subtract | LazyTools</title>
+    <meta name="description" content="Free date calculator: count days, weeks, months and business days between two dates, or add and subtract days, weeks, months and years from any date.">
+    <meta name="keywords" content="date calculator, days between dates, date difference, add days to date, business days calculator, working days">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/date-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Date Calculator — Days Between Dates & Date Add/Subtract | LazyTools"><meta property="og:description" content="Free date calculator: count days, weeks, months and business days between two dates, or add and subtract days, weeks, months and years from any date."><meta property="og:url" content="https://lazytools.pages.dev/tools/date-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Date Calculator — Days Between Dates & Date Add/Subtract | LazyTools"><meta name="twitter:description" content="Free date calculator: count days, weeks, months and business days between two dates, or add and subtract days, weeks, months and years from any date."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Date Calculator", "url": "https://lazytools.pages.dev/tools/date-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free date calculator: count days, weeks, months and business days between two dates, or add and subtract days, weeks, months and years from any date.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the day count include the start and end dates?", "acceptedAnswer": {"@type": "Answer", "text": "The total days shown is the pure difference (end minus start). The business-days figure counts both endpoints as included — the standard working-days convention for deadlines."}}, {"@type": "Question", "name": "What are business days?", "acceptedAnswer": {"@type": "Answer", "text": "Monday through Friday. Public holidays are not subtracted because they differ by country and year — check your local holiday calendar if precision matters."}}, {"@type": "Question", "name": "Why would I need to add months to a date?", "acceptedAnswer": {"@type": "Answer", "text": "Contract deadlines, visa and notice periods, subscription renewals, pregnancy due dates and loan terms are almost always expressed as “+ 3 months” or “+ 6 months” rather than a day count."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Date Calculator", "item": "https://lazytools.pages.dev/tools/date-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Everyday › Date Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Everyday</span>
+  <h1>📅 Date Calculator</h1>
+  <p class="lead">Two tools in one: find the exact time between two dates (including business days), or add and subtract days, weeks, months and years from a starting date.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="btn-row" style="margin-top:0">
+    <button class="btn-primary" type="button" id="tab-diff-btn" onclick="dtTab('diff')">Difference between dates</button>
+    <button class="btn-ghost" type="button" id="tab-add-btn" onclick="dtTab('add')">Add / subtract from a date</button>
+  </div>
+
+  <div id="dt-diff">
+    <div class="grid-2" style="margin-top:16px">
+      <div class="field"><label for="d1">Start date</label><input type="date" id="d1"></div>
+      <div class="field"><label for="d2">End date</label><input type="date" id="d2"></div>
+    </div>
+    <div class="btn-row"><button class="btn-primary" type="button" onclick="runDiff()">Calculate difference</button></div>
+    <div class="results" id="diff-res">
+      <div class="stat-grid">
+        <div class="stat"><b id="dif-days">—</b><span>Total days</span></div>
+        <div class="stat"><b id="dif-weeks">—</b><span>Weeks & days</span></div>
+        <div class="stat"><b id="dif-ymd">—</b><span>Years, months, days</span></div>
+        <div class="stat"><b id="dif-biz">—</b><span>Business days</span></div>
+      </div>
+      <p class="note">Both dates are counted as included. Business days = Monday to Friday, ignoring public holidays.</p>
+    </div>
+  </div>
+
+  <div id="dt-add" style="display:none">
+    <div class="grid-2" style="margin-top:16px">
+      <div class="field"><label for="ad-start">Start date</label><input type="date" id="ad-start"></div>
+      <div class="field"><label for="ad-n">Amount</label><input type="number" id="ad-n" value="30" step="any"></div>
+      <div class="field"><label for="ad-unit">Unit</label>
+        <select id="ad-unit"><option value="days">Days</option><option value="weeks">Weeks</option><option value="months">Months</option><option value="years">Years</option></select>
+      </div>
+      <div class="field"><label for="ad-sign">Direction</label>
+        <select id="ad-sign"><option value="add">Add (future)</option><option value="sub">Subtract (past)</option></select>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn-primary" type="button" onclick="runAdd()">Calculate new date</button></div>
+    <div class="results" id="add-res">
+      <p class="big-result" id="add-out"></p>
+      <p class="note">Adding months handles overflow like a calendar: Jan 31 + 1 month lands on Mar 3 (or Feb 28/29 in some libraries) — this tool uses the “keep the day number, roll over” behaviour of most calendar apps.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Date Calculator</h2>
+  <p>Date math sounds trivial until you try it: months have different lengths, leap years add a day every four years (except most century years), and “one month from January 31” has no single right answer. Calendars are genuinely hard, which is why date calculators are among the most-searched utilities on the web.</p><p>Typical uses: counting days until a deadline or trip, checking a notice period, computing someone's exact age at a future date, or finding what weekday a project milestone will land on.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>Does the day count include the start and end dates?</summary><p>The total days shown is the pure difference (end minus start). The business-days figure counts both endpoints as included — the standard working-days convention for deadlines.</p></details><details><summary>What are business days?</summary><p>Monday through Friday. Public holidays are not subtracted because they differ by country and year — check your local holiday calendar if precision matters.</p></details><details><summary>Why would I need to add months to a date?</summary><p>Contract deadlines, visa and notice periods, subscription renewals, pregnancy due dates and loan terms are almost always expressed as “+ 3 months” or “+ 6 months” rather than a day count.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a><a class="tool-card" href="../tools/discount-calculator.html" data-slug="discount-calculator" data-cat="Everyday" data-name="Discount Calculator" data-keywords="Percent off, the price you pay and what you saved — plus two reverse modes. discount calculator, percent off calculator, sale price calculator, how much do i save, 20 percent off, original price calculator, percentage discount"><span class="ico">🏷️</span><h3>Discount Calculator</h3><p>Percent off, the price you pay and what you saved — plus two reverse modes.</p></a><a class="tool-card" href="../tools/hours-calculator.html" data-slug="hours-calculator" data-cat="Business" data-name="Hours Calculator" data-keywords="Hours between two times, plus a weekly time-card total in decimal hours for payroll. hours calculator, time card calculator, work hours calculator, hours between two times, decimal hours, payroll hours, timesheet calculator"><span class="ico">⏱️</span><h3>Hours Calculator</h3><p>Hours between two times, plus a weekly time-card total in decimal hours for payroll.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function dtTab(which){
+  var diff = which === 'diff';
+  $id('dt-diff').style.display = diff ? '' : 'none';
+  $id('dt-add').style.display = diff ? 'none' : '';
+  $id('tab-diff-btn').className = diff ? 'btn-primary' : 'btn-ghost';
+  $id('tab-add-btn').className = diff ? 'btn-ghost' : 'btn-primary';
+}
+function bizDays(a, b){
+  if(b < a){ var t = a; a = b; b = t; }
+  var total = Math.round((b - a) / 86400000) + 1;
+  if(total > 200000) return null;
+  var full = Math.floor(total / 7) * 5, rem = total % 7;
+  for(var i = 0; i < rem; i++){
+    var dow = new Date(a.getTime() + (Math.floor(total / 7) * 7 + i) * 86400000).getDay();
+    if(dow > 0 && dow < 6) full++;
+  }
+  return full;
+}
+function runDiff(){
+  var v1 = $id('d1').value, v2 = $id('d2').value;
+  if(!v1 || !v2){ alert('Please choose both dates.'); return; }
+  var a = new Date(v1 + 'T00:00:00'), b = new Date(v2 + 'T00:00:00');
+  if(b < a){ var t = a; a = b; b = t; }
+  var days = Math.round((b - a) / 86400000);
+  $id('dif-days').textContent = fmt(days, 0);
+  $id('dif-weeks').textContent = Math.floor(days / 7) + ' w ' + (days % 7) + ' d';
+  var y = b.getFullYear() - a.getFullYear(), m = b.getMonth() - a.getMonth(), d = b.getDate() - a.getDate();
+  if(d < 0){ m--; d += new Date(b.getFullYear(), b.getMonth(), 0).getDate(); }
+  if(m < 0){ y--; m += 12; }
+  $id('dif-ymd').textContent = y + 'y ' + m + 'm ' + d + 'd';
+  var bd = bizDays(a, b);
+  $id('dif-biz').textContent = bd === null ? '—' : fmt(bd, 0);
+  showRes('diff-res');
+}
+function runAdd(){
+  var v = $id('ad-start').value;
+  if(!v){ alert('Please choose a start date.'); return; }
+  var n = parseFloat($id('ad-n').value);
+  if(isNaN(n)){ alert('Please enter an amount.'); return; }
+  var d = new Date(v + 'T00:00:00');
+  var unit = $id('ad-unit').value;
+  var sign = $id('ad-sign').value === 'sub' ? -1 : 1;
+  if(unit === 'days') d.setDate(d.getDate() + sign * n);
+  else if(unit === 'weeks') d.setDate(d.getDate() + sign * 7 * n);
+  else if(unit === 'months') d.setMonth(d.getMonth() + sign * n);
+  else d.setFullYear(d.getFullYear() + sign * n);
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  $id('add-out').textContent = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  showRes('add-res');
+}
+(function(){
+  var t = new Date();
+  $id('d1').value = localISO(t);
+  $id('ad-start').value = localISO(t);
+  var next = new Date(t.getTime() + 30 * 86400000);
+  $id('d2').value = localISO(next);
+})();
+</script>
+</body>
+</html>

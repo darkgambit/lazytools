@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sales Tax Calculator — Add or Reverse Tax (VAT & GST) | LazyTools</title>
+    <meta name="description" content="Free sales tax calculator: add sales tax, VAT or GST to a net price, or reverse a tax-inclusive total to find the pre-tax amount and the tax you paid. Any rate, any currency.">
+    <meta name="keywords" content="sales tax calculator, reverse sales tax calculator, add tax to price, remove tax from total, vat calculator, gst calculator, tax inclusive price, pre-tax amount">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/sales-tax-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Sales Tax Calculator — Add or Reverse Tax (VAT & GST) | LazyTools"><meta property="og:description" content="Free sales tax calculator: add sales tax, VAT or GST to a net price, or reverse a tax-inclusive total to find the pre-tax amount and the tax you paid. Any rate, any currency."><meta property="og:url" content="https://lazytools.pages.dev/tools/sales-tax-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Sales Tax Calculator — Add or Reverse Tax (VAT & GST) | LazyTools"><meta name="twitter:description" content="Free sales tax calculator: add sales tax, VAT or GST to a net price, or reverse a tax-inclusive total to find the pre-tax amount and the tax you paid. Any rate, any currency."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Sales Tax Calculator", "url": "https://lazytools.pages.dev/tools/sales-tax-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free sales tax calculator: add sales tax, VAT or GST to a net price, or reverse a tax-inclusive total to find the pre-tax amount and the tax you paid. Any rate, any currency.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I remove sales tax from a total?", "acceptedAnswer": {"@type": "Answer", "text": "Divide the total by (1 + rate/100) — do not subtract the percentage. At 8.25%, a 270.63 total is 270.63 / 1.0825 = 250.00 before tax. Subtracting 8.25% from the total instead would give 248.30, which is wrong: the tax was charged on the pre-tax amount, not on the total."}}, {"@type": "Question", "name": "What is the difference between sales tax, VAT and GST?", "acceptedAnswer": {"@type": "Answer", "text": "They are all consumption taxes collected at the point of sale. US sales tax is normally added on top of the displayed price, while VAT (Europe, UK) and GST (Australia, Canada, India, Singapore) are usually already included in the shelf price — which is exactly why the reverse mode matters more outside the US."}}, {"@type": "Question", "name": "Can it handle compound tax or two rates at once?", "acceptedAnswer": {"@type": "Answer", "text": "It handles one rate at a time. For compound tax, where a second tax is charged on top of the first, run the 'add tax' step and then feed the resulting total back in as the pre-tax price for the second rate."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Sales Tax Calculator", "item": "https://lazytools.pages.dev/tools/sales-tax-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Finance › Sales Tax Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Finance</span>
+  <h1>🧮 Sales Tax Calculator</h1>
+  <p class="lead">Both directions, because both come up: add a tax rate to a net price, or pull the tax back out of a gross total to see what you actually paid for the goods.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <h3 class="panel-title">Add tax to a price</h3>
+  <div class="grid-2">
+    <div class="field"><label for="st1-net">Price before tax</label><input type="number" id="st1-net" placeholder="e.g. 250" min="0" step="any"></div>
+    <div class="field"><label for="st1-rate">Tax rate (%)</label><input type="number" id="st1-rate" value="8.25" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runST1()">Add tax</button></div>
+  <div class="results" id="st1-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="st1-tax">—</b><span>Tax</span></div>
+      <div class="stat"><b id="st1-gross">—</b><span>Total with tax</span></div>
+    </div>
+    <p class="big-result" id="st1-out">—</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">Remove tax from a total (reverse)</h3>
+  <div class="grid-2">
+    <div class="field"><label for="st2-gross">Total including tax</label><input type="number" id="st2-gross" placeholder="e.g. 270.63" min="0" step="any"></div>
+    <div class="field"><label for="st2-rate">Tax rate (%)</label><input type="number" id="st2-rate" value="8.25" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runST2()">Remove tax</button></div>
+  <div class="results" id="st2-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="st2-net">—</b><span>Price before tax</span></div>
+      <div class="stat"><b id="st2-tax">—</b><span>Tax included</span></div>
+    </div>
+    <p class="big-result" id="st2-out">—</p>
+    <p class="note">Reversing tax is not the same as subtracting the percentage — see the first FAQ for why.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Sales Tax Calculator</h2>
+  <p>Sales tax, VAT and GST are all consumption taxes, and the single most common mistake is working backwards. People subtract the rate from the tax-inclusive total, which always understates the tax and overstates the pre-tax price, because the tax was charged on the smaller pre-tax amount rather than on the total.</p><p>This calculator does both directions properly: forward to add tax to a net price, and reverse to divide it back out of a gross total. Rates are free-form, so it works for a US state sales tax, UK VAT, Australian GST, or any other percentage.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How do I remove sales tax from a total?</summary><p>Divide the total by (1 + rate/100) — do not subtract the percentage. At 8.25%, a 270.63 total is 270.63 / 1.0825 = 250.00 before tax. Subtracting 8.25% from the total instead would give 248.30, which is wrong: the tax was charged on the pre-tax amount, not on the total.</p></details><details><summary>What is the difference between sales tax, VAT and GST?</summary><p>They are all consumption taxes collected at the point of sale. US sales tax is normally added on top of the displayed price, while VAT (Europe, UK) and GST (Australia, Canada, India, Singapore) are usually already included in the shelf price — which is exactly why the reverse mode matters more outside the US.</p></details><details><summary>Can it handle compound tax or two rates at once?</summary><p>It handles one rate at a time. For compound tax, where a second tax is charged on top of the first, run the 'add tax' step and then feed the resulting total back in as the pre-tax price for the second rate.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a><a class="tool-card" href="../tools/tip-calculator.html" data-slug="tip-calculator" data-cat="Finance" data-name="Tip Calculator" data-keywords="Tip amount, total and per-person split in one tap. tip calculator, gratuity calculator, bill splitter, how much to tip, split the bill"><span class="ico">💵</span><h3>Tip Calculator</h3><p>Tip amount, total and per-person split in one tap.</p></a><a class="tool-card" href="../tools/loan-calculator.html" data-slug="loan-calculator" data-cat="Finance" data-name="Loan Calculator" data-keywords="Monthly payment and total interest for any loan — plus extra-payment savings. loan calculator, monthly payment calculator, mortgage payment calculator, car loan calculator, extra payment savings, amortization"><span class="ico">🏦</span><h3>Loan Calculator</h3><p>Monthly payment and total interest for any loan — plus extra-payment savings.</p></a><a class="tool-card" href="../tools/invoice-generator.html" data-slug="invoice-generator" data-cat="Business" data-name="Invoice Generator" data-keywords="Create a clean, professional invoice and save it as PDF — free, no signup. invoice generator, free invoice maker, create invoice online, invoice pdf, invoice template"><span class="ico">🧾</span><h3>Invoice Generator</h3><p>Create a clean, professional invoice and save it as PDF — free, no signup.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function runST1(){
+  var net = readNum('st1-net', 'the price before tax'); if(net === null) return;
+  var rate = readNum('st1-rate', 'the tax rate'); if(rate === null) return;
+  var tax = net * rate / 100;
+  $id('st1-tax').textContent = fmt(tax);
+  $id('st1-gross').textContent = fmt(net + tax);
+  $id('st1-out').textContent = fmt(net) + ' + ' + fmt(rate, 3) + '% tax = ' + fmt(net + tax);
+  showRes('st1-res');
+}
+function runST2(){
+  var gross = readNum('st2-gross', 'the tax-inclusive total'); if(gross === null) return;
+  var rate = readNum('st2-rate', 'the tax rate'); if(rate === null) return;
+  if(rate <= -100){ alert('That tax rate is not a valid number.'); return; }
+  var net = gross / (1 + rate / 100), tax = gross - net;
+  $id('st2-net').textContent = fmt(net);
+  $id('st2-tax').textContent = fmt(tax);
+  $id('st2-out').textContent = fmt(gross) + ' including ' + fmt(rate, 3) + '% tax = ' + fmt(net) + ' before tax';
+  showRes('st2-res');
+}
+</script>
+</body>
+</html>

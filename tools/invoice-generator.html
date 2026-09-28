@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Free Invoice Generator — Create & Download Invoices as PDF | LazyTools</title>
+    <meta name="description" content="Free invoice generator: create professional invoices with line items and tax, then save as PDF straight from your browser. No signup, no watermark, nothing uploaded.">
+    <meta name="keywords" content="invoice generator, free invoice maker, create invoice online, invoice pdf, invoice template">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/invoice-generator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Free Invoice Generator — Create & Download Invoices as PDF | LazyTools"><meta property="og:description" content="Free invoice generator: create professional invoices with line items and tax, then save as PDF straight from your browser. No signup, no watermark, nothing uploaded."><meta property="og:url" content="https://lazytools.pages.dev/tools/invoice-generator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Free Invoice Generator — Create & Download Invoices as PDF | LazyTools"><meta name="twitter:description" content="Free invoice generator: create professional invoices with line items and tax, then save as PDF straight from your browser. No signup, no watermark, nothing uploaded."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Invoice Generator", "url": "https://lazytools.pages.dev/tools/invoice-generator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free invoice generator: create professional invoices with line items and tax, then save as PDF straight from your browser. No signup, no watermark, nothing uploaded.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this invoice generator really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — no signup, no watermark, no page limit, and no “upgrade to download” trap. The invoice is produced entirely in your browser; nothing is uploaded to any server."}}, {"@type": "Question", "name": "How do I save the invoice as a PDF?", "acceptedAnswer": {"@type": "Answer", "text": "Click “Print / Save as PDF”, then in the browser's print dialog choose “Save as PDF” as the destination. This works in Chrome, Edge, Firefox and Safari on desktop and mobile."}}, {"@type": "Question", "name": "Are invoices made in a browser legally valid?", "acceptedAnswer": {"@type": "Answer", "text": "In most countries an invoice is valid as long as it contains the required details — parties, date, unique number, description, amounts and tax. Check your local requirements (some places require a tax ID or specific numbering) and keep a copy of every invoice you send."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Invoice Generator", "item": "https://lazytools.pages.dev/tools/invoice-generator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Business › Invoice Generator</nav>
+<div class="tool-hero">
+  <span class="badge">Business</span>
+  <h1>🧾 Invoice Generator</h1>
+  <p class="lead">Fill in the fields, add your line items, and hit “Print / Save as PDF” for a clean, professional invoice. Free, no signup, no watermark — and it never leaves your browser.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel no-print">
+  <p class="panel-title" style="margin-bottom:6px">How it works</p>
+  <p class="note" style="margin-top:0">Type directly into the invoice below — totals update live. When you're done, click <b>Print / Save as PDF</b> and choose “Save as PDF” as the printer destination. Everything stays on your device.</p>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="window.print()">🖨️ Print / Save as PDF</button></div>
+</div>
+
+<div id="invoice-sheet" class="invoice-sheet">
+  <div class="inv-head">
+    <div>
+      <div class="inv-logo">INVOICE</div>
+      <label>Invoice #</label><input id="inv-no" value="INV-001">
+    </div>
+    <div class="inv-dates">
+      <label>Date</label><input type="date" id="inv-date">
+      <label>Due date</label><input type="date" id="inv-due">
+    </div>
+  </div>
+
+  <div class="inv-parties">
+    <div>
+      <label>From (your details)</label>
+      <textarea id="inv-from" rows="4">Your Name&#10;Street Address&#10;City, Country&#10;you@example.com</textarea>
+    </div>
+    <div>
+      <label>Bill to (client)</label>
+      <textarea id="inv-to" rows="4">Client Name&#10;Street Address&#10;City, Country&#10;client@example.com</textarea>
+    </div>
+  </div>
+
+  <table class="inv-table">
+    <thead><tr><th style="width:52%">Description</th><th>Qty</th><th>Price</th><th>Amount</th><th class="no-print"></th></tr></thead>
+    <tbody id="inv-items"></tbody>
+  </table>
+  <div class="btn-row no-print"><button class="btn-ghost" type="button" onclick="invAdd()">+ Add line item</button></div>
+
+  <div class="inv-totals">
+    <div><span>Subtotal</span><b id="inv-sub">0.00</b></div>
+    <div><span>Tax % <input type="number" id="inv-tax" value="0" min="0" step="any" class="mini" oninput="invCalc()"></span><b id="inv-taxamt">0.00</b></div>
+    <div class="inv-total"><span>Total</span><b id="inv-total">0.00</b></div>
+  </div>
+
+  <div class="inv-notes">
+    <label>Notes / payment details</label>
+    <textarea id="inv-notes" rows="3">Payment instructions, bank or wallet details, thank-you note…</textarea>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Invoice Generator</h2>
+  <p>Freelancers, small shops and consultants lose real money to invoicing friction: clunky templates, sign-up walls, watermarks, and subscriptions for something that should take two minutes. This generator keeps it simple — type, print, done.</p><p>Because everything renders locally, there is no account to create, no client data leaking to a third party, and no waiting: the invoice is a real document you can save as PDF and email. That also makes it work offline. If you bill by the hour, the <a href="hours-calculator.html">hours calculator</a> turns a week of start and finish times into the decimal hours these line items need.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>Is this invoice generator really free?</summary><p>Yes — no signup, no watermark, no page limit, and no “upgrade to download” trap. The invoice is produced entirely in your browser; nothing is uploaded to any server.</p></details><details><summary>How do I save the invoice as a PDF?</summary><p>Click “Print / Save as PDF”, then in the browser's print dialog choose “Save as PDF” as the destination. This works in Chrome, Edge, Firefox and Safari on desktop and mobile.</p></details><details><summary>Are invoices made in a browser legally valid?</summary><p>In most countries an invoice is valid as long as it contains the required details — parties, date, unique number, description, amounts and tax. Check your local requirements (some places require a tax ID or specific numbering) and keep a copy of every invoice you send.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/hours-calculator.html" data-slug="hours-calculator" data-cat="Business" data-name="Hours Calculator" data-keywords="Hours between two times, plus a weekly time-card total in decimal hours for payroll. hours calculator, time card calculator, work hours calculator, hours between two times, decimal hours, payroll hours, timesheet calculator"><span class="ico">⏱️</span><h3>Hours Calculator</h3><p>Hours between two times, plus a weekly time-card total in decimal hours for payroll.</p></a><a class="tool-card" href="../tools/compound-interest-calculator.html" data-slug="compound-interest-calculator" data-cat="Finance" data-name="Compound Interest Calculator" data-keywords="See how savings grow with compound interest and monthly deposits — with a year-by-year table. compound interest calculator, savings calculator, investment growth calculator, monthly contribution calculator, future value calculator"><span class="ico">📈</span><h3>Compound Interest Calculator</h3><p>See how savings grow with compound interest and monthly deposits — with a year-by-year table.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+function invCalc(){
+  var rows = document.querySelectorAll('#inv-items tr');
+  var sub = 0;
+  rows.forEach(function(tr){
+    var qty = parseFloat(tr.querySelector('.inv-qty').value) || 0;
+    var price = parseFloat(tr.querySelector('.inv-price').value) || 0;
+    var amt = qty * price;
+    tr.querySelector('.inv-amt').textContent = amt.toFixed(2);
+    sub += amt;
+  });
+  var taxPct = parseFloat($id('inv-tax').value) || 0;
+  var tax = sub * taxPct / 100;
+  $id('inv-sub').textContent = sub.toFixed(2);
+  $id('inv-taxamt').textContent = tax.toFixed(2);
+  $id('inv-total').textContent = (sub + tax).toFixed(2);
+}
+function invDel(btn){
+  var tr = btn.parentNode.parentNode;
+  tr.parentNode.removeChild(tr);
+  invCalc();
+}
+function invAdd(desc, qty, price){
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><input class="inv-desc" value="' + (desc || '') + '" placeholder="Description of work"></td>' +
+    '<td><input type="number" class="inv-qty" value="' + (qty !== undefined ? qty : 1) + '" min="0" step="any"></td>' +
+    '<td><input type="number" class="inv-price" value="' + (price !== undefined ? price : 0) + '" min="0" step="any"></td>' +
+    '<td class="inv-amt">0.00</td>' +
+    '<td class="no-print"><button class="inv-x" type="button" onclick="invDel(this)">✕</button></td>';
+  $id('inv-items').appendChild(tr);
+  tr.addEventListener('input', invCalc);
+  invCalc();
+}
+(function(){
+  $id('inv-date').value = localISO(new Date());
+  var due = new Date(Date.now() + 14 * 86400000);
+  $id('inv-due').value = localISO(due);
+  invAdd('Website design — landing page', 1, 250);
+  invAdd('Monthly maintenance', 1, 50);
+})();
+</script>
+</body>
+</html>

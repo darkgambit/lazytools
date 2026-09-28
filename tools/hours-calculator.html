@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hours Calculator — Time Card & Hours Between Two Times | LazyTools</title>
+    <meta name="description" content="Free hours calculator: work out the hours between two times, subtract unpaid breaks, and total a full week as decimal hours ready for payroll. Runs 100% in your browser.">
+    <meta name="keywords" content="hours calculator, time card calculator, work hours calculator, hours between two times, decimal hours, payroll hours, timesheet calculator">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/hours-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Hours Calculator — Time Card & Hours Between Two Times | LazyTools"><meta property="og:description" content="Free hours calculator: work out the hours between two times, subtract unpaid breaks, and total a full week as decimal hours ready for payroll. Runs 100% in your browser."><meta property="og:url" content="https://lazytools.pages.dev/tools/hours-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Hours Calculator — Time Card & Hours Between Two Times | LazyTools"><meta name="twitter:description" content="Free hours calculator: work out the hours between two times, subtract unpaid breaks, and total a full week as decimal hours ready for payroll. Runs 100% in your browser."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Hours Calculator", "url": "https://lazytools.pages.dev/tools/hours-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free hours calculator: work out the hours between two times, subtract unpaid breaks, and total a full week as decimal hours ready for payroll. Runs 100% in your browser.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I convert hours and minutes into decimal hours?", "acceptedAnswer": {"@type": "Answer", "text": "Divide the minutes by 60. So 7 hours 30 minutes is 7 + 30/60 = 7.50 decimal hours. Payroll systems use decimal hours because they multiply straight into an hourly rate — 7.50 × 20 = 150."}}, {"@type": "Question", "name": "Why does the calculator say my night shift crosses midnight?", "acceptedAnswer": {"@type": "Answer", "text": "If the end time is earlier than the start time, the only sensible reading is that the shift ran past midnight: 22:00 to 06:00 is 8 hours, not a negative number. This tool adds 24 hours automatically and tells you it did."}}, {"@type": "Question", "name": "Does it deduct unpaid breaks automatically?", "acceptedAnswer": {"@type": "Answer", "text": "Only the break you enter. Some jurisdictions require a rest break to be unpaid, others require it to be paid, so the tool never assumes. Enter your unpaid break in minutes and it is deducted from the day and from the weekly total."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Hours Calculator", "item": "https://lazytools.pages.dev/tools/hours-calculator"}]}</script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Business › Hours Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Business</span>
+  <h1>⏱️ Hours Calculator</h1>
+  <p class="lead">Add up working hours the way payroll does — get the duration between two times, then total a full week in both hours:minutes and the decimal hours that timesheets actually use.</p>
+</div>
+<div class="ad-slot" data-slot="top" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <h3 class="panel-title">Hours between two times</h3>
+  <div class="grid-2">
+    <div class="field"><label for="hc-start">Start time</label><input type="time" id="hc-start" value="09:00"></div>
+    <div class="field"><label for="hc-end">End time</label><input type="time" id="hc-end" value="17:30"></div>
+    <div class="field"><label for="hc-break">Unpaid break (minutes)</label><input type="number" id="hc-break" value="30" min="0" step="1"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runHours()">Calculate hours</button></div>
+  <div class="results" id="hc-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="hc-hm">—</b><span>Hours &amp; minutes</span></div>
+      <div class="stat"><b id="hc-dec">—</b><span>Decimal hours</span></div>
+      <div class="stat"><b id="hc-mins">—</b><span>Total minutes</span></div>
+      <div class="stat"><b id="hc-overnight">—</b><span>Crosses midnight</span></div>
+    </div>
+    <p class="note">If the end time is earlier than the start time the shift is counted as crossing midnight — useful for night work. Your times never leave this page.</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">Weekly time card</h3>
+  <ul class="sleep-list" id="hc-week"></ul>
+  <div class="results show" id="hc-wres">
+    <div class="stat-grid">
+      <div class="stat"><b id="hc-wtotal">0.00</b><span>Decimal hours</span></div>
+      <div class="stat"><b id="hc-whm">0 h 0 m</b><span>Hours &amp; minutes</span></div>
+      <div class="stat"><b id="hc-wdays">0</b><span>Days worked</span></div>
+    </div>
+    <p class="note">Payroll bills in decimal hours: 7 h 30 m = 7.50 h. Multiply by your hourly rate to get gross pay before deductions.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Hours Calculator</h2>
+  <p>An hours calculator is one of the most searched tools on the web because timesheets are still filled in by hand. The arithmetic is deceptively awkward: clock time is base-60, payroll is base-10, and any shift that crosses midnight breaks a naive subtraction.</p><p>This tool handles all three problems at once. It returns the duration between two times with unpaid breaks deducted, converts that answer into decimal hours, and then totals a whole week the way a payroll system would — overnight shifts included.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How do I convert hours and minutes into decimal hours?</summary><p>Divide the minutes by 60. So 7 hours 30 minutes is 7 + 30/60 = 7.50 decimal hours. Payroll systems use decimal hours because they multiply straight into an hourly rate — 7.50 × 20 = 150.</p></details><details><summary>Why does the calculator say my night shift crosses midnight?</summary><p>If the end time is earlier than the start time, the only sensible reading is that the shift ran past midnight: 22:00 to 06:00 is 8 hours, not a negative number. This tool adds 24 hours automatically and tells you it did.</p></details><details><summary>Does it deduct unpaid breaks automatically?</summary><p>Only the break you enter. Some jurisdictions require a rest break to be unpaid, others require it to be paid, so the tool never assumes. Enter your unpaid break in minutes and it is deducted from the day and from the weekly total.</p></details></div>
+</section>
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/invoice-generator.html" data-slug="invoice-generator" data-cat="Business" data-name="Invoice Generator" data-keywords="Create a clean, professional invoice and save it as PDF — free, no signup. invoice generator, free invoice maker, create invoice online, invoice pdf, invoice template"><span class="ico">🧾</span><h3>Invoice Generator</h3><p>Create a clean, professional invoice and save it as PDF — free, no signup.</p></a><a class="tool-card" href="../tools/word-counter.html" data-slug="word-counter" data-cat="Text" data-name="Word Counter" data-keywords="Live word, character, sentence and paragraph counts with reading time. word counter, character count, letter count, sentence counter, reading time calculator, words per page"><span class="ico">✍️</span><h3>Word Counter</h3><p>Live word, character, sentence and paragraph counts with reading time.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" aria-label="Advertisement"></div>
+</main>
+<script>
+var HC_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function hcParse(t){ if(!t) return null; var p = t.split(':'); return (parseInt(p[0], 10) * 60) + parseInt(p[1], 10); }
+function hcHM(m){ m = Math.max(0, Math.round(m)); return Math.floor(m / 60) + ' h ' + (m % 60) + ' m'; }
+function hcSpan(startV, endV, brk){
+  var s = hcParse(startV), e = hcParse(endV);
+  if(s === null || e === null) return null;
+  var overnight = false;
+  if(e < s){ e += 1440; overnight = true; }
+  var mins = e - s - (brk || 0);
+  if(mins < 0) mins = 0;
+  return { mins: mins, overnight: overnight };
+}
+function hcBuild(){
+  var host = $id('hc-week');
+  var html = '';
+  HC_DAYS.forEach(function(d){
+    html += '<li><b style="font-size:.95rem;min-width:84px;color:var(--text)">' + d + '</b>' +
+            '<input type="time" class="hc-in" aria-label="' + d + ' start time" style="width:134px">' +
+            '<input type="time" class="hc-out" aria-label="' + d + ' end time" style="width:134px">' +
+            '<input type="number" class="hc-brk mini" value="0" min="0" step="1" title="Unpaid break (minutes)" aria-label="' + d + ' unpaid break minutes">' +
+            '<span class="hc-day" style="margin-left:auto">—</span></li>';
+  });
+  host.innerHTML = html;
+  host.addEventListener('input', hcWeek);
+}
+function runHours(){
+  var brk = parseFloat($id('hc-break').value) || 0;
+  var r = hcSpan($id('hc-start').value, $id('hc-end').value, brk);
+  if(!r){ alert('Please enter both a start time and an end time.'); return; }
+  $id('hc-hm').textContent = hcHM(r.mins);
+  $id('hc-dec').textContent = (r.mins / 60).toFixed(2);
+  $id('hc-mins').textContent = fmt(r.mins, 0) + ' min';
+  $id('hc-overnight').textContent = r.overnight ? 'Yes (+1 day)' : 'No';
+  showRes('hc-res');
+}
+function hcWeek(){
+  var total = 0, days = 0;
+  [].slice.call(document.querySelectorAll('#hc-week li')).forEach(function(li){
+    var r = hcSpan(li.querySelector('.hc-in').value, li.querySelector('.hc-out').value,
+                  parseFloat(li.querySelector('.hc-brk').value) || 0);
+    var cell = li.querySelector('.hc-day');
+    if(r){ total += r.mins; if(r.mins > 0) days++; cell.textContent = hcHM(r.mins) + ' · ' + (r.mins / 60).toFixed(2); }
+    else { cell.textContent = '—'; }
+  });
+  $id('hc-wtotal').textContent = (total / 60).toFixed(2);
+  $id('hc-whm').textContent = hcHM(total);
+  $id('hc-wdays').textContent = String(days);
+}
+hcBuild();
+runHours();
+</script>
+</body>
+</html>

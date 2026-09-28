@@ -60,17 +60,13 @@ the first Adsterra payout (not before signup).
 
 - **GitHub login** — ✅ done (as `darkgambit`).
 - **Cloudflare login** — ✅ done. Project `lazytools` created, first deployment live.
-- **Google Search Console** — 🔶 **tag deployed, sitemap submitted by you.** Confirm you clicked
-  **Verify** and that the property shows as verified; then I'll record the date. Bing imports
-  from GSC next (no second tag needed).
-- **Cloudflare Web Analytics** — ⏭ **next, and it's the easiest win.** Cookieless, free,
-  unlimited, no consent banner. Open the Cloudflare dashboard → **Web Analytics** → add
-  `lazytools.pages.dev` → copy the one-line snippet → paste it to me. I put it in
-  `ANALYTICS_CODE`, rebuild and redeploy. (I can't do it for you: the wrangler login token
-  doesn't carry the `analytics` / `rum` scope.)
-- **Adsterra** — the step that starts earning. Publisher signup with your email, then add the
-  website and create 3 ad units; paste the 3 codes to me. **The code is now safe to paste** —
-  see "Step 6 prep" below.
+- **Google Search Console** — ✅ **done 2026-09-28.** Tag deployed, sitemap submitted,
+  **property confirmed verified** by the owner. Next: Bing Webmaster imports from GSC (no second tag).
+- **Cloudflare Web Analytics** — ✅ **done 2026-09-28.** Snippet wired into `ANALYTICS_CODE` and
+  live on 21/21 pages. Nothing further needed — it is cookieless, so no consent banner.
+- **Adsterra** — 🔶 **publisher account exists (ID `6084129`), `ads.txt` line deployed.**
+  ⏭ **The one thing I still need: the 3 ad-unit codes.** Ad Units → Create → copy each code.
+  See the format guidance below before you create them.
 - **Affiliate signups** — see Step 7 below.
 
 ---
@@ -377,6 +373,92 @@ Committed as `91cf1dc`, pushed, deployed. Live markup verified on the edge:
 `<div class="ad-slot" data-slot="top" data-w="728" data-h="90" …>` on tool pages and the
 homepage. Full live re-verification after deploy: deploy contract **PASSED** · e2e **25/25** ·
 ads **10/10**.
+
+---
+
+## ✅ Step 4 — Google Search Console: verified (2026-09-28)
+
+Tag deployed to all 21 pages, sitemap submitted, **property confirmed verified by the owner on
+2026-09-28**. Bing Webmaster can now import the property straight from GSC — no second tag.
+
+IndexNow was re-run after this deploy: key file live and byte-correct, **20 URLs, HTTP 200
+accepted**. That covers Bing/Yandex/Seznam/Naver immediately, without waiting for a crawl.
+
+## ✅ Step 5 — analytics live (2026-09-28)
+
+The Cloudflare Web Analytics snippet lives in `ANALYTICS_CODE` in `_generator/build.py` and is
+injected into every page's `<head>` via the `__ANALYTICS__` token — **verified present on 21/21
+pages**, and asserted positively in the browser suite on every page it visits, so a page that
+silently loses its beacon now fails the build instead of quietly losing traffic.
+
+Cookieless, so no consent banner and no privacy-policy change was required — but the policy now
+*says so* explicitly (and links Adsterra's own policy, which the network requires).
+
+### 🐞 A real bug the beacon exposed — in the test suite, not the site
+
+Adding the beacon turned **every one of the 21 page checks red**, while all of their functional
+assertions still passed (`cards=17`, `ads=3`, `ld=3`, results all correct). The suite was failing
+on `errs.length === 0` alone.
+
+Cause: the beacon POSTs to `cloudflareinsights.com/cdn-cgi/rum`, which answers with
+`Access-Control-Allow-Origin: http://127.0.0.1` — **it strips the port** — so the CORS preflight
+fails from `http://127.0.0.1:8788`. A localhost-only artifact, not a production bug.
+
+The fix is a scoping change, not a silence: **errors only count against this site when they come
+from this site's own origin.** Known third-party hosts are still collected and printed, never
+hidden. Coverage is preserved by asserting `beacon === 1` on every page, so filtering the noise
+loses nothing. One subtlety worth keeping: a failed subresource logs a generic *"Failed to load
+resource"* with no hostname in the text, so the console message's **source URL** has to be matched
+too — the message text alone would have let it through.
+
+### Measured and rejected
+
+I suspected the beacon (`<script type='module'>`, deferred) would delay the `load` event for
+visitors whose network blocks it. Measured it with the host aborted — what an ad blocker does:
+
+| Variant | DOMContentLoaded | load |
+|---|---|---|
+| no beacon | 303 ms | 313 ms |
+| snippet verbatim | 334 ms | **358 ms** |
+| snippet + `async` | 298 ms | **319 ms** |
+
+So the verbatim snippet costs ~45 ms and `async` saves ~40 ms. **Not worth deviating from
+Cloudflare's official snippet for** — so it stays verbatim. Recording this because "I measured it
+and the concern didn't hold up" is a result, and re-litigating it later would waste time.
+
+## 🔶 Step 6 — Adsterra: account and ads.txt done, ad units outstanding
+
+**Done:** publisher account created (ID **`6084129`**), `ADSTERRA_PUBLISHER_ID` set in `build.py`,
+and the line is **live** at https://lazytools.pages.dev/ads.txt :
+
+```
+adsterra.com, 6084129, DIRECT
+```
+
+**Still needed from you: the 3 ad-unit codes.** Ad Units → Create → GET CODE → paste each to me.
+I insert them into `assets/ads.js`, rebuild, redeploy, and verify they render **live**.
+
+### ⚠️ Read this before creating the units
+
+- **Format matters more than size.** Create **Banner** units (728×90 → `top`, 300×250 → `middle`,
+  300×250 → `bottom`) and/or **Native Banner**. **Do not** use Popunder, Social Bar or Smartlink:
+  they are the formats most associated with forced redirects, and a tool site's whole pitch is
+  "no surprises".
+- **Turn Adult ads OFF** when adding the website, and pick category **Other** — Adsterra's list is
+  coarse and has no Technology option.
+- **A third-party integration guide reports forced redirects even without choosing a redirect
+  format**, and the author ended up disabling ads entirely. Treat that as a real risk: after the
+  codes go live I will re-run the browser suite and check for unexpected navigation, and you
+  should load the site once on a real phone and in a private window. If anything redirects, we
+  pull the codes the same day. Ads are worth a few dollars a month; losing visitors is not.
+- **`highperformanceformat.com` is flagged by some malware sandboxes.** Ad networks attract false
+  positives, but it means a minority of visitors may see a security warning or have the ad
+  blocked. Nothing to fix — just don't be surprised, and don't "fix" it by moving the tag inline.
+- **Day-one CPM is ~$0.09 and takes days to weeks to climb.** Do not read the first 48 hours as
+  the verdict.
+
+The code path itself is already proven safe and rendering — see "Step 6 prep" above. Pasting real
+ad code cannot blank the site, and the suite proves both that and that the ad actually appears.
 
 ---
 
@@ -688,3 +770,28 @@ has not.
 - Commit `91cf1dc`, pushed, deployed. Post-deploy live re-verification: deploy contract PASSED ·
   e2e 25/25 · ads 10/10 · slot markup with `data-w`/`data-h` confirmed on the edge.
 - **Next blocker is unchanged and still yours:** the Adsterra publisher account (Step 6).
+
+### 2026-09-28 — Steps 4 done, 5 live, 6 started
+- **GSC confirmed verified** by the owner; sitemap already submitted. IndexNow re-run: 20 URLs,
+  HTTP 200 accepted.
+- **Analytics live**: Cloudflare Web Analytics snippet wired into `ANALYTICS_CODE`, verified on
+  21/21 pages and asserted positively per-page in the browser suite. Privacy policy updated to
+  state the analytics is cookieless and to link Adsterra's own policy.
+- **The beacon broke the test suite, not the site.** All 21 page checks went red while every
+  functional assertion in them still passed: the RUM endpoint answers with
+  `Access-Control-Allow-Origin: http://127.0.0.1` (port stripped), failing the CORS preflight from
+  `127.0.0.1:8788`. Fixed by scoping error collection to first-party origins — third-party noise is
+  printed but never fatal, and `beacon === 1` is now asserted per page so filtering loses no
+  coverage. A failed subresource needs its console message's **source URL** matched, not just its
+  text, or the generic "Failed to load resource" line slips through.
+- **Measured and rejected** adding `async` to the beacon: a blocked host costs ~45 ms of load
+  time and `async` saves ~40 ms — not worth deviating from Cloudflare's snippet.
+- **`ads.txt` is real now**: `adsterra.com, 6084129, DIRECT`, live and verified. Corrected the
+  file's example comment, which named a hostname that does not exist.
+- **Adsterra risk found while researching the ads.txt format**: a published integration write-up
+  reports forced redirects even without choosing a redirect ad format, and the author disabled
+  ads entirely. Documented above, with the format guidance (Banner/Native only; no Popunder,
+  Social Bar or Smartlink) and a plan to re-test for unexpected navigation once codes are live.
+- Verified after deploy: deploy contract PASSED · e2e 25/25 ×5 (emulator) and 25/25 live ·
+  ads 10/10 ×5 and 10/10 live. Commit `96bf176`.
+- **Awaiting the owner:** the 3 Adsterra ad-unit codes.

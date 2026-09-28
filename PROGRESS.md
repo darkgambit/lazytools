@@ -22,7 +22,7 @@ Chrome against production.
 | 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
 | 2 | GitHub: gh auth + public repo + push | ✅ done — https://github.com/darkgambit/lazytools | 2026-09-28 |
 | 3 | Deploy free (Cloudflare Pages) + verify live | ✅ done — https://lazytools.pages.dev | 2026-09-28 |
-| 4 | Google Search Console + Bing + sitemap | ⏭ **next** — needs your Google login | — |
+| 4 | Google Search Console + Bing + sitemap | 🔄 verification tag **live & matched** — click Verify, then submit the sitemap | 2026-09-28 |
 | 4b | IndexNow ping to Bing/Yandex/Seznam/Naver — no account needed | ✅ done — HTTP 202 accepted | 2026-09-28 |
 | 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
 | 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
@@ -348,6 +348,38 @@ When you've signed up, send me the tracking links and I'll insert them with
 
 ---
 
+## 🔄 Step 4 — Google Search Console (tag deployed, awaiting your click)
+
+**The verification tag is live and verified.** `GOOGLE_VERIFICATION` in `build.py` holds the
+token Google issued, and `verification_tags()` renders it into **every** page's `<head>` —
+Google only checks the property URL, but carrying it site-wide means a future rebuild can never
+drop it from the one page that matters. `BING_VERIFICATION` is stubbed for the same treatment.
+
+Checked against production rather than the local build:
+
+| URL | Result |
+|---|---|
+| `https://lazytools.pages.dev/` | tag present, token **matches** Google's exactly |
+| `https://lazytools.pages.dev/about` | tag present, token **matches** |
+| Local build | tag on **21 / 21** pages |
+
+Deploy contract re-run after the change: **PASSED**.
+
+### 👉 What you need to do
+1. Go back to the **Search Console** tab where you copied the tag
+2. Click **Verify**
+3. Once it says *"Ownership verified"*, open **Sitemaps** in the left menu
+4. Enter `sitemap.xml` and click **Submit**
+
+Then tell me and I'll do the Bing side (it imports straight from GSC, no second tag needed).
+
+> **Note on a red herring:** my first check after deploying reported the tag missing. It was not —
+> Cloudflare's CDN had not finished propagating. A deploy reporting success is not the same as the
+> edge serving the new bytes, so always re-check the live URL after a short pause before believing
+> a failure.
+
+---
+
 ## ✅ Step 4b — IndexNow: search engines told about the site (2026-09-28)
 
 Google is **not** an IndexNow participant, so this does **not** replace Search Console — but it is
@@ -552,3 +584,14 @@ has not.
   previews will render · live key file 200 with the correct body.
 - **Still blocked on you for Step 4** (Google Search Console). Everything else that can be done
   without your credentials is now done.
+
+### 2026-09-28 — Step 4: verification tag deployed and matched
+- the owner supplied the GSC token. Added `GOOGLE_VERIFICATION` + `verification_tags()` to
+  `build.py`, rendered into **every** page's `<head>` (21/21), so a future rebuild can never drop
+  it from the one page Google checks. `BING_VERIFICATION` stubbed for the same flow.
+- **Checked against production, not the local build:** the token on
+  `https://lazytools.pages.dev/` and `/about` matches Google's exactly. Deploy contract PASSED.
+- **Red herring worth remembering:** the first post-deploy check reported the tag *missing*. It
+  wasn't — Cloudflare's CDN had not finished propagating. A deploy reporting success is not the
+  same as the edge serving the new bytes. Pause and re-fetch before believing a failure.
+- **Awaiting the owner:** click **Verify**, then submit `sitemap.xml`. Bing imports from GSC next.

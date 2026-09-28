@@ -5,6 +5,7 @@ Disallow: /_tests/
 Disallow: /_generator/
 Disallow: /README.md
 Disallow: /PROGRESS.md
+Disallow: /LAUNCH.md
 Disallow: /CLAUDE-CODE-PROMPT.md
 Disallow: /.gitignore
 

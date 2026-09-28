@@ -383,6 +383,7 @@ def robots():
             "Disallow: /_generator/\n"
             "Disallow: /README.md\n"
             "Disallow: /PROGRESS.md\n"
+            "Disallow: /LAUNCH.md\n"
             "Disallow: /CLAUDE-CODE-PROMPT.md\n"
             "Disallow: /.gitignore\n"
             "\nSitemap: " + SITE_URL + "/sitemap.xml\n")

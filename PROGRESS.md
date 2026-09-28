@@ -23,11 +23,13 @@ Chrome against production.
 | 2 | GitHub: gh auth + public repo + push | ✅ done — https://github.com/darkgambit/lazytools | 2026-09-28 |
 | 3 | Deploy free (Cloudflare Pages) + verify live | ✅ done — https://lazytools.pages.dev | 2026-09-28 |
 | 4 | Google Search Console + Bing + sitemap | ⏭ **next** — needs your Google login | — |
+| 4b | IndexNow ping to Bing/Yandex/Seznam/Naver — no account needed | ✅ done — HTTP 202 accepted | 2026-09-28 |
 | 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
 | 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
 | 6 | Adsterra ad units + ads.txt | ⏸ blocked on step 3 | — |
 | 7 | Affiliate links — shortlist prepared below | 🔄 prepared, needs your signups | — |
-| 8 | Growth loop — cycle 1: 3 tools added (**14 → 17**) | ✅ done (launch posts pending your URL) | 2026-09-28 |
+| 8 | Growth loop — cycle 1: 3 tools added (**14 → 17**) | ✅ done | 2026-09-28 |
+| 8b | Launch kit written — Product Hunt, Show HN, Reddit, X, Pinterest | ✅ done — see `LAUNCH.md` | 2026-09-28 |
 | — | Monetization reality check + earnings math + 30-day plan (section below) | ✅ done | 2026-09-28 |
 
 Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
@@ -346,6 +348,44 @@ When you've signed up, send me the tracking links and I'll insert them with
 
 ---
 
+## ✅ Step 4b — IndexNow: search engines told about the site (2026-09-28)
+
+Google is **not** an IndexNow participant, so this does **not** replace Search Console — but it is
+the one indexing lever that needs no account at all, and it covers **Bing** (which also feeds
+Copilot / ChatGPT search), **Yandex**, **Seznam** and **Naver**.
+
+- `build.py` now generates `<key>.txt`, which is how IndexNow proves you own the host. That file
+  must stay publicly readable, so it is deliberately **not** in the robots.txt Disallow list.
+- `_generator/indexnow.py` verifies the key file is **live and byte-correct before submitting**.
+  Submitting against an unreachable key file just returns 403 and teaches you nothing, so the
+  script aborts instead. It caught exactly that on its very first dry run, before the file had
+  been deployed — the guard did its job the first time it was asked to.
+- All 20 URLs submitted → **HTTP 202, accepted**.
+
+This keeps paying off every growth cycle: each new tool gets pinged immediately instead of waiting
+for a recrawl.
+
+---
+
+## ✅ Step 8b — launch kit written (2026-09-28)
+
+`LAUNCH.md` — the drafts that were queued waiting on a live URL. Now complete and ready to post:
+
+- **Product Hunt:** name, a 43-character tagline, description, and a ready-to-paste first comment
+- **Show HN:** title + body that leads with the two real bugs instead of a feature list
+- **r/SideProject:** post built around what was actually learned building it
+- **3 X posts:** launch, privacy angle (the strongest), build angle
+- **5 Pinterest pins** with titles + descriptions, matched to the tools Pinterest actually sends
+  traffic to — sleep cycle, BMI, compound interest, time card, discount
+- A **"what to watch" table**, plus an explicit warning not to respond to a weak launch by adding
+  30 more tools
+
+The copy deliberately leads with *"no signup"* and *"your data never leaves your device"* rather
+than "17 tools". The count is not the interesting part, and both claims are literally true here
+because every tool computes client-side.
+
+---
+
 ## 💰 Will this get monetized? — the honest math (2026-09-28)
 
 **Short answer: the mechanism is real and the site is built for it, but revenue today is $0 and
@@ -498,3 +538,17 @@ has not.
   failures until it was given a browser UA.
 - **Next: Step 4 — Google Search Console.** Needs your Google login; I inject the verification
   tag, redeploy, then you click Verify.
+
+### 2026-09-28 — Step 4b (IndexNow) + Step 8b (launch kit) while Step 4 waits
+- **IndexNow live.** `build.py` generates `<key>.txt`; `_generator/indexnow.py` checks that file
+  is live and byte-correct *before* submitting, then posts all 20 URLs → **HTTP 202 accepted**.
+  Covers Bing (and thus Copilot/ChatGPT search), Yandex, Seznam, Naver. No account needed. The
+  pre-flight guard aborted correctly on its first dry run because the key file had not been
+  deployed yet.
+- **`LAUNCH.md` written** — Product Hunt, Show HN, r/SideProject, 3 X posts and 5 Pinterest pins,
+  all ready to paste now that there is a live URL to point at. Also added `/LAUNCH.md` to the
+  robots.txt Disallow list, since the repo root is the deploy directory.
+- Verified: static checks 0 issues · live `og-image.png` 200 (`image/png`, 117 KB) so social
+  previews will render · live key file 200 with the correct body.
+- **Still blocked on you for Step 4** (Google Search Console). Everything else that can be done
+  without your credentials is now done.

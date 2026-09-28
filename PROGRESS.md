@@ -60,11 +60,17 @@ the first Adsterra payout (not before signup).
 
 - **GitHub login** — ✅ done (as `darkgambit`).
 - **Cloudflare login** — ✅ done. Project `lazytools` created, first deployment live.
-- **Google Search Console** — ⏭ **next.** Add a **URL-prefix** property for
-  `https://lazytools.pages.dev`, pick the **HTML tag** method, and paste the meta tag back to me.
-  I inject it into the build, redeploy, then you click Verify and submit the sitemap.
-- **Bing Webmaster** — same flow (or import straight from GSC).
-- **Adsterra** — publisher signup with your email, then add the website and create 3 ad units; paste the 3 codes to me.
+- **Google Search Console** — 🔶 **tag deployed, sitemap submitted by you.** Confirm you clicked
+  **Verify** and that the property shows as verified; then I'll record the date. Bing imports
+  from GSC next (no second tag needed).
+- **Cloudflare Web Analytics** — ⏭ **next, and it's the easiest win.** Cookieless, free,
+  unlimited, no consent banner. Open the Cloudflare dashboard → **Web Analytics** → add
+  `lazytools.pages.dev` → copy the one-line snippet → paste it to me. I put it in
+  `ANALYTICS_CODE`, rebuild and redeploy. (I can't do it for you: the wrangler login token
+  doesn't carry the `analytics` / `rum` scope.)
+- **Adsterra** — the step that starts earning. Publisher signup with your email, then add the
+  website and create 3 ad units; paste the 3 codes to me. **The code is now safe to paste** —
+  see "Step 6 prep" below.
 - **Affiliate signups** — see Step 7 below.
 
 ---
@@ -309,6 +315,68 @@ New checks added to the suite: the weekly time card (Mon–Fri 09:00–17:00 wit
 → **35.00 h**, 5 days), an overnight shift (22:00–06:00 → 8 h), the discount reverse modes
 (120 → 84 = **30% off**; 84 after 30% off = **120**), and reverse sales tax (270.63 incl 8.25%
 → net **250**, tax **20.63**).
+
+---
+
+## ✅ Step 6 prep — real ad code can no longer blank the site (2026-09-28)
+
+This is the one piece of Step 6 that could be done without your Adsterra account, and it
+was worth doing **before** you paste anything in. It also turned out to be a revenue bug,
+not just a safety bug.
+
+### The problem
+
+Adsterra's banner codes load a cross-origin `invoke.js` which calls `document.write`.
+`document.write` is only legal while a parser is active. I measured what it actually does
+in headless Chrome, in this repo, rather than trusting the docs:
+
+| When the write lands | What happens |
+|---|---|
+| `readyState` = `interactive` (script arrived fast) | **Silently swallowed.** Page survives, nothing logged, **nothing written — the ad never appears.** |
+| `readyState` = `complete` (script arrived after load) | Implicit `document.open()` → **the entire document is erased.** Visitor gets a blank tab. |
+
+So without a fix you get one of two outcomes, and which one depends only on network timing:
+you either lose the page, or you lose the ad and have no symptom to debug. The blank-tab case
+is the one that only shows up **after** real ad code is pasted in — i.e. on launch day, for
+every visitor.
+
+### The fix
+
+`assets/ads.js` now renders any slot whose code is known to write inside a same-origin
+`srcdoc` iframe. `srcdoc` is parsed normally, so the write lands inside the iframe while a
+parser is active: **the ad renders correctly and the page is untouched.** Isolation is
+therefore load-bearing for revenue, not just for safety.
+
+Detection can't just look for the string `document.write`, because the snippet you paste
+usually contains no such thing — the write lives in `invoke.js` on another host. So it also
+matches the known ad-script hostnames. **If you switch networks and see blank slots, add that
+network's host to `needsIsolation()`.** Plain markup (AdSense, most native units) still goes
+in inline, because some networks require their tag in the top-level document.
+
+Also fixed: `AD_SIZES` and the `ad(slot)` helper were **dead code** — all five ad slots were
+hardcoded markup, so the sizes never reached the page. They now emit
+`data-w` / `data-h`, which is what the iframe is sized from.
+
+### Verification
+
+`_tests/check_ads.js` is new — **10 checks, 10/10, stable across 5 consecutive runs**, run
+against both the emulator and the live site. The ad config is injected by intercepting the
+`ads.js` request, so fake ad code can never be left behind in the repo. It asserts **both
+halves**: page intact *and* the ad actually rendered inside the iframe.
+
+Critically it carries **two negative controls** that disable the isolation branch, because a
+suite that cannot fail proves nothing:
+
+- isolation off + late write → `bodyLen=69 h1=0` — **page confirmed wiped**
+- isolation off + instant write → page survives but `payloadTop=false` — **ad confirmed lost**
+
+Both reproduce the real bugs, so the suite's ability to catch them is proven rather than
+assumed.
+
+Committed as `91cf1dc`, pushed, deployed. Live markup verified on the edge:
+`<div class="ad-slot" data-slot="top" data-w="728" data-h="90" …>` on tool pages and the
+homepage. Full live re-verification after deploy: deploy contract **PASSED** · e2e **25/25** ·
+ads **10/10**.
 
 ---
 
@@ -595,3 +663,28 @@ has not.
   wasn't — Cloudflare's CDN had not finished propagating. A deploy reporting success is not the
   same as the edge serving the new bytes. Pause and re-fetch before believing a failure.
 - **Awaiting the owner:** click **Verify**, then submit `sitemap.xml`. Bing imports from GSC next.
+
+### 2026-09-28 — Step 6 prep: ad code can no longer blank the site
+- The open item from the previous session was a **failing negative control** in the ad-isolation
+  suite. Diagnosed it instead of papering over it, and the diagnosis changed the design brief.
+- **Measured `document.write` behaviour directly** with a throwaway probe that ran the real
+  `assets/ads.js` with the isolation branch dead, recording `readyState` at write time:
+  - at `interactive` → write silently swallowed, `lenBefore=8988 lenAfter=8988`, page survives,
+    nothing written;
+  - at `complete` → `lenBefore=9222 lenAfter=29`, `h1` gone, `readyState` reset to `loading` —
+    the document really is erased.
+- So the original negative control was **mis-timed, not wrong about the hazard**: it injected the
+  ad during the deferred-script phase, which is precisely the no-op case. The real failure needs
+  the write to land after load, which is what any cold cross-origin fetch does.
+- A second finding, and the more expensive one: with isolation off and an instant write, the page
+  survives but **the ad never renders** (`payloadTop=false`). Blank slots, no error, no symptom.
+  Isolation is therefore load-bearing for **revenue**, not just safety.
+- **Rewrote `_tests/check_ads.js`** around the measured behaviour: 10 checks, 10/10, stable across
+  5 consecutive runs, green against the emulator *and* live. Now asserts both halves — page intact
+  *and* ad rendered inside the iframe — and carries two negative controls, one per failure mode.
+  Both reproduce real bugs, so the suite is proven able to fail.
+- Corrected the `assets/ads.js` header comment to describe what was measured rather than what was
+  assumed, and documented that new ad networks may need their host added to `needsIsolation()`.
+- Commit `91cf1dc`, pushed, deployed. Post-deploy live re-verification: deploy contract PASSED ·
+  e2e 25/25 · ads 10/10 · slot markup with `data-w`/`data-h` confirmed on the edge.
+- **Next blocker is unchanged and still yours:** the Adsterra publisher account (Step 6).

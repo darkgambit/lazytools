@@ -2,6 +2,18 @@
 
 Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ignored)
 
+## 🟢 THE SITE IS LIVE → **https://lazytools.pages.dev**
+
+Deployed 2026-09-28 to Cloudflare Pages (free tier). Source: https://github.com/darkgambit/lazytools
+
+**Verified on the live URL, not locally:** deploy contract **PASSED** (all 20 sitemap URLs 200
+with matching canonicals, 4 security headers present, repo-only paths disallowed, unknown path
+→ 404) and the real-browser suite **25/25** — every one of the 17 tools computes correctly in
+Chrome against production.
+
+**Still earning $0** — ads are not wired up yet (Step 6) and the site is not yet indexed
+(Step 4). Being live is necessary, not sufficient.
+
 | Step | What | Status | Date |
 |---|---|---|---|
 | 0 | INFO.md (personal data, git-ignored) | ✅ done — name, email, contact, domain + analytics decided | 2026-09-28 |
@@ -9,7 +21,8 @@ Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ign
 | 1b | Production-readiness pass (URLs, OG, headers, guards) | ✅ done | 2026-09-28 |
 | 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
 | 2 | GitHub: gh auth + public repo + push | ✅ done — https://github.com/darkgambit/lazytools | 2026-09-28 |
-| 3 | Deploy free (Cloudflare Pages) + verify live | ⏭ **next** — needs your Cloudflare login | — |
+| 3 | Deploy free (Cloudflare Pages) + verify live | ✅ done — https://lazytools.pages.dev | 2026-09-28 |
+| 4 | Google Search Console + Bing + sitemap | ⏭ **next** — needs your Google login | — |
 | 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
 | 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
 | 6 | Adsterra ad units + ads.txt | ⏸ blocked on step 3 | — |
@@ -38,16 +51,17 @@ don't have to, and I will never ask.
 
 ## ⏸ BLOCKED ON YOU — the rest of the queue
 
-**1. `INFO.md`** — ✅ **done.** Name, email, contact email, domain and analytics are all decided
-and recorded. Only `payout_wallet` is outstanding, and it is not needed until the first Adsterra
-payout (not before signup).
+**1. `INFO.md`** — ✅ **done.** Only `payout_wallet` is outstanding, and it is not needed until
+the first Adsterra payout (not before signup).
 
 **2. Then, one at a time (I'll prompt you for each):**
 
-- **GitHub login** — 🔄 in progress, see above.
-- **Cloudflare login** — I run `npx wrangler login`; you complete the browser part. Free tier, no card.
-- **Google Search Console** — add a URL-prefix property, choose HTML-tag verification, paste the meta tag back to me. I inject it, rebuild, deploy, then you click Verify.
-- **Bing Webmaster** — same flow (or import from GSC).
+- **GitHub login** — ✅ done (as `darkgambit`).
+- **Cloudflare login** — ✅ done. Project `lazytools` created, first deployment live.
+- **Google Search Console** — ⏭ **next.** Add a **URL-prefix** property for
+  `https://lazytools.pages.dev`, pick the **HTML tag** method, and paste the meta tag back to me.
+  I inject it into the build, redeploy, then you click Verify and submit the sitemap.
+- **Bing Webmaster** — same flow (or import straight from GSC).
 - **Adsterra** — publisher signup with your email, then add the website and create 3 ad units; paste the 3 codes to me.
 - **Affiliate signups** — see Step 7 below.
 
@@ -205,6 +219,45 @@ paths disallowed, unknown path → 404) · `mailto:` present on `/about` and `/p
 Starting `wrangler pages dev` detached in a subshell makes it die as soon as the Bash command
 returns, so a *later* command sees a dead server and every URL returns **502**. Run the server,
 the readiness poll and the check **in the same shell invocation**.
+
+---
+
+## ✅ Step 3 — deployed to Cloudflare Pages (2026-09-28)
+
+**Live: https://lazytools.pages.dev**
+
+- `npx wrangler login` — OAuth, free tier, no card.
+- `npx wrangler pages project create lazytools --production-branch main` — **the name was free**,
+  so the assigned hostname matched the provisional `SITE_URL` exactly and **no rebuild was
+  needed**. Had it been taken, Cloudflare would have appended a suffix and every canonical,
+  the sitemap and `og:image` would have pointed at a host that does not exist — which is
+  precisely why `SITE_URL` was flagged provisional rather than assumed.
+- `npx wrangler pages deploy . --project-name lazytools --branch main` — 44 files in 2.9s.
+
+### Verified against the LIVE URL, not locally
+```
+python _tests/check_deploy.py https://lazytools.pages.dev   # → DEPLOY CHECK PASSED
+LT_BASE=https://lazytools.pages.dev node _tests/e2e.js      # → 25 passed, 0 failed
+```
+- All 20 sitemap URLs return **200 directly** with a canonical matching the live URL.
+- All four security headers present on the **real edge**, not just the emulator.
+- Unknown path → 404 page. `/_headers` not served.
+- **25/25 real-browser checks in Chrome against production** — all 17 tools compute correctly
+  (age `36 y 4 m 13 d`, compound interest `54,623.32`, loan `386.66/mo`, weekly time card
+  `35.00 h`, reverse sales tax net `250` / tax `20.63`), with zero console errors.
+
+### 🐞 Environment bugs found only by testing the live site
+1. **`curl -o /dev/null` fails with exit 23** on this machine ("Failed writing body"), and `/tmp`
+   is not writable either. Write curl output into the gitignored `.wrangler/` directory instead.
+2. **The outbound proxy returns 403 for Python's default User-Agent.** `check_deploy.py` reported
+   **40 failures, all 403**, against a site that curl fetched perfectly with a browser UA. Fixed
+   permanently: the checker now sends a real browser UA. Without that fix a live-site run tests
+   the proxy, not the site — and would have "proven" a working deployment was broken.
+
+### Deployment mechanics
+Deploys are currently **manual** (`wrangler pages deploy`). Connecting the GitHub repo in the
+Cloudflare dashboard would auto-deploy on every push — worth doing before the ad-tuning phase,
+since every ad-code change requires a redeploy.
 
 ---
 
@@ -431,3 +484,17 @@ has not.
   filesystem (`git branch -r` is empty, `git rev-parse origin/main` fails) even though the fetch
   reports success and the push works. Push with an explicit refspec if a command ever needs it.
 - **Next: Step 3 — Cloudflare Pages deploy.** Needs your Cloudflare login.
+
+### 2026-09-28 — Step 3 complete: THE SITE IS LIVE
+- **https://lazytools.pages.dev** — Cloudflare Pages free tier, project `lazytools`, 44 files.
+- The project name was free, so the assigned hostname matched the provisional `SITE_URL`
+  exactly and no rebuild was needed. Verified live: homepage 200 with correct title + canonical,
+  17 tool cards, tool pages 200, contact `mailto:` live on `/about`.
+- **Deploy contract PASSED against the live URL** and **browser E2E 25/25 in Chrome against
+  production** with zero console errors.
+- Two environment bugs found only because I tested the live site rather than stopping at the
+  emulator: `curl -o /dev/null` exit 23 (plus `/tmp` being unwritable), and the proxy returning
+  **403 for Python's default User-Agent** — which made the deploy checker report 40 false
+  failures until it was given a browser UA.
+- **Next: Step 4 — Google Search Console.** Needs your Google login; I inject the verification
+  tag, redeploy, then you click Verify.

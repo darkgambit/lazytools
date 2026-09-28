@@ -27,6 +27,13 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 OPENER = urllib.request.build_opener(NoRedirect)
+# This machine routes outbound traffic through a proxy that rejects Python's default
+# User-Agent ("Python-urllib/3.x") with a 403. Without a browser UA, every URL in a
+# live-site run reports 403 and the check appears to fail catastrophically when the
+# site is actually fine. Send a real UA so the result reflects the site, not the proxy.
+OPENER.addheaders = [("User-Agent",
+                      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36")]
 
 
 def probe(path):

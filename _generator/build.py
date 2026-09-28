@@ -44,6 +44,13 @@ ANALYTICS_CODE = ""
 # so main() generates that file and it must stay publicly readable (do NOT add it to the
 # robots.txt Disallow list). Submit with:  python _generator/indexnow.py
 INDEXNOW_KEY = "d328e91fa97904481ce908132cc8af34"
+
+# Search-engine ownership proofs, injected into every page's <head> by verification_tags().
+# Google Search Console only checks the property URL, but carrying the tag site-wide means a
+# rebuild can never drop it from the one page that matters. Bing can be verified by importing
+# from GSC, or by pasting its own token into BING_VERIFICATION.
+GOOGLE_VERIFICATION = "2gqxtbCOJQVOaYka5Ycs_7T08h4rrPWn6Ug1dtAC8Go"
+BING_VERIFICATION = ""
 # ---------------------------------------------------------------------------- #
 
 BUILD_DATE = datetime.date.today().strftime("%d %B %Y")
@@ -129,6 +136,7 @@ def head(title, desc, path, rel, keywords=None, jsonld=None, noindex=False):
     # page including the 404, since a 404 hit is itself a signal that someone followed a
     # dead link. Blank config means zero bytes of third-party script on the site.
     an = ("\n    " + ANALYTICS_CODE) if ANALYTICS_CODE else ""
+    vf = verification_tags()
     return """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,7 +145,7 @@ def head(title, desc, path, rel, keywords=None, jsonld=None, noindex=False):
     <title>__TITLE__</title>
     <meta name="description" content="__DESC__">
     __KW____CANON__
-    __OG__
+    __OG____VERIFY__
     <meta name="theme-color" content="#0a0f1e">
     <link rel="icon" href="__REL__favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="__REL__site.webmanifest">
@@ -152,10 +160,19 @@ def head(title, desc, path, rel, keywords=None, jsonld=None, noindex=False):
 <body>
 """.replace("__TITLE__", title).replace("__DESC__", esc_attr(desc)).replace("__URL__", url) \
    .replace("__KW__", kw).replace("__CANON__", canon).replace("__OG__", og).replace("__REL__", rel).replace("__LD__", ld) \
-   .replace("__ANALYTICS__", an)
+   .replace("__ANALYTICS__", an).replace("__VERIFY__", vf)
 
 def esc_attr(s):
     return s.replace('"', "&quot;")
+
+def verification_tags():
+    """Search-engine ownership proofs. Empty config emits nothing at all."""
+    out = []
+    if GOOGLE_VERIFICATION:
+        out.append('<meta name="google-site-verification" content="' + GOOGLE_VERIFICATION + '">')
+    if BING_VERIFICATION:
+        out.append('<meta name="msvalidate.01" content="' + BING_VERIFICATION + '">')
+    return ("\n    " + "\n    ".join(out)) if out else ""
 
 def ad(slot):
     return '<div class="ad-slot" data-slot="' + slot + '" aria-label="Advertisement"></div>'

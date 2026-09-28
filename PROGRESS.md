@@ -8,8 +8,8 @@ Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ign
 | 1 | Finalize site — build, verify, git init, v1 commit | ✅ done | 2026-09-28 |
 | 1b | Production-readiness pass (URLs, OG, headers, guards) | ✅ done | 2026-09-28 |
 | 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
-| 2 | GitHub: gh auth + public repo + push | 🔄 **waiting on you** — device code issued, expires in ~15 min | 2026-09-28 |
-| 3 | Deploy free (Cloudflare Pages) + verify live | ⏸ blocked on step 2 | — |
+| 2 | GitHub: gh auth + public repo + push | ✅ done — https://github.com/darkgambit/lazytools | 2026-09-28 |
+| 3 | Deploy free (Cloudflare Pages) + verify live | ⏭ **next** — needs your Cloudflare login | — |
 | 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
 | 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
 | 6 | Adsterra ad units + ads.txt | ⏸ blocked on step 3 | — |
@@ -21,17 +21,18 @@ Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
 
 ---
 
-## 🔴 ACTION REQUIRED RIGHT NOW — GitHub login
+## ✅ GitHub — authenticated and published
 
-A device-flow login is running and waiting for you. Codes expire after about 15 minutes; if it
-lapses I just issue a new one.
+Device-flow login completed 2026-09-28 as **darkgambit** (token scopes: `repo`, `read:org`,
+`gist`). Public repo: **https://github.com/darkgambit/lazytools** — 4 commits, 42 files,
+default branch `main`, every commit authored as the owner.
 
-1. Open **https://github.com/login/device**
-2. Enter the one-time code **`7895-9A85`** (already copied to your clipboard)
-3. Approve the GitHub CLI
+Verified **after** pushing, not assumed: `INFO.md` and `.workbuddy-ai/` are absent from the
+remote (checked through the GitHub API), and a scan of every tracked file found no secrets,
+tokens or private keys.
 
-Then say "done" and I will create the public repo and push. **Never paste a password or an OTP
-into this chat** — the device flow exists precisely so you don't have to, and I will never ask.
+**Never paste a password or an OTP into this chat** — the device flow exists precisely so you
+don't have to, and I will never ask.
 
 ---
 
@@ -416,3 +417,17 @@ has not.
 - **GitHub device flow issued** (`gh auth login --web`). Code **`1BBF-B91F`**, waiting on you at
   https://github.com/login/device. Repo creation and push follow as soon as it's approved.
 - Static checks still 0 issues (319 refs, 17 JS blocks).
+
+### 2026-09-28 — Step 2 complete: the site is on GitHub
+- **GitHub login completed** as **darkgambit** via the device flow. The first code expired before
+  use (that is normal and harmless) — a second one was issued and approved.
+- **Public repo created and pushed: https://github.com/darkgambit/lazytools**
+  4 commits, 42 files, branch `main`, all authored as the owner.
+- **Pre-publish safety scan** over every tracked file: no secrets, tokens or private keys. The
+  only personal data that goes public is `kingripper9@gmail.com`, and that is deliberate — it is
+  the published contact address on `/about` and `/privacy`, which ad networks require.
+  `INFO.md` and `.workbuddy-ai/` confirmed absent from the remote via the GitHub API.
+- Local quirk worth remembering: the `origin/main` remote-tracking ref does not persist on this
+  filesystem (`git branch -r` is empty, `git rev-parse origin/main` fails) even though the fetch
+  reports success and the push works. Push with an explicit refspec if a command ever needs it.
+- **Next: Step 3 — Cloudflare Pages deploy.** Needs your Cloudflare login.

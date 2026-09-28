@@ -303,6 +303,10 @@ function runBed(){
 "about": [
 "Alarm clocks don't know where you are in your sleep cycle. If they ring during deep (slow-wave) sleep you wake up groggy even after a long night; if they ring between cycles you can feel fine after less sleep. That mismatch is called sleep inertia.",
 "This calculator works backwards from your wake-up time in 90-minute steps and adds ~15 minutes of falling-asleep time, giving you several bedtimes that should end a cycle right as your alarm rings. It's a simple heuristic — but a genuinely useful one that millions of people search for every week."
+],
+"gear": [
+{"query": "blackout curtains bedroom", "label": "Blackout curtains", "why": "Light is the strongest signal your body clock reads — blocking it is the cheapest fix for early waking."},
+{"query": "white noise machine", "label": "White noise machine", "why": "Steadier background sound reduces the mid-night wakings that break a cycle in half."}
 ]
 },
 
@@ -513,6 +517,12 @@ function runBMI(){
 "about": [
 "BMI (Body Mass Index) divides your weight by the square of your height (kg/m²). It was designed in the 1830s as a population statistic, and it remains the fastest universal screening number for weight-related health risk — which is exactly why doctors, insurers, gyms and diet apps still ask for it.",
 "The healthy-weight range shown alongside your BMI is simply your height multiplied by the healthy BMI band (18.5–24.9), converted back into your chosen units — the number most people are actually looking for when they search for a BMI calculator."
+],
+# Amazon Associates. Deliberately NO prices and NO star ratings — displaying either without
+# pulling it live from an Amazon API is a listed reason for account closure. Keep it that way.
+"gear": [
+{"query": "digital bathroom scale", "label": "Digital bathroom scale", "why": "Weighing in weekly at the same time of day shows a real trend; daily readings are mostly noise."},
+{"query": "body tape measure", "label": "Body tape measure", "why": "Waist circumference catches the blind spot BMI is worst at — muscle versus fat."}
 ]
 },
 

@@ -233,6 +233,19 @@ h2.section{margin:38px 0 10px;font-size:1.28rem;font-weight:800}
   .invoice-sheet input,.invoice-sheet textarea{background:transparent!important}
 }
 
+/* ---------- recommended gear (Amazon Associates) ---------- */
+/* Only rendered on tools that define a "gear" list — see gear_block() in _generator/build.py.
+   The disclosure sits ABOVE the links on purpose: Amazon's Operating Agreement and the FTC both
+   require the affiliate relationship to be clear before the reader clicks, not buried below. */
+.gear-list{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.gear-list li{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 18px;
+}
+.gear-link{font-weight:700}
+.gear-why{display:block;color:var(--muted);font-size:.88rem;margin-top:4px}
+.gear-disclosure{color:var(--muted);font-size:.84rem;margin:0 0 12px}
+
 /* ---------- misc ---------- */
 .center{text-align:center}
 .mt0{margin-top:0}

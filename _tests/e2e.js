@@ -252,6 +252,30 @@ let pass = 0, fail = 0;
     await page.close();
   } catch (e) { report(false, 'sales tax (reverse)', e.message.split('\n')[0]); }
 
+  // ---------- affiliate links: the revenue path, end to end ----------
+  // The static guard already proves the tag and disclosure are in the HTML. This proves the
+  // links actually RENDER as working links a visitor can click, with the tag intact after any
+  // JS has run — and that the disclosure is visible rather than merely present in the source.
+  // The tag is read from the links rather than hardcoded, so this cannot drift from config.
+  try {
+    const { page, errs } = await newPage();
+    await page.goto(nav('tools/bmi-calculator.html'), { waitUntil: 'load' });
+    const links = await page.$$eval('.gear-list a.gear-link', as => as.map(a => ({
+      href: a.getAttribute('href'),
+      rel: a.getAttribute('rel') || '',
+      target: a.getAttribute('target') || ''
+    })));
+    const disclosureVisible = await page.locator('.gear-disclosure').first().isVisible();
+    const tags = links.map(l => (l.href.match(/[?&]tag=([^&]+)/) || [])[1] || '');
+    const ok = links.length === 2 && tags.every(t => t && t === tags[0]) &&
+               links.every(l => l.rel.includes('sponsored') && l.rel.includes('noopener') &&
+                                l.target === '_blank' && /^https:\/\/www\.amazon\./.test(l.href)) &&
+               disclosureVisible && errs.length === 0;
+    report(ok, 'affiliate links', `n=${links.length} tag=${tags[0] || '(none)'} ` +
+      `disclosure=${disclosureVisible} rel=${links[0] ? links[0].rel : '-'} errs=${errs.length}`);
+    await page.close();
+  } catch (e) { report(false, 'affiliate links', e.message.split('\n')[0]); }
+
   // ---------- static pages ----------
   for (const p of ['about.html', 'privacy.html', '404.html']) {
     try {

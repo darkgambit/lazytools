@@ -95,11 +95,25 @@ function patchAdsJsUnisolated(adCode) {
   return src.replace(marker, 'if (false) {');
 }
 
-async function scenario(browser, { adCode, invokeBody, unisolated, settle = 1500 }) {
+async function scenario(browser, { adCode, invokeBody, unisolated, settle = 2000 }) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message)));
+
+  /* This suite is about ad slots, not analytics, so the analytics beacon is aborted outright.
+
+     It is not cosmetic. Measured: with the beacon's real network fetch allowed, `load` took
+     3046 ms; with it aborted, 234 ms. Because every scenario here gets a FRESH browser context,
+     that cold third-party fetch is paid on every single page load, and any stall in it holds the
+     `load` event open — which surfaced as an intermittent `page.goto: Timeout 30000ms exceeded`
+     that looked like a bug in the ad code and was nothing of the sort. (e2e.js does not hit this
+     because it reuses one context, so the beacon is cached after the first page.)
+
+     Aborting also keeps the suite honest and offline-capable: it asserts the page's own
+     behaviour, and never depends on a third party being up. */
+  await page.route('**cloudflareinsights.com/**', r => r.abort());
+
   await page.route('**/assets/ads.js', r => r.fulfill({
     status: 200, contentType: 'application/javascript',
     body: unisolated ? patchAdsJsUnisolated(adCode) : patchAdsJs(adCode)
@@ -109,7 +123,11 @@ async function scenario(browser, { adCode, invokeBody, unisolated, settle = 1500
       status: 200, contentType: 'application/javascript', body: invokeBody
     }));
   }
-  await page.goto(BASE + '/tools/bmi-calculator', { waitUntil: 'load' });
+  /* `domcontentloaded`, not `load`. Every assertion below reads DOM state after a settle
+     period, so waiting for `load` adds no coverage — it only adds a dependency on every
+     third-party request the page makes. ads.js is deferred, so it has already run and the
+     slots are populated by the time this resolves. */
+  await page.goto(BASE + '/tools/bmi-calculator', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(settle);
 
   let out = { bodyLen: -1, h1: -1, iframes: -1, slotLive: -1, plainInline: -1,

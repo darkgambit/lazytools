@@ -68,6 +68,10 @@ genPw();
 "about": [
 "Almost every large password leak comes from two causes: passwords chosen by humans (patterns, names, keyboard walks) and password reuse across sites. A random generator removes the first problem, and a password manager makes reuse unnecessary.",
 "The strength meter shown here is based on real entropy — length multiplied by the information content of the character pool — rather than cosmetic rules, so adding length visibly moves the needle while swapping symbols for other symbols does not."
+],
+"gear": [
+{"query": "hardware security key fido2", "label": "Hardware security key (FIDO2)", "why": "Phishing-proof second factor. A strong generated password plus a hardware key is the single biggest upgrade you can make to an account."},
+{"query": "password manager", "label": "Password manager", "why": "This is what makes it practical to give every site a different generated password and actually remember none of them."}
 ]
 },
 
@@ -366,6 +370,10 @@ function runWater(){
 "about": [
 "Hydration needs are not one-size-fits-all: they scale with body mass, sweat losses from activity, and climate — which is why a one-line “8 glasses a day” rule fails desert dwellers and office workers alike.",
 "This calculator starts from the widely used weight-based guideline (about 35 ml per kg), adds sweat replacement for exercise, and layers on a climate adjustment — then translates the result into glasses and bottles, the units people actually track."
+],
+"gear": [
+{"query": "insulated water bottle 1 litre", "label": "Insulated 1 L water bottle", "why": "Keeping it visible and full on your desk does more for your intake than any reminder app."},
+{"query": "reusable water bottle with time markers", "label": "Bottle with time markers", "why": "Turns a daily total into hourly checkpoints, which is the part people actually miss."}
 ]
 },
 

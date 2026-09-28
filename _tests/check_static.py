@@ -119,9 +119,65 @@ for rel in html_files:
     for token in sorted(set(PLACEHOLDER.findall(txt))):
         issues.append("%s -> unsubstituted template token %s" % (rel, token))
 
+# Amazon Associates invariants. Both failure modes are silent and one is fatal:
+#   * An untagged link still sends the visitor to Amazon but earns NOTHING. There is no
+#     error, no log and no symptom — you simply never get paid for that click.
+#   * A missing disclosure is a listed reason for account closure, and a lapsed Associates
+#     ID is never reinstated (you reapply with a NEW tag and must swap every link).
+#   * A hardcoded price or star rating is also a closure trigger, so nothing in a gear block
+#     may contain one.
+# These are asserted against the GENERATED HTML, not the generator source, so a broken
+# gear_block() cannot slip through.
+_m = re.search(r'^AMAZON_TAG\s*=\s*"([^"]*)"', build, re.M)
+AMZ_TAG = _m.group(1) if _m else ""
+_d = re.search(r'^AMAZON_DISCLOSURE\s*=\s*"([^"]*)"', build, re.M)
+AMZ_DISCLOSURE = _d.group(1) if _d else ""
+amz_links = 0
+if AMZ_TAG:
+    PRICEY = re.compile(r"\$\s?\d|★|stars\b|out of 5", re.I)
+    # Affiliate links are exactly the ones gear_block() emits, and they carry class="gear-link".
+    # Matching on the class rather than the domain matters: /privacy links to Amazon's *help*
+    # pages for legal reference, which is an informational link and must NOT carry a tracking
+    # tag. Matching any amazon.com anchor flagged that as a defect — a false positive.
+    AFF = re.compile(r'<a[^>]*class="gear-link"[^>]*>')
+    # ...but a hand-pasted product or search link would bypass the class, and that is precisely
+    # the silent failure worth catching. So any OTHER amazon link whose URL has an affiliate
+    # shape is reported, while a help-page link is left alone.
+    AFFILIATE_SHAPED = re.compile(r"amazon\.[a-z.]+/(dp/|s\?)", re.I)
+    for rel in html_files:
+        txt = open(os.path.join(ROOT, rel), encoding="utf-8").read()
+        anchors = AFF.findall(txt)
+        if anchors:
+            amz_links += len(anchors)
+            if AMZ_DISCLOSURE and AMZ_DISCLOSURE not in txt:
+                issues.append("%s -> %d Amazon affiliate link(s) but no required disclosure text"
+                              % (rel, len(anchors)))
+            for a in anchors:
+                href = re.search(r'href="([^"]*)"', a)
+                href = href.group(1) if href else ""
+                if ("tag=" + AMZ_TAG) not in href:
+                    issues.append("%s -> Amazon link without the tracking tag (earns nothing): %s"
+                                  % (rel, href))
+                if "sponsored" not in a or "noopener" not in a:
+                    issues.append("%s -> Amazon link missing rel=\"sponsored noopener\"" % rel)
+        for a in re.findall(r"<a[^>]*amazon\.[^>]*>", txt):
+            if "gear-link" in a:
+                continue
+            href = re.search(r'href="([^"]*)"', a)
+            href = href.group(1) if href else ""
+            if AFFILIATE_SHAPED.search(href):
+                issues.append("%s -> Amazon product/search link that is NOT a gear-link, so it is "
+                              "probably untagged: %s" % (rel, href))
+        for block in re.findall(r'<ul class="gear-list">.*?</ul>', txt, re.S):
+            hit = PRICEY.search(block)
+            if hit:
+                issues.append("%s -> gear block contains a price/rating (%r); that is an "
+                              "Amazon closure trigger" % (rel, hit.group(0)))
+
 print("HTML files checked : %d" % len(html_files))
 print("Local refs checked : %d" % checked)
 print("Inline JS blocks   : %d (syntax-checked)" % js_count)
+print("Amazon links       : %d (tagged, disclosed, price-free)" % amz_links)
 print("Broken links / SEO : %d" % len(issues))
 for i in issues:
     print("  ! " + i)

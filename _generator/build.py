@@ -16,6 +16,7 @@ import json
 import os
 import sys
 import datetime
+import urllib.parse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tools_core import TOOLS_CORE
@@ -183,10 +184,77 @@ AD_SIZES = {"top": (728, 90), "middle": (300, 250), "bottom": (300, 250)}
 # CODE itself never lives here, it goes in assets/ads.js. Leave blank to omit the ads.txt line.
 ADSTERRA_PUBLISHER_ID = "6084129"
 
+# Amazon Associates tracking ID (owner, 2026-09-28). Every Amazon link on the site is built
+# from this one constant — deliberately, because of a hard Amazon rule:
+#
+#   If a new Associates account is withdrawn for failing to refer 3 qualifying sales within
+#   180 days, Amazon does NOT reinstate that ID. You reapply and get a NEW tag, and EVERY link
+#   still carrying the old tag earns nothing. So the tag must be swappable in one place.
+#
+# Empty string disables all Amazon links site-wide and hides the "Recommended gear" blocks,
+# which is the correct state if the account lapses — links pointing at a dead tag are worse
+# than no links, because they still send visitors to Amazon while earning nothing.
+AMAZON_TAG = "lazytool-20"
+AMAZON_DOMAIN = "www.amazon.com"
+
 def ad(slot):
     w, h = AD_SIZES.get(slot, (300, 250))
     return ('<div class="ad-slot" data-slot="' + slot + '" data-w="' + str(w) +
             '" data-h="' + str(h) + '" aria-label="Advertisement"></div>')
+
+# --------------------------------------------------------------------------- #
+#  Amazon Associates
+# --------------------------------------------------------------------------- #
+# Amazon's Program Policies make two things mandatory, and BOTH are listed reasons for account
+# closure if you get them wrong:
+#   1. A clear disclosure on any page carrying affiliate links.
+#   2. NO hardcoded prices and NO star ratings. Showing either without pulling it live from an
+#      Amazon API is a closure trigger, so the product data in tools_*.py carries a name and a
+#      reason to recommend it — never a price, never a rating.
+AMAZON_DISCLOSURE = "As an Amazon Associate I earn from qualifying purchases."
+
+def amazon_link(item):
+    """Build one affiliate link. Returns "" when AMAZON_TAG is blank, which hides every link.
+
+    Two shapes, chosen by the data:
+      - item has "asin" -> a canonical product link:  /dp/<ASIN>?tag=...
+      - otherwise       -> a search link:             /s?k=<query>&tag=...
+
+    Search links are an Amazon-sanctioned link type (SiteStripe generates them), and they are the
+    honest default here: inventing an ASIN would send visitors to the wrong product, which is
+    worse than a search page. Swap any entry to a real ASIN once you have one from SiteStripe.
+
+    rel="sponsored noopener nofollow" — Google requires affiliate links to be marked `sponsored`,
+    and an unmarked paid link is a ranking risk. Amazon does not ask for it; Google does.
+    rel="noopener" is required whenever target="_blank" is used.
+    """
+    if not AMAZON_TAG:
+        return ""
+    if item.get("asin"):
+        url = "https://" + AMAZON_DOMAIN + "/dp/" + item["asin"] + "?tag=" + AMAZON_TAG
+    else:
+        url = ("https://" + AMAZON_DOMAIN + "/s?k=" +
+               urllib.parse.quote_plus(item["query"]) + "&tag=" + AMAZON_TAG)
+    return ('<a class="gear-link" href="' + esc_attr(url) +
+            '" rel="sponsored noopener nofollow" target="_blank">' + item["label"] + "</a>")
+
+def gear_block(t):
+    """Optional per-tool product recommendations.
+
+    Rendered ONLY when the tool defines a "gear" list AND a tag is configured. A tool without
+    "gear" gets no section at all, so adding this costs the other 13 pages nothing — and no page
+    ever ships an empty "Recommended gear" heading, which would be worse than not having one.
+    """
+    items = t.get("gear")
+    if not items or not AMAZON_TAG:
+        return ""
+    lis = "".join("<li>" + amazon_link(i) + ' <span class="gear-why">' + i["why"] + "</span></li>"
+                  for i in items)
+    return ('<section class="gear">\n'
+            '  <h2 class="section">Recommended gear</h2>\n'
+            '  <p class="gear-disclosure">' + AMAZON_DISCLOSURE + '</p>\n'
+            '  <ul class="gear-list">' + lis + '</ul>\n'
+            '</section>\n')
 
 def tool_card(t, rel):
     return ('<a class="tool-card" href="' + rel + "tools/" + t["slug"] + '.html" '
@@ -256,6 +324,7 @@ __AD_MIDDLE__
   <h2 class="section">Frequently asked questions</h2>
   <div class="faq">__FAQS__</div>
 </section>
+__GEAR__
 <section class="related">
   <h2 class="section">Related tools</h2>
   <div class="tool-grid">__RELT__</div>
@@ -270,6 +339,7 @@ __AD_BOTTOM__
                 .replace("__ICON__", t["icon"]).replace("__LEAD__", t["lead"])
                 .replace("__BODY__", t["body"]).replace("__ABOUT__", about)
                 .replace("__FAQS__", faqs).replace("__RELT__", relhtml).replace("__JS__", t["js"])
+                .replace("__GEAR__", gear_block(t))
                 .replace("__AD_TOP__", ad("top")).replace("__AD_MIDDLE__", ad("middle"))
                 .replace("__AD_BOTTOM__", ad("bottom")))
     return html
@@ -339,7 +409,7 @@ def about_page():
   <h2 class="section" id="disclosure">How we make money (full disclosure)</h2>
   <p>Two ways, and only two ways:</p>
   <p><b>1. Display advertising.</b> Banner slots on these pages are served by third-party ad networks. They may use cookies as described in our <a href="privacy.html">privacy policy</a>.</p>
-  <p><b>2. Affiliate links.</b> Occasionally we may recommend a product or service and earn a small commission if you sign up. Recommendations are marked, and commissions never change what we recommend.</p>
+  <p><b>2. Affiliate links.</b> A few pages recommend a product we think is genuinely useful, and we earn a small commission if you buy it through our link — at no extra cost to you. <b>As an Amazon Associate I earn from qualifying purchases.</b> Anything we recommend is labelled as an affiliate link on the page itself, and a commission never changes what we recommend: we only list things we would mention anyway.</p>
   <p>We do not sell your data, we do not have accounts, and we do not charge for any tool. If that model ever changes, this page changes with it.</p>
   <h2 class="section">Contact</h2>
   <p>Found a bug? Want a tool added? Email <a href="mailto:__EMAIL__">__EMAIL__</a> — a human reads every message.</p>
@@ -365,7 +435,7 @@ def privacy_page():
   <h2 class="section">Advertising cookies</h2>
   <p>This site displays ads from third-party ad networks (such as Adsterra and/or Google AdSense). These partners may set cookies or use similar technologies to show you more relevant ads and measure performance. You can opt out of personalised advertising through your browser settings, or via your ad provider's opt-out page. Visiting an ad partner's site is governed by that partner's own privacy policy — for example, see <a href="https://adsterra.com/privacy-policy/" rel="noopener" target="_blank">Adsterra's privacy policy</a>.</p>
   <h2 class="section">Affiliate links</h2>
-  <p>Some outbound links may be affiliate links. If you make a purchase or sign up after clicking one, we may earn a commission at no extra cost to you. Affiliate partners may set their own cookies to attribute the referral.</p>
+  <p>Some outbound links are affiliate links — currently from the <strong>Amazon Associates</strong> programme. If you click one and make a purchase, we may earn a commission at no extra cost to you. As an Amazon Associate I earn from qualifying purchases. Affiliate partners may set their own cookies to attribute the referral; see <a href="https://www.amazon.com/gp/help/customer/display.html?nodeId=468496" rel="noopener" target="_blank">Amazon's privacy notice</a>.</p>
   <h2 class="section">Your choices</h2>
   <p>You can clear or block cookies in your browser at any time; the tools will continue to work perfectly. You may also use an ad blocker — the tools remain free either way.</p>
   <h2 class="section">Changes &amp; contact</h2>

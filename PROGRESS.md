@@ -4,14 +4,14 @@ Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ign
 
 | Step | What | Status | Date |
 |---|---|---|---|
-| 0 | INFO.md (personal data, git-ignored) | 🔄 **partial** — name/email/contact set; 3 fields still needed | 2026-09-28 |
+| 0 | INFO.md (personal data, git-ignored) | ✅ done — name, email, contact, domain + analytics decided | 2026-09-28 |
 | 1 | Finalize site — build, verify, git init, v1 commit | ✅ done | 2026-09-28 |
-| 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
 | 1b | Production-readiness pass (URLs, OG, headers, guards) | ✅ done | 2026-09-28 |
-| 2 | GitHub: gh auth + public repo + push | ⏸ **blocked on you** (gh installed, not logged in) | — |
+| 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
+| 2 | GitHub: gh auth + public repo + push | 🔄 **waiting on you** — device code issued, expires in ~15 min | 2026-09-28 |
 | 3 | Deploy free (Cloudflare Pages) + verify live | ⏸ blocked on step 2 | — |
 | 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
-| 5 | Analytics | ⏸ blocked on step 3 | — |
+| 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
 | 6 | Adsterra ad units + ads.txt | ⏸ blocked on step 3 | — |
 | 7 | Affiliate links — shortlist prepared below | 🔄 prepared, needs your signups | — |
 | 8 | Growth loop — cycle 1: 3 tools added (**14 → 17**) | ✅ done (launch posts pending your URL) | 2026-09-28 |
@@ -21,20 +21,29 @@ Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
 
 ---
 
-## ⏸ BLOCKED ON YOU — do these and I continue automatically
+## 🔴 ACTION REQUIRED RIGHT NOW — GitHub login
 
-**1. Fill `INFO.md`** — ✅ **partly done.** Name, email and contact email are in, and are now
-wired into the build (About + Privacy carry a working `mailto:`). Still needed:
+A device-flow login is running and waiting for you. Codes expire after about 15 minutes; if it
+lapses I just issue a new one.
 
-| Field | Needed for | Needed now? |
-|---|---|---|
-| `domain` | real URL instead of `*.pages.dev` | **yes** — decides whether `SITE_URL` is permanent |
-| `github_username` | repo naming / login | optional — `gh auth status` reveals it after login |
-| `payout_wallet` | Adsterra payouts (USDT TRC-20 etc.) | later, before the first payout |
+1. Open **https://github.com/login/device**
+2. Enter the one-time code **`1BBF-B91F`** (already copied to your clipboard)
+3. Approve the GitHub CLI
+
+Then say "done" and I will create the public repo and push. **Never paste a password or an OTP
+into this chat** — the device flow exists precisely so you don't have to, and I will never ask.
+
+---
+
+## ⏸ BLOCKED ON YOU — the rest of the queue
+
+**1. `INFO.md`** — ✅ **done.** Name, email, contact email, domain and analytics are all decided
+and recorded. Only `payout_wallet` is outstanding, and it is not needed until the first Adsterra
+payout (not before signup).
 
 **2. Then, one at a time (I'll prompt you for each):**
 
-- **GitHub login** — I run `gh auth login`; you complete the browser + OTP part. Never paste a password into chat.
+- **GitHub login** — 🔄 in progress, see above.
 - **Cloudflare login** — I run `npx wrangler login`; you complete the browser part. Free tier, no card.
 - **Google Search Console** — add a URL-prefix property, choose HTML-tag verification, paste the meta tag back to me. I inject it, rebuild, deploy, then you click Verify.
 - **Bing Webmaster** — same flow (or import from GSC).
@@ -169,6 +178,22 @@ Verified output: 1200×630, 115 KB, "17 fast, private calculators, converters & 
   money with premium US/UK finance traffic. A new Adsterra site with mixed-geo traffic should be
   budgeted at **$0.50–$3.00**, so its "10k pageviews ≈ $50" was optimistic by **2–10×**. The
   README now points at the earnings table above instead of quoting a number that flatters.
+
+### Step 5 pre-wired (analytics)
+You chose **Cloudflare Web Analytics** — cookieless, so no consent banner and no privacy-policy
+complication. Added an `ANALYTICS_CODE` constant to `_generator/build.py` plus a `__ANALYTICS__`
+injection point in `head()`, so Step 5 is now: paste the dashboard snippet, rebuild, redeploy.
+An empty constant emits **zero** third-party bytes, so shipping it blank is safe.
+`privacy.html` already documents aggregate analytics, so no policy change is needed.
+
+Proved both paths rather than assuming: with a test snippet the tag appears in the head of every
+page; with the constant blank, no tag and no leftover placeholder are emitted.
+
+### New guard: unsubstituted template tokens
+`_tests/check_static.py` now fails if any `__TOKEN__` survives into built HTML. Adding a
+placeholder to a template and forgetting its `.replace()` ships the literal token into
+production — invisible in a browser and very easy to miss. **Negative-tested**: deleting the
+`__ANALYTICS__` replace made the guard report it on all 21 pages; restored, rebuilt, clean again.
 
 ### Verified after all changes
 `check_static.py` 0 issues (319 refs, 17 JS blocks) · `e2e.js` **25/25** · `check_deploy.py`
@@ -379,3 +404,15 @@ has not.
   No content and no public history lost; repo rebuilt as one honest commit, now authored as
   the owner. Verified again after rebuilding: 25/25 E2E, static 0 issues, deploy contract PASSED.
 - Still needed from you: **`domain`** (or "none"), and `payout_wallet` before the first payout.
+
+### 2026-09-28 — decisions locked in; GitHub device login issued
+- **You decided:** no custom domain (free `lazytools.pages.dev`), **Cloudflare Web Analytics**,
+  and GitHub first. All recorded in `INFO.md`.
+- **Step 5 pre-wired.** `ANALYTICS_CODE` constant + `__ANALYTICS__` injection in `head()`.
+  Verified both directions: a test snippet injects on every page; blank emits nothing at all.
+  Step 5 is now a one-line paste after deploy.
+- **New guard:** `check_static.py` fails on any unsubstituted `__TOKEN__` in built HTML.
+  Negative-tested by deleting the `__ANALYTICS__` replace — caught on all 21 pages.
+- **GitHub device flow issued** (`gh auth login --web`). Code **`1BBF-B91F`**, waiting on you at
+  https://github.com/login/device. Repo creation and push follow as soon as it's approved.
+- Static checks still 0 issues (319 refs, 17 JS blocks).

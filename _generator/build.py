@@ -25,12 +25,19 @@ from tools_extra import TOOLS_EXTRA
 #  SITE CONFIGURATION — edit these two lines before you deploy!               #
 # --------------------------------------------------------------------------- #
 SITE_NAME    = "LazyTools"
-# SITE_URL is PROVISIONAL until Step 3 finishes. Cloudflare Pages will assign the real
-# production hostname at `wrangler pages project create`; if it differs from this, change
-# this one line, re-run the build, and re-deploy. Canonicals, the sitemap, og:image and
-# robots.txt all derive from it, so it MUST be correct before the site is indexed.
+# Decided 2026-09-28: no custom domain — the site ships on Cloudflare's free *.pages.dev
+# subdomain. NOTE: the exact hostname is assigned by `wrangler pages project create`. If
+# "lazytools" is already taken there, Cloudflare appends a suffix, so this line MUST be
+# corrected to the real hostname before the site is indexed. Canonicals, the sitemap,
+# og:image and robots.txt all derive from it.
 SITE_URL     = "https://lazytools.pages.dev"
 CONTACT_EMAIL = "kingripper9@gmail.com"
+
+# Cloudflare Web Analytics (chosen 2026-09-28). Cookieless, so no consent banner is needed
+# and privacy.html already covers aggregate analytics. Paste the snippet from the Cloudflare
+# dashboard here after the first deploy, then re-run the build. An empty string emits no
+# analytics tag at all, so this is safe to leave blank until Step 5.
+ANALYTICS_CODE = ""
 # ---------------------------------------------------------------------------- #
 
 BUILD_DATE = datetime.date.today().strftime("%d %B %Y")
@@ -112,6 +119,10 @@ def head(title, desc, path, rel, keywords=None, jsonld=None, noindex=False):
     ld = ""
     if jsonld:
         ld = "\n    ".join('<script type="application/ld+json">' + json.dumps(b, ensure_ascii=False) + "</script>" for b in jsonld)
+    # Analytics tag — empty until ANALYTICS_CODE is filled in at Step 5. Emitted on every
+    # page including the 404, since a 404 hit is itself a signal that someone followed a
+    # dead link. Blank config means zero bytes of third-party script on the site.
+    an = ("\n    " + ANALYTICS_CODE) if ANALYTICS_CODE else ""
     return """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,11 +141,12 @@ def head(title, desc, path, rel, keywords=None, jsonld=None, noindex=False):
          <body>, which executes before any deferred script. It also sets the theme
          class before first paint, avoiding a flash of the wrong theme. -->
     <script defer src="__REL__assets/ads.js"></script>
-    __LD__
+    __LD____ANALYTICS__
 </head>
 <body>
 """.replace("__TITLE__", title).replace("__DESC__", esc_attr(desc)).replace("__URL__", url) \
-   .replace("__KW__", kw).replace("__CANON__", canon).replace("__OG__", og).replace("__REL__", rel).replace("__LD__", ld)
+   .replace("__KW__", kw).replace("__CANON__", canon).replace("__OG__", og).replace("__REL__", rel).replace("__LD__", ld) \
+   .replace("__ANALYTICS__", an)
 
 def esc_attr(s):
     return s.replace('"', "&quot;")

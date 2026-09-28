@@ -109,6 +109,16 @@ build = open(os.path.join(ROOT, "_generator", "build.py"), encoding="utf-8").rea
 if re.search(r'<script\s+defer\s+src="__REL__assets/app\.js"', build):
     issues.append("_generator/build.py -> app.js is deferred again; tool pages will throw '$id is not defined'")
 
+# generator invariant: every __TOKEN__ in a template must have been substituted.
+# Adding a placeholder to head()/a page template and forgetting its .replace() ships the
+# literal token into production HTML — invisible in a browser and very easy to miss.
+# Requires a trailing "__" so JS identifiers like window.__LAZYTOOLS_ADS don't false-positive.
+PLACEHOLDER = re.compile(r"__[A-Z][A-Z_]{2,}__")
+for rel in html_files:
+    txt = open(os.path.join(ROOT, rel), encoding="utf-8").read()
+    for token in sorted(set(PLACEHOLDER.findall(txt))):
+        issues.append("%s -> unsubstituted template token %s" % (rel, token))
+
 print("HTML files checked : %d" % len(html_files))
 print("Local refs checked : %d" % checked)
 print("Inline JS blocks   : %d (syntax-checked)" % js_count)

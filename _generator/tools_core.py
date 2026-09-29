@@ -592,7 +592,7 @@ function runWC(){
 ],
 "about": [
 "Word counts gate a surprising amount of life: essays and dissertations have hard limits, X/Twitter posts have character caps, meta descriptions live around 155 characters, LinkedIn posts decay after ~1,300, and medium-form articles are judged by estimated reading time.",
-"Reading and speaking time estimates are the underrated half of this tool: they tell you whether your blog post is a 3-minute skim or a 12-minute commitment, and whether your speech fits the 5-minute slot on the conference agenda."
+"Reading and speaking time estimates are the underrated half of this tool: they tell you whether your blog post is a 3-minute skim or a 12-minute commitment, and whether your speech fits the 5-minute slot on the conference agenda. Tidying the text itself is the other half of writing it, and the <a href=\"case-converter.html\">case converter</a> fixes the capitalisation that sneaks in from a stuck Caps Lock key or a pasted headline."
 ]
 },
 ]

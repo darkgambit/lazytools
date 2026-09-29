@@ -925,3 +925,46 @@ links still tagged/disclosed/price-free) · browser suite **32/32 × 5 consecuti
 carried a duplicated Step 4 row — stale from before the site went live. Corrected, and this cycle
 added as Step 8c.
 
+### 2026-09-29 — audit finds the footer was missing from every tool page
+
+With Steps 6 and 7 blocked, the thing that decides whether this ever earns is whether Google can
+crawl and rank it — so I audited the live site instead of adding more content. The audit checked
+metadata uniqueness, orphan detection, inbound link counts and content depth.
+
+**Clean:** no duplicate titles or descriptions, no missing title/description/H1, no orphan pages,
+every page reachable from the home page by following links.
+
+**The bug:** `tool_page()` never called `footer(rel)`. `footer()` is invoked for the home, about,
+privacy and 404 pages, and it takes a `rel` argument that only ever needs to be `"../"` for tool
+pages — which is what it was written for. So **all 20 tool pages shipped with no footer at all**:
+
+- the site-wide links to `/about` and `/privacy` were absent from every tool page, leaving
+  `/privacy` with **2 inbound links** — on the exact page an ad-network reviewer opens
+- the footer's five "Popular tools" links were missing from 20 pages, roughly **100 internal links**
+  the design intended to exist
+
+**Fixed** by adding a `__FOOTER__` placeholder to the tool-page template and substituting
+`footer(rel)`. Local refs went **365 → 545**.
+
+**Guarded and negative-tested:**
+- `check_static.py` now fails if a page has no footer, if the footer omits `/about` or `/privacy`,
+  or if it is missing its link list. Negative test: substituting the token with an empty string made
+  the guard fire on exactly the 20 tool pages.
+- `e2e.js` asserts at least 8 footer anchors **per page, in a real browser**.
+
+The guard itself was wrong on the first attempt — it looked for `class="tool-card"` inside the
+footer, but `footer()` emits plain `<li><a>` entries, so it would have failed every page. Caught by
+reading the generator rather than by running it. A guard can be wrong in the *other* direction too.
+
+**Three thin pages topped up** with natural in-body links: word-counter → case-converter,
+case-converter → password-generator, calorie-calculator → unit-converter. Only `case-converter`
+remains under 4 inbound, which is expected — the Text category has just two tools.
+
+**Verified:** static 0 issues (548 refs) · e2e **32/32 × 5 consecutive runs** · ads **10/10** ·
+deploy contract **PASSED**.
+
+**Noted, not fixed:** 13 titles exceed 65 characters and 10 meta descriptions exceed 165, so Google
+will truncate both. That costs click-through, not ranking — worth a pass once there is traffic data
+to judge which pages matter.
+
+

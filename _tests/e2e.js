@@ -183,10 +183,13 @@ let pass = 0, fail = 0;
       // Analytics must reach EVERY page, not just the homepage — a page missing the beacon
       // is invisible traffic. Asserted positively so filtering third-party noise loses nothing.
       const beacon = await page.locator("script[src*='cloudflareinsights.com/beacon.min.js']").count();
+      // The site footer is the only place /about and /privacy are linked from a tool page,
+      // and tool_page() once forgot to render it entirely. Asserted per page, in a browser.
+      const footLinks = await page.locator('.site-footer a').count();
       report(!/NaN|undefined|Infinity|^—$|^$/.test(val) && slots === 3 && demo + (slots - demo) === 3 &&
              related >= 1 && faqs >= 3 && ld === 3 && !!canonical && errs.length === 0 && initialErrs === 0 &&
-             direct && beacon === 1,
-        label, `result="${val.slice(0, 24)}" ads=${slots} related=${related} faq=${faqs} ld=${ld} direct=${direct} beacon=${beacon} errs=${errs.length}`);
+             direct && beacon === 1 && footLinks >= 8,
+        label, `result="${val.slice(0, 24)}" ads=${slots} related=${related} faq=${faqs} ld=${ld} foot=${footLinks} direct=${direct} beacon=${beacon} errs=${errs.length}`);
       errs.forEach((e) => console.log('        ' + e));
       noise.forEach((e) => console.log('        (third-party, ignored) ' + e));
       await page.close();

@@ -331,6 +331,7 @@ __GEAR__
 </section>
 __AD_BOTTOM__
 </main>
+__FOOTER__
 <script>__JS__</script>
 </body>
 </html>
@@ -340,6 +341,7 @@ __AD_BOTTOM__
                 .replace("__BODY__", t["body"]).replace("__ABOUT__", about)
                 .replace("__FAQS__", faqs).replace("__RELT__", relhtml).replace("__JS__", t["js"])
                 .replace("__GEAR__", gear_block(t))
+                .replace("__FOOTER__", footer(rel))
                 .replace("__AD_TOP__", ad("top")).replace("__AD_MIDDLE__", ad("middle"))
                 .replace("__AD_BOTTOM__", ad("bottom")))
     return html

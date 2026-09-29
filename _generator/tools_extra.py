@@ -555,7 +555,7 @@ function conv(kind){
 ],
 "about": [
 "Accidentally typed three paragraphs with Caps Lock on? Need a URL-safe version of a product name? Turning a headline into proper title case for a blog post? Case conversion is a small job that shows up constantly in writing, coding and marketing.",
-"This tool covers the eight cases people actually need — including the developer trio camelCase, snake_case and kebab-case, which most simple converters skip."
+"This tool covers the eight cases people actually need — including the developer trio camelCase, snake_case and kebab-case, which most simple converters skip. When what you need is a random string rather than a tidied one, the <a href=\"password-generator.html\">password generator</a> builds strong ones at any length you choose."
 ]
 },
 
@@ -1063,7 +1063,7 @@ runCal();
 ],
 "about": [
 "Every calorie target starts with one number: how much energy your body uses in a day. That figure has two parts. The first is your basal metabolic rate, the cost of simply staying alive, which depends mostly on body size, sex and age. The second is everything you do on top of that — walking, working, training — expressed as a multiplier on the first.",
-"Multiplying the two gives your total daily energy expenditure, or maintenance calories. Eat around that number and your weight holds steady; eat below it and you lose; eat above it and you gain. The arithmetic here uses the Mifflin-St Jeor equation, the formula most clinical dietitians default to because it is more accurate than the older Harris-Benedict equation across a wide range of body types."
+"Multiplying the two gives your total daily energy expenditure, or maintenance calories. Eat around that number and your weight holds steady; eat below it and you lose; eat above it and you gain. The arithmetic here uses the Mifflin-St Jeor equation, the formula most clinical dietitians default to because it is more accurate than the older Harris-Benedict equation across a wide range of body types. Both metric and imperial inputs are accepted — for anything else that needs converting between the two systems, the <a href=\"unit-converter.html\">unit converter</a> covers length, weight, volume and temperature."
 ]
 },
 

@@ -89,6 +89,24 @@ for path in html_files:
             if 'data-slot="%s"' % slot not in txt:
                 issues.append("%s -> missing ad slot %s" % (rel, slot))
 
+    # Site-wide footer. It is not decoration: it carries the only links to /about and
+    # /privacy from every page, plus the "Popular tools" list that feeds the internal
+    # link graph. tool_page() originally forgot to render it, so all 20 tool pages
+    # shipped with no footer at all and /privacy ended up with two inbound links —
+    # on the exact page an ad network reviewer opens.
+    m_foot = re.search(r'<footer class="site-footer">.*?</footer>', txt, re.S)
+    if not m_foot:
+        issues.append("%s -> missing the site footer" % rel)
+    else:
+        foot = m_foot.group(0)
+        for dest in ("about.html", "privacy.html"):
+            if dest not in foot:
+                issues.append("%s -> footer does not link to %s" % (rel, dest))
+        # footer() emits plain <li><a> entries (5 popular tools + 3 site links), not
+        # tool-card markup — so count anchors, not classes.
+        if len(re.findall(r"<a\s", foot)) < 8:
+            issues.append("%s -> footer is missing its popular-tools / site links" % rel)
+
     for i, code in enumerate(INLINE_JS.findall(txt)):
         if not code.strip():
             continue

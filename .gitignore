@@ -17,6 +17,11 @@ node_modules/
 __pycache__/
 *.pyc
 
+# ---- git internals ----
+# filter-branch scratch. It lands at the repo root, is never wanted in a commit, and the
+# sandbox's bulk-delete guard can refuse to remove it — so ignore it rather than fight it.
+.git-rewrite/
+
 # ---- editor ----
 .vscode/
 .idea/

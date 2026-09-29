@@ -11,8 +11,9 @@ with matching canonicals, 4 security headers present, repo-only paths disallowed
 → 404) and the real-browser suite **32/32** — every one of the 20 tools computes correctly in
 Chrome against production.
 
-**Still earning $0** — ads are not wired up yet (Step 6) and the site is not yet indexed
-(Step 4). Being live is necessary, not sufficient.
+**Earning is now possible** — the first ad unit is live in production (Step 6, 2026-09-29). The
+site is not yet indexed (Step 4), so traffic is still ~0 and revenue with it. Being live is
+necessary, not sufficient.
 
 | Step | What | Status | Date |
 |---|---|---|---|
@@ -25,11 +26,12 @@ Chrome against production.
 | 4 | Google Search Console + Bing + sitemap | ✅ done — property verified, sitemap submitted; Bing imports from GSC | 2026-09-28 |
 | 4b | IndexNow ping to Bing/Yandex/Seznam/Naver — no account needed | ✅ done — HTTP 202 accepted | 2026-09-28 |
 | 5 | Analytics — Cloudflare Web Analytics (cookieless, no consent banner) | ✅ done — live on every page | 2026-09-28 |
-| 6 | Adsterra ad units + ads.txt | 🔶 `ads.txt` live; **waiting on you for the 3 ad-unit codes** | 2026-09-29 |
+| 6 | Adsterra ad units + ads.txt | 🔶 **1 of 3 units live** — the 300×250 unit fires in production on all 20 tool pages; `top` and `bottom` still need their own codes | 2026-09-29 |
 | 7 | Affiliate links — shortlist prepared below | 🔶 Amazon live (tag `lazytool-20`); **payout path blocked — see the Libya caveat** | 2026-09-28 |
 | 8 | Growth loop — cycle 1: 3 tools added (**14 → 17**) | ✅ done | 2026-09-28 |
 | 8b | Launch kit written — Product Hunt, Show HN, Reddit, X, Pinterest | ✅ done — see `LAUNCH.md` | 2026-09-28 |
 | 8c | Growth loop — cycle 2: 3 tools added (**17 → 20**) | ✅ done | 2026-09-29 |
+| 9 | Deploy hygiene — stop serving `INFO.md` / `.workbuddy-ai/` | ✅ done — `_generator/deploy.py` stages a whitelisted tree; **10/10 private paths 404 live** | 2026-09-29 |
 | — | Monetization reality check + earnings math + 30-day plan (section below) | ✅ done | 2026-09-28 |
 
 Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
@@ -998,6 +1000,56 @@ Negative test — stripping the tags from the generated file — fired with
 **Verified:** static 0 issues · deploy contract **PASSED** live · live sitemap now shows 23
 `<lastmod>` values · IndexNow re-accepted 23 URLs. No HTML changed in this pass, so the previously
 verified 32/32 × 5 browser runs and 10/10 ad checks still hold byte-for-byte.
+
+---
+
+## ✅ Step 6 — the first ad unit is LIVE (2026-09-29)
+
+The 300×250 unit (`0bab55ec…`) is wired into the **`middle`** slot and **fires in production** —
+verified by loading the live site in Chrome and watching the real tag request
+`highrevenueformat.com/<key>/invoke.js` from inside its isolation iframe.
+
+**The trap that was in the way.** `needsIsolation()` listed `highperformanceformat.com`, but the
+supplied tag loads from **`highrevenueformat.com`** — a different domain. Unmatched, the tag would
+have run inline, and inline is the branch that either **silently swallows the ad** or **erases the
+whole document**, chosen purely by network timing. The matcher now also accepts the `/invoke.js`
+path, which is the one shape every Adsterra snippet shares — worth more than the host list, because
+Adsterra rotates hosts and a miss costs the visitor the whole page.
+
+**One unit, one slot.** `atOptions` is a global and `invoke.js` re-initialises, so pasting the same
+snippet into two slots renders only one. Three ads therefore need three units.
+
+### A second bug, found by looking at the live page
+With all three slots empty, each one rendered a dashed box reading **"Ad space — add code in
+assets/ads.js"** — on all 20 pages, live. Unfilled slots now collapse, and the placeholder sits
+behind `showPlaceholders` (default off) for local development. The e2e assertion that should have
+caught this was `demo + (slots - demo) === 3`, a **tautology**; it is replaced by the real invariant
+(every slot is live or hidden, never a placeholder), asserted per page.
+
+**Verified:** `check_ads.js` **15/15** (was 10) · e2e **32/32 × 5** on the emulator *and* live ·
+static 0 issues.
+
+## ✅ Step 9 — deploy hygiene: the site was publishing your personal data (2026-09-29)
+
+While probing the deploy, `https://lazytools.pages.dev/INFO.md` returned **200 with your real name,
+personal Gmail, country and GitHub handle**. `PROGRESS.md`, `CLAUDE-CODE-PROMPT.md`, `LAUNCH.md`,
+`README.md`, `.gitignore`, `_tests/`, `_generator/` and `.workbuddy-ai/memory/*.md` were public too.
+
+**Root cause.** `wrangler pages deploy` reads **neither `.gitignore` nor `.assetsignore`**; its whole
+filter is a hardcoded nine-pattern list. The repo root was the deploy directory, so everything in it
+went up. robots.txt had been treated as the guard, but it never listed `/INFO.md` or
+`/.workbuddy-ai/` — and robots.txt is a request, not access control.
+
+**Fixed properly:** `_generator/deploy.py` stages `.wrangler/deploy/` from an explicit whitelist and
+deploys that, so a new internal file is now private by default. Two guards, both negative-tested:
+refuse a tree containing a private file, and refuse an **incomplete** one.
+
+> **Use `python _generator/deploy.py` from now on. Do not run `wrangler pages deploy .`.**
+> Local preview must serve the same staged tree: `wrangler pages dev .wrangler/deploy`.
+
+**Verified live, cache-busted:** 10/10 private paths **404**, every public path still **200**,
+security headers intact, 23/23 sitemap URLs still canonical-correct, deploy contract **PASSED**.
+
 
 
 

@@ -14,6 +14,7 @@ Exits non-zero on any failure.
 """
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -95,14 +96,35 @@ if not ok:
     failures.append("/_headers -> status=%s (config file must not be served)" % status)
 print("%-6s %-46s %s" % ("OK" if ok else "FAIL", "/_headers (config, must 404)", status))
 
-# ---- 3. repo-only files must be Disallow'ed in robots.txt ----
-# The repo root is the deploy directory, so these ARE reachable. Pages' _redirects
-# cannot 404 them (only 200/301/302/303/307/308) and .assetsignore is not honoured
-# by Pages — both verified against `wrangler pages dev`. robots.txt is the guard.
-print("--- repo-only files must be Disallow'ed in robots.txt ---")
+# ---- 3. repo-only files must NOT be served at all ----
+# Not merely Disallow'ed in robots.txt. robots.txt is a request, not access control: it
+# stops a compliant crawler indexing a URL, and does nothing to stop a human, a scraper
+# that ignores it, or a link someone shares. It also never covered /INFO.md or
+# /.workbuddy-ai/ at all. The site is published from a staged directory
+# (_generator/deploy.py) that excludes them, so they must 404.
+#
+# The cache-busting query string is load-bearing. These paths were fetched while the leak
+# was being diagnosed, so they sit in Cloudflare's edge cache with a week-long TTL, and a
+# clean origin can still answer 200 for a while. Without the query string a correct
+# deploy would look broken, and with it a stale edge copy is not mistaken for a leak.
+print("--- repo-only files must 404 (not just be disallowed) ---")
+CB = "?cb=" + str(int(time.time()))
+for p in ["/INFO.md", "/PROGRESS.md", "/CLAUDE-CODE-PROMPT.md", "/README.md", "/LAUNCH.md",
+          "/.gitignore", "/.workbuddy-ai/memory/MEMORY.md",
+          "/_tests/check_static.py", "/_generator/build.py"]:
+    status, _, _ = probe(p + CB)
+    ok = status == 404
+    if not ok:
+        failures.append("%s -> status=%s (must 404; is the emulator serving the repo "
+                        "root instead of .wrangler/deploy?)" % (p, status))
+    print("%-6s %-46s %s" % ("OK" if ok else "FAIL", p, status))
+
+# ---- 3b. ...and they stay Disallow'ed, as belt-and-braces ----
+print("--- repo-only files must also be Disallow'ed in robots.txt ---")
 _, rbody, _ = probe("/robots.txt")
 robots_txt = rbody.decode("utf-8", "replace")
-for p in ["/_tests/", "/_generator/", "/README.md", "/PROGRESS.md", "/CLAUDE-CODE-PROMPT.md"]:
+for p in ["/_tests/", "/_generator/", "/README.md", "/PROGRESS.md", "/CLAUDE-CODE-PROMPT.md",
+          "/INFO.md", "/.workbuddy-ai/"]:
     ok = ("Disallow: " + p) in robots_txt
     if not ok:
         failures.append("robots.txt does not disallow %s" % p)

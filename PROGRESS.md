@@ -6,9 +6,9 @@ Started: 2026-09-28 · Hosting target: $0/month · Owner: see `INFO.md` (git-ign
 
 Deployed 2026-09-28 to Cloudflare Pages (free tier). Source: https://github.com/darkgambit/lazytools
 
-**Verified on the live URL, not locally:** deploy contract **PASSED** (all 20 sitemap URLs 200
+**Verified on the live URL, not locally:** deploy contract **PASSED** (all 23 sitemap URLs 200
 with matching canonicals, 4 security headers present, repo-only paths disallowed, unknown path
-→ 404) and the real-browser suite **25/25** — every one of the 17 tools computes correctly in
+→ 404) and the real-browser suite **32/32** — every one of the 20 tools computes correctly in
 Chrome against production.
 
 **Still earning $0** — ads are not wired up yet (Step 6) and the site is not yet indexed
@@ -22,14 +22,14 @@ Chrome against production.
 | 1c | Real site config + self-updating OG card + README corrections | ✅ done | 2026-09-28 |
 | 2 | GitHub: gh auth + public repo + push | ✅ done — https://github.com/darkgambit/lazytools | 2026-09-28 |
 | 3 | Deploy free (Cloudflare Pages) + verify live | ✅ done — https://lazytools.pages.dev | 2026-09-28 |
-| 4 | Google Search Console + Bing + sitemap | 🔄 verification tag **live & matched** — click Verify, then submit the sitemap | 2026-09-28 |
+| 4 | Google Search Console + Bing + sitemap | ✅ done — property verified, sitemap submitted; Bing imports from GSC | 2026-09-28 |
 | 4b | IndexNow ping to Bing/Yandex/Seznam/Naver — no account needed | ✅ done — HTTP 202 accepted | 2026-09-28 |
-| 4 | Google Search Console + Bing + sitemap | ⏸ blocked on step 3 | — |
-| 5 | Analytics — Cloudflare Web Analytics; build plumbing **done**, snippet pending deploy | 🔄 half done | 2026-09-28 |
-| 6 | Adsterra ad units + ads.txt | ⏸ blocked on step 3 | — |
-| 7 | Affiliate links — shortlist prepared below | 🔄 prepared, needs your signups | — |
+| 5 | Analytics — Cloudflare Web Analytics (cookieless, no consent banner) | ✅ done — live on every page | 2026-09-28 |
+| 6 | Adsterra ad units + ads.txt | 🔶 `ads.txt` live; **waiting on you for the 3 ad-unit codes** | 2026-09-29 |
+| 7 | Affiliate links — shortlist prepared below | 🔶 Amazon live (tag `lazytool-20`); **payout path blocked — see the Libya caveat** | 2026-09-28 |
 | 8 | Growth loop — cycle 1: 3 tools added (**14 → 17**) | ✅ done | 2026-09-28 |
 | 8b | Launch kit written — Product Hunt, Show HN, Reddit, X, Pinterest | ✅ done — see `LAUNCH.md` | 2026-09-28 |
+| 8c | Growth loop — cycle 2: 3 tools added (**17 → 20**) | ✅ done | 2026-09-29 |
 | — | Monetization reality check + earnings math + 30-day plan (section below) | ✅ done | 2026-09-28 |
 
 Legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ blocked
@@ -883,3 +883,45 @@ has not.
   the other Step 7 programs pay by crypto or wire and are the better bet.
 - **Not verified:** amazon.com returns 503 to automated requests from this machine, so I could
   not confirm the links resolve end to end. Format and tag are correct; the owner should click one.
+
+### 2026-09-29 — Step 8 growth cycle 2 (17 → 20 tools)
+
+The one piece of the plan that needs nothing from the owner. Steps 1–5, 4b, 8 and 8b are done; Step 6
+is waiting on the three Adsterra ad-unit codes and Step 7's payout path is blocked by the Libya
+caveat — so this cycle adds search surface area instead of waiting.
+
+**Added three tools**, picked from the brief's prioritised list by search value:
+
+- **GPA Calculator** (Everyday) — credit-weighted GPA on the 4.0 scale from course grades and
+  credit hours, plus a cumulative combine against an existing GPA and credit total.
+- **Calorie Calculator** (Health) — BMR and TDEE via the Mifflin-St Jeor equation, with maintenance,
+  weight-loss and weight-gain targets, in metric or imperial units. It refuses to show a weight-loss
+  target below 1,200 kcal and warns for under-15s, because both are where these calculators usually
+  give dangerous answers.
+- **Time Zone Converter** (Utilities) — converts any date and time between 22 zones, reads daylight
+  saving from the browser's own time zone database for the *specific date* you enter, and shows the
+  day shift plus a world-clock table for the same instant.
+
+**Contextual internal links added** from four existing pages into the new ones — BMI → Calorie,
+Water Intake → Calorie, Percentage → GPA, Hours → Time Zone. These are in-body editorial links, not
+just the auto-generated "Related tools" block, so the new pages pick up real inbound links from
+pages that already have some authority.
+
+**Verified:** static checks 0 issues (365 local refs, 20 inline JS blocks syntax-checked, 8 Amazon
+links still tagged/disclosed/price-free) · browser suite **32/32 × 5 consecutive runs** (up from 26)
+· ad suite **10/10** · `og-image.png` regenerated and now bakes in "20 tools" · sitemap 23 URLs.
+
+**The new tests assert exact arithmetic, not "not NaN":**
+
+- GPA: A(3 cr) + B(4 cr) + A−(3 cr) + B+(3 cr) → **3.46**; combined with 3.2 over 60 credits →
+  **3.25**, a change of **+0.05**.
+- Calorie: male, 30 y, 180 cm, 80 kg, moderately active → BMR **1780**, TDEE **2759**, loss target
+  **2259**, gain target **3009** — each checked against the formula by hand.
+- Time zone: 12:00 New York on 15 January → **17:00** London, same day, **5 h** apart; 23:00 New
+  York → **13:00** Tokyo, **+1 day**, **14 h** apart. Both dates sit clear of any DST transition so
+  the expected answer is unambiguous.
+
+**Also fixed:** the status table at the top still listed Steps 4, 5 and 6 as "blocked on step 3" and
+carried a duplicated Step 4 row — stale from before the site went live. Corrected, and this cycle
+added as Step 8c.
+

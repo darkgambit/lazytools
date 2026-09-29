@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GPA Calculator — Weighted Grade Point Average (4.0 Scale) | LazyTools</title>
+    <meta name="description" content="Free GPA calculator: enter each course's grade and credit hours for your weighted GPA on the 4.0 scale, then combine it with your previous record for a cumulative GPA.">
+    <meta name="keywords" content="gpa calculator, weighted gpa, grade point average, cumulative gpa calculator, college gpa, 4.0 scale gpa, high school gpa">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/gpa-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="GPA Calculator — Weighted Grade Point Average (4.0 Scale) | LazyTools"><meta property="og:description" content="Free GPA calculator: enter each course's grade and credit hours for your weighted GPA on the 4.0 scale, then combine it with your previous record for a cumulative GPA."><meta property="og:url" content="https://lazytools.pages.dev/tools/gpa-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="GPA Calculator — Weighted Grade Point Average (4.0 Scale) | LazyTools"><meta name="twitter:description" content="Free GPA calculator: enter each course's grade and credit hours for your weighted GPA on the 4.0 scale, then combine it with your previous record for a cumulative GPA."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="google-site-verification" content="2gqxtbCOJQVOaYka5Ycs_7T08h4rrPWn6Ug1dtAC8Go">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "GPA Calculator", "url": "https://lazytools.pages.dev/tools/gpa-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free GPA calculator: enter each course's grade and credit hours for your weighted GPA on the 4.0 scale, then combine it with your previous record for a cumulative GPA.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is GPA calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Multiply each course's grade points by its credit hours, add all of those products together, then divide by the total credit hours. That sum of products is the 'quality points'. A 3-credit A (4.0) contributes 12 quality points and a 1-credit A contributes 4 — so credit hours, not the number of courses, decide the result."}}, {"@type": "Question", "name": "What is the difference between weighted and unweighted GPA?", "acceptedAnswer": {"@type": "Answer", "text": "An unweighted GPA puts every course on the same 4.0 scale. A weighted GPA adds extra points for honours, AP or IB classes, often out to 5.0, so a hard course can lift the number above 4.0. This calculator produces the unweighted, credit-weighted figure that most universities report; if your school weights honours classes, enter the adjusted grade points your registrar uses instead."}}, {"@type": "Question", "name": "Does a pass/fail course affect my GPA?", "acceptedAnswer": {"@type": "Answer", "text": "No. Pass/fail, credit/no-credit and withdrawn courses carry no grade points, so leave them out entirely. Entering them as an F or a 0 would drag the average down incorrectly."}}, {"@type": "Question", "name": "How much can one bad semester lower my cumulative GPA?", "acceptedAnswer": {"@type": "Answer", "text": "Less than you fear, as long as you keep earning credits. The cumulative average is credit-weighted, so 60 existing credits plus a weak 12-credit term moves the number only slightly. The same maths means recovery is slow and steady rather than instant."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "GPA Calculator", "item": "https://lazytools.pages.dev/tools/gpa-calculator"}]}</script>
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "acfbc9d4873643d981ed1837233ae31c"}'></script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Everyday › GPA Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Everyday</span>
+  <h1>🎓 GPA Calculator</h1>
+  <p class="lead">Enter your courses, grades and credit hours to get the credit-weighted GPA that actually goes on a transcript — then fold it into your cumulative GPA.</p>
+</div>
+<div class="ad-slot" data-slot="top" data-w="728" data-h="90" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <h3 class="panel-title">This term's courses</h3>
+  <ul class="sleep-list" id="gpa-rows"></ul>
+  <div class="btn-row">
+    <button class="btn-primary" type="button" onclick="runGPA()">Calculate GPA</button>
+    <button class="btn-ghost" type="button" onclick="gpaAddRow()">+ Add course</button>
+    <button class="btn-ghost" type="button" onclick="gpaClear()">Clear all</button>
+  </div>
+  <div class="results" id="gpa-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="gpa-val">—</b><span>Term GPA</span></div>
+      <div class="stat"><b id="gpa-credits">—</b><span>Credit hours</span></div>
+      <div class="stat"><b id="gpa-points">—</b><span>Quality points</span></div>
+    </div>
+    <p class="note">GPA is credit-weighted, not a plain average of your grades: a 3-credit course counts three times as much as a 1-credit one. Only graded courses count — pass/fail, credit/no-credit and withdrawn courses carry no grade points.</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">Cumulative GPA</h3>
+  <div class="grid-2">
+    <div class="field"><label for="cg-gpa">Current cumulative GPA</label><input type="number" id="cg-gpa" value="3.2" min="0" max="5" step="any"></div>
+    <div class="field"><label for="cg-cr">Credits earned so far</label><input type="number" id="cg-cr" value="60" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runCGPA()">Combine with this term</button></div>
+  <div class="results" id="cg-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="cg-new">—</b><span>New cumulative GPA</span></div>
+      <div class="stat"><b id="cg-total">—</b><span>Total credits</span></div>
+      <div class="stat"><b id="cg-change">—</b><span>Change</span></div>
+    </div>
+    <p class="note">This uses the term result from above, so calculate the term first. Old grades never leave the average — which is why one weak semester is hard to undo late in a degree, and why adding credits is usually faster than chasing perfect grades.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" data-w="300" data-h="250" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the GPA Calculator</h2>
+  <p>A grade point average is a credit-weighted mean of your grades. The weighting is the whole point: universities use it to stop a single hard 4-credit course from counting the same as a light 1-credit elective, and employers and graduate schools read it as a single comparable number across very different transcripts.</p><p>Working out the term figure by hand is where most people go wrong, because it is not an average of the letter grades you can see. You have to convert each grade to grade points, multiply by the credit hours, total both, and divide. That is exactly what this calculator does, and it then folds the result into your existing cumulative GPA — the number that actually appears on a transcript.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How is GPA calculated?</summary><p>Multiply each course's grade points by its credit hours, add all of those products together, then divide by the total credit hours. That sum of products is the 'quality points'. A 3-credit A (4.0) contributes 12 quality points and a 1-credit A contributes 4 — so credit hours, not the number of courses, decide the result.</p></details><details><summary>What is the difference between weighted and unweighted GPA?</summary><p>An unweighted GPA puts every course on the same 4.0 scale. A weighted GPA adds extra points for honours, AP or IB classes, often out to 5.0, so a hard course can lift the number above 4.0. This calculator produces the unweighted, credit-weighted figure that most universities report; if your school weights honours classes, enter the adjusted grade points your registrar uses instead.</p></details><details><summary>Does a pass/fail course affect my GPA?</summary><p>No. Pass/fail, credit/no-credit and withdrawn courses carry no grade points, so leave them out entirely. Entering them as an F or a 0 would drag the average down incorrectly.</p></details><details><summary>How much can one bad semester lower my cumulative GPA?</summary><p>Less than you fear, as long as you keep earning credits. The cumulative average is credit-weighted, so 60 existing credits plus a weak 12-credit term moves the number only slightly. The same maths means recovery is slow and steady rather than instant.</p></details></div>
+</section>
+
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a><a class="tool-card" href="../tools/date-calculator.html" data-slug="date-calculator" data-cat="Everyday" data-name="Date Calculator" data-keywords="Days between two dates (with business days), or add / subtract days, weeks, months and years. date calculator, days between dates, date difference, add days to date, business days calculator, working days"><span class="ico">📅</span><h3>Date Calculator</h3><p>Days between two dates (with business days), or add / subtract days, weeks, months and years.</p></a><a class="tool-card" href="../tools/calorie-calculator.html" data-slug="calorie-calculator" data-cat="Health" data-name="Calorie Calculator" data-keywords="Your BMR and daily calorie needs (TDEE), plus targets for losing or gaining weight. calorie calculator, bmr calculator, tdee calculator, daily calorie needs, maintenance calories, weight loss calories, mifflin st jeor"><span class="ico">🔥</span><h3>Calorie Calculator</h3><p>Your BMR and daily calorie needs (TDEE), plus targets for losing or gaining weight.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" data-w="300" data-h="250" aria-label="Advertisement"></div>
+</main>
+<script>
+var GPA_GRADES = [
+  ['A+', 4.0], ['A', 4.0], ['A-', 3.7],
+  ['B+', 3.3], ['B', 3.0], ['B-', 2.7],
+  ['C+', 2.3], ['C', 2.0], ['C-', 1.7],
+  ['D+', 1.3], ['D', 1.0], ['D-', 0.7],
+  ['F', 0.0]
+];
+function gpaOpts(sel){
+  return GPA_GRADES.map(function(g){
+    return '<option value="' + g[1] + '"' + (g[0] === sel ? ' selected' : '') + '>' + g[0] + '</option>';
+  }).join('');
+}
+function gpaAddRow(name, grade, credits){
+  var li = document.createElement('li');
+  li.innerHTML = '<input type="text" class="gpa-name" value="' + (name || '') +
+    '" placeholder="Course name" aria-label="Course name" style="flex:1 1 130px;min-width:120px">' +
+    '<select class="gpa-grade" aria-label="Grade">' + gpaOpts(grade === undefined ? 'A' : grade) + '</select>' +
+    '<input type="number" class="gpa-cr mini" value="' + (credits === undefined ? 3 : credits) +
+    '" min="0" step="any" aria-label="Credit hours" title="Credit hours">';
+  $id('gpa-rows').appendChild(li);
+}
+function gpaClear(){
+  $id('gpa-rows').innerHTML = '';
+  gpaAddRow('', 'A', 3);
+}
+function gpaTotals(){
+  var credits = 0, points = 0, n = 0;
+  [].slice.call(document.querySelectorAll('#gpa-rows li')).forEach(function(li){
+    var g = parseFloat(li.querySelector('.gpa-grade').value);
+    var c = parseFloat(li.querySelector('.gpa-cr').value);
+    if(isNaN(g) || isNaN(c) || c <= 0) return;
+    credits += c; points += g * c; n++;
+  });
+  return { credits: credits, points: points, n: n, gpa: credits > 0 ? points / credits : 0 };
+}
+function runGPA(){
+  var t = gpaTotals();
+  if(t.n === 0){ alert('Enter at least one course with credit hours greater than zero.'); return; }
+  $id('gpa-val').textContent = t.gpa.toFixed(2);
+  $id('gpa-credits').textContent = fmt(t.credits, 2);
+  $id('gpa-points').textContent = fmt(t.points, 2);
+  showRes('gpa-res');
+}
+function runCGPA(){
+  var t = gpaTotals();
+  if(t.n === 0){ alert('Add your courses above first — this figure uses the term result.'); return; }
+  var prev = readNum('cg-gpa', 'your current cumulative GPA'); if(prev === null) return;
+  var prevCr = readNum('cg-cr', 'credits earned so far'); if(prevCr === null) return;
+  if(prev < 0 || prevCr < 0){ alert('GPA and credit hours cannot be negative.'); return; }
+  var totalCr = prevCr + t.credits;
+  if(totalCr <= 0){ alert('Total credit hours must be greater than zero.'); return; }
+  var combined = ((prev * prevCr) + t.points) / totalCr;
+  var diff = combined - prev;
+  $id('cg-new').textContent = combined.toFixed(2);
+  $id('cg-total').textContent = fmt(totalCr, 2);
+  $id('cg-change').textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2);
+  $id('cg-change').style.color = diff >= 0 ? '#4ade80' : '#f87171';
+  showRes('cg-res');
+}
+gpaAddRow('Course 1', 'A', 3);
+gpaAddRow('Course 2', 'B', 3);
+gpaAddRow('Course 3', 'A-', 3);
+gpaAddRow('Course 4', 'B+', 3);
+runGPA();
+</script>
+</body>
+</html>

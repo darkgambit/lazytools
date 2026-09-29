@@ -18,6 +18,9 @@
   <url><loc>https://lazytools.pages.dev/tools/hours-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://lazytools.pages.dev/tools/discount-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://lazytools.pages.dev/tools/sales-tax-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://lazytools.pages.dev/tools/gpa-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://lazytools.pages.dev/tools/calorie-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://lazytools.pages.dev/tools/time-zone-converter</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://lazytools.pages.dev/about</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://lazytools.pages.dev/privacy</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

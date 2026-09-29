@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calorie Calculator — BMR & Daily Calorie Needs (TDEE) | LazyTools</title>
+    <meta name="description" content="Free calorie calculator using the Mifflin-St Jeor equation. Get your BMR, your daily maintenance calories (TDEE) and safe targets for losing or gaining weight, in metric or imperial units.">
+    <meta name="keywords" content="calorie calculator, bmr calculator, tdee calculator, daily calorie needs, maintenance calories, weight loss calories, mifflin st jeor">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/calorie-calculator">
+    <meta property="og:type" content="website"><meta property="og:title" content="Calorie Calculator — BMR & Daily Calorie Needs (TDEE) | LazyTools"><meta property="og:description" content="Free calorie calculator using the Mifflin-St Jeor equation. Get your BMR, your daily maintenance calories (TDEE) and safe targets for losing or gaining weight, in metric or imperial units."><meta property="og:url" content="https://lazytools.pages.dev/tools/calorie-calculator"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Calorie Calculator — BMR & Daily Calorie Needs (TDEE) | LazyTools"><meta name="twitter:description" content="Free calorie calculator using the Mifflin-St Jeor equation. Get your BMR, your daily maintenance calories (TDEE) and safe targets for losing or gaining weight, in metric or imperial units."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="google-site-verification" content="2gqxtbCOJQVOaYka5Ycs_7T08h4rrPWn6Ug1dtAC8Go">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Calorie Calculator", "url": "https://lazytools.pages.dev/tools/calorie-calculator", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free calorie calculator using the Mifflin-St Jeor equation. Get your BMR, your daily maintenance calories (TDEE) and safe targets for losing or gaining weight, in metric or imperial units.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the difference between BMR and TDEE?", "acceptedAnswer": {"@type": "Answer", "text": "BMR (basal metabolic rate) is the energy you would burn lying still all day — it covers breathing, circulation, temperature control and cell repair. TDEE (total daily energy expenditure) is BMR multiplied by an activity factor, and it is the number that predicts whether you gain, lose or hold weight. If you eat roughly your TDEE, your weight stays put."}}, {"@type": "Question", "name": "How many calories should I eat to lose weight?", "acceptedAnswer": {"@type": "Answer", "text": "A deficit of about 500 kcal a day below your maintenance level is the standard target, and it produces roughly 0.5 kg (1 lb) of loss a week — which is also what this calculator's weight-loss figure shows. Larger deficits lose weight faster but cost muscle and are harder to sustain."}}, {"@type": "Question", "name": "How accurate is the Mifflin-St Jeor equation?", "acceptedAnswer": {"@type": "Answer", "text": "It is the equation most dietitians use, and studies find it lands within about 10% of measured resting energy expenditure for most adults. That still means a few hundred calories either way. Treat the result as a starting point, watch your weight over two to three weeks, and adjust."}}, {"@type": "Question", "name": "Is it safe to eat only 1,200 calories a day?", "acceptedAnswer": {"@type": "Answer", "text": "1,200 kcal is generally treated as the floor below which you should not go without medical supervision, because it becomes very hard to hit your protein, vitamin and mineral needs. This calculator will not show a weight-loss target below that level."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Calorie Calculator", "item": "https://lazytools.pages.dev/tools/calorie-calculator"}]}</script>
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "acfbc9d4873643d981ed1837233ae31c"}'></script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Health › Calorie Calculator</nav>
+<div class="tool-hero">
+  <span class="badge">Health</span>
+  <h1>🔥 Calorie Calculator</h1>
+  <p class="lead">Work out how many calories you actually burn in a day — your BMR and your TDEE — and what that means for losing or gaining weight.</p>
+</div>
+<div class="ad-slot" data-slot="top" data-w="728" data-h="90" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="cal-units">Units</label>
+      <select id="cal-units" onchange="calUnits()">
+        <option value="metric">Metric (cm, kg)</option>
+        <option value="imperial">Imperial (ft/in, lb)</option>
+      </select>
+    </div>
+    <div class="field"><label for="cal-sex">Sex</label>
+      <select id="cal-sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid-2" id="cal-metric" style="margin-top:14px">
+    <div class="field"><label for="cal-h">Height (cm)</label><input type="number" id="cal-h" value="180" min="0" step="any"></div>
+    <div class="field"><label for="cal-w">Weight (kg)</label><input type="number" id="cal-w" value="80" min="0" step="any"></div>
+    <div class="field"><label for="cal-age">Age (years)</label><input type="number" id="cal-age" value="30" min="0" step="1"></div>
+  </div>
+  <div class="grid-2" id="cal-imperial" style="display:none;margin-top:14px">
+    <div class="field"><label for="cal-ft">Height (feet)</label><input type="number" id="cal-ft" value="5" min="0" step="any"></div>
+    <div class="field"><label for="cal-in">Height (inches)</label><input type="number" id="cal-in" value="11" min="0" step="any"></div>
+    <div class="field"><label for="cal-lb">Weight (pounds)</label><input type="number" id="cal-lb" value="176" min="0" step="any"></div>
+    <div class="field"><label for="cal-age-i">Age (years)</label><input type="number" id="cal-age-i" value="30" min="0" step="1"></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="field"><label for="cal-act">Activity level</label>
+      <select id="cal-act">
+        <option value="1.2">Sedentary — little or no exercise</option>
+        <option value="1.375">Lightly active — 1–3 days a week</option>
+        <option value="1.55" selected>Moderately active — 3–5 days a week</option>
+        <option value="1.725">Very active — 6–7 days a week</option>
+        <option value="1.9">Extra active — physical job or twice a day</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runCal()">Calculate calories</button></div>
+  <div class="results" id="cal-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="cal-bmr">—</b><span>BMR (at rest)</span></div>
+      <div class="stat"><b id="cal-tdee">—</b><span>Maintenance</span></div>
+      <div class="stat"><b id="cal-cut">—</b><span>Lose ~0.5 kg/week</span></div>
+      <div class="stat"><b id="cal-bulk">—</b><span>Gain ~0.25 kg/week</span></div>
+    </div>
+    <p class="note">BMR is what your body burns at complete rest. Maintenance (TDEE) multiplies that by how active you are. A deficit of about 500 kcal a day is the usual target for roughly 0.5 kg (1 lb) of fat loss a week — but do not eat below your BMR, and speak to a doctor before aggressive dieting.</p>
+  </div>
+</div>
+
+<div class="ad-slot" data-slot="middle" data-w="300" data-h="250" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Calorie Calculator</h2>
+  <p>Every calorie target starts with one number: how much energy your body uses in a day. That figure has two parts. The first is your basal metabolic rate, the cost of simply staying alive, which depends mostly on body size, sex and age. The second is everything you do on top of that — walking, working, training — expressed as a multiplier on the first.</p><p>Multiplying the two gives your total daily energy expenditure, or maintenance calories. Eat around that number and your weight holds steady; eat below it and you lose; eat above it and you gain. The arithmetic here uses the Mifflin-St Jeor equation, the formula most clinical dietitians default to because it is more accurate than the older Harris-Benedict equation across a wide range of body types.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>What is the difference between BMR and TDEE?</summary><p>BMR (basal metabolic rate) is the energy you would burn lying still all day — it covers breathing, circulation, temperature control and cell repair. TDEE (total daily energy expenditure) is BMR multiplied by an activity factor, and it is the number that predicts whether you gain, lose or hold weight. If you eat roughly your TDEE, your weight stays put.</p></details><details><summary>How many calories should I eat to lose weight?</summary><p>A deficit of about 500 kcal a day below your maintenance level is the standard target, and it produces roughly 0.5 kg (1 lb) of loss a week — which is also what this calculator's weight-loss figure shows. Larger deficits lose weight faster but cost muscle and are harder to sustain.</p></details><details><summary>How accurate is the Mifflin-St Jeor equation?</summary><p>It is the equation most dietitians use, and studies find it lands within about 10% of measured resting energy expenditure for most adults. That still means a few hundred calories either way. Treat the result as a starting point, watch your weight over two to three weeks, and adjust.</p></details><details><summary>Is it safe to eat only 1,200 calories a day?</summary><p>1,200 kcal is generally treated as the floor below which you should not go without medical supervision, because it becomes very hard to hit your protein, vitamin and mineral needs. This calculator will not show a weight-loss target below that level.</p></details></div>
+</section>
+
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/sleep-cycle-calculator.html" data-slug="sleep-cycle-calculator" data-cat="Health" data-name="Sleep Cycle Calculator" data-keywords="Best bedtimes to wake up refreshed, based on 90-minute sleep cycles. sleep cycle calculator, best bedtime, what time should i sleep, 90 minute sleep cycle, wake up refreshed, sleep calculator"><span class="ico">😴</span><h3>Sleep Cycle Calculator</h3><p>Best bedtimes to wake up refreshed, based on 90-minute sleep cycles.</p></a><a class="tool-card" href="../tools/bmi-calculator.html" data-slug="bmi-calculator" data-cat="Health" data-name="BMI Calculator" data-keywords="Body Mass Index in metric or imperial units, with your healthy weight range. bmi calculator, body mass index, healthy weight range, metric imperial bmi, who bmi categories"><span class="ico">⚖️</span><h3>BMI Calculator</h3><p>Body Mass Index in metric or imperial units, with your healthy weight range.</p></a><a class="tool-card" href="../tools/water-intake-calculator.html" data-slug="water-intake-calculator" data-cat="Health" data-name="Water Intake Calculator" data-keywords="Personalized daily water goal based on weight, activity and climate. water intake calculator, how much water should i drink, daily water intake, hydration calculator, water per day"><span class="ico">💧</span><h3>Water Intake Calculator</h3><p>Personalized daily water goal based on weight, activity and climate.</p></a><a class="tool-card" href="../tools/invoice-generator.html" data-slug="invoice-generator" data-cat="Business" data-name="Invoice Generator" data-keywords="Create a clean, professional invoice and save it as PDF — free, no signup. invoice generator, free invoice maker, create invoice online, invoice pdf, invoice template"><span class="ico">🧾</span><h3>Invoice Generator</h3><p>Create a clean, professional invoice and save it as PDF — free, no signup.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" data-w="300" data-h="250" aria-label="Advertisement"></div>
+</main>
+<script>
+function calUnits(){
+  var imp = $id('cal-units').value === 'imperial';
+  $id('cal-metric').style.display = imp ? 'none' : '';
+  $id('cal-imperial').style.display = imp ? '' : 'none';
+}
+function runCal(){
+  var unit = $id('cal-units').value;
+  var male = $id('cal-sex').value === 'male';
+  var hcm, wkg, age;
+  if(unit === 'metric'){
+    hcm = readNum('cal-h', 'height'); wkg = readNum('cal-w', 'weight');
+    age = readNum('cal-age', 'age');
+  } else {
+    var ft = readNum('cal-ft', 'feet'); var inch = parseFloat($id('cal-in').value) || 0;
+    wkg = readNum('cal-lb', 'weight'); age = readNum('cal-age-i', 'age');
+    if(ft === null) return;
+    hcm = (ft * 12 + inch) * 2.54;
+    if(wkg !== null) wkg = wkg * 0.45359237;
+  }
+  if(hcm === null || wkg === null || age === null) return;
+  if(hcm <= 0 || wkg <= 0 || age <= 0){ alert('Height, weight and age must all be positive numbers.'); return; }
+  if(age < 15 || age > 100){ alert('This formula is validated for adults. Use a paediatric calculator for under-15s.'); return; }
+  /* Mifflin-St Jeor: the most accurate simple BMR equation for the general population. */
+  var bmr = (10 * wkg) + (6.25 * hcm) - (5 * age) + (male ? 5 : -161);
+  var factor = parseFloat($id('cal-act').value);
+  var tdee = bmr * factor;
+  var cut = tdee - 500;
+  var bulk = tdee + 250;
+  /* never present a target below the floor of 1,200 kcal */
+  if(cut < 1200) cut = 1200;
+  $id('cal-bmr').textContent = fmt(bmr, 0) + ' kcal';
+  $id('cal-tdee').textContent = fmt(tdee, 0) + ' kcal';
+  $id('cal-cut').textContent = fmt(cut, 0) + ' kcal';
+  $id('cal-bulk').textContent = fmt(bulk, 0) + ' kcal';
+  showRes('cal-res');
+}
+runCal();
+</script>
+</body>
+</html>

@@ -142,7 +142,7 @@ function runP3(){
 ],
 "about": [
 "Percentages are the most-used bit of school maths in adult life — and the easiest to get wrong under pressure. A discount that says “30% off, plus an extra 20% off the reduced price” is not 50% off, and percentage increases and decreases do not cancel out symmetrically.",
-"Having the three standard formulas in one place — percent of a number, the reverse “what percent is X of Y”, and percentage change — covers almost every everyday case, from splitting a restaurant bill to checking whether your salary raise beat inflation. For shopping in particular, the <a href=\"discount-calculator.html\">discount calculator</a> handles the sale-price, “what discount did I actually get” and original-price versions in a single step."
+"Having the three standard formulas in one place — percent of a number, the reverse “what percent is X of Y”, and percentage change — covers almost every everyday case, from splitting a restaurant bill to checking whether your salary raise beat inflation. For shopping in particular, the <a href=\"discount-calculator.html\">discount calculator</a> handles the sale-price, “what discount did I actually get” and original-price versions in a single step. The same weighted-average idea decides a school result, where credits rather than course count set how much each grade matters — that is what the <a href=\"gpa-calculator.html\">GPA calculator</a> does."
 ]
 },
 
@@ -516,7 +516,7 @@ function runBMI(){
 ],
 "about": [
 "BMI (Body Mass Index) divides your weight by the square of your height (kg/m²). It was designed in the 1830s as a population statistic, and it remains the fastest universal screening number for weight-related health risk — which is exactly why doctors, insurers, gyms and diet apps still ask for it.",
-"The healthy-weight range shown alongside your BMI is simply your height multiplied by the healthy BMI band (18.5–24.9), converted back into your chosen units — the number most people are actually looking for when they search for a BMI calculator."
+"The healthy-weight range shown alongside your BMI is simply your height multiplied by the healthy BMI band (18.5–24.9), converted back into your chosen units — the number most people are actually looking for when they search for a BMI calculator. BMI tells you where you currently sit, not how much to eat: the <a href=\"calorie-calculator.html\">calorie calculator</a> gives you the daily energy figure that actually moves the number."
 ],
 # Amazon Associates. Deliberately NO prices and NO star ratings — displaying either without
 # pulling it live from an Amazon API is a listed reason for account closure. Keep it that way.

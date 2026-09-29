@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Time Zone Converter — Convert Time Between Any Two Zones | LazyTools</title>
+    <meta name="description" content="Free time zone converter: turn a date and time in one city into the local time in another, with daylight saving handled automatically and the day shift shown clearly.">
+    <meta name="keywords" content="time zone converter, world clock, time difference calculator, meeting time converter, daylight saving converter, utc converter">
+    <link rel="canonical" href="https://lazytools.pages.dev/tools/time-zone-converter">
+    <meta property="og:type" content="website"><meta property="og:title" content="Time Zone Converter — Convert Time Between Any Two Zones | LazyTools"><meta property="og:description" content="Free time zone converter: turn a date and time in one city into the local time in another, with daylight saving handled automatically and the day shift shown clearly."><meta property="og:url" content="https://lazytools.pages.dev/tools/time-zone-converter"><meta property="og:site_name" content="LazyTools"><meta property="og:image" content="https://lazytools.pages.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Time Zone Converter — Convert Time Between Any Two Zones | LazyTools"><meta name="twitter:description" content="Free time zone converter: turn a date and time in one city into the local time in another, with daylight saving handled automatically and the day shift shown clearly."><meta name="twitter:image" content="https://lazytools.pages.dev/og-image.png">
+    <meta name="google-site-verification" content="2gqxtbCOJQVOaYka5Ycs_7T08h4rrPWn6Ug1dtAC8Go">
+    <meta name="theme-color" content="#0a0f1e">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="../site.webmanifest">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/app.js"></script>
+    <!-- app.js MUST stay non-deferred: tool pages run their init inline at the end of
+         <body>, which executes before any deferred script. It also sets the theme
+         class before first paint, avoiding a flash of the wrong theme. -->
+    <script defer src="../assets/ads.js"></script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Time Zone Converter", "url": "https://lazytools.pages.dev/tools/time-zone-converter", "applicationCategory": "UtilityApplication", "operatingSystem": "Any", "description": "Free time zone converter: turn a date and time in one city into the local time in another, with daylight saving handled automatically and the day shift shown clearly.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I convert a time from one time zone to another?", "acceptedAnswer": {"@type": "Answer", "text": "Find the offset of each zone from UTC at that exact date, then shift the time by the difference. A 12:00 meeting in New York on 15 January is 17:00 in London, because New York is UTC-5 in winter and London is UTC+0. This converter does that arithmetic for you and also shows the day shift when the two zones land on different calendar dates."}}, {"@type": "Question", "name": "Does the converter handle daylight saving time?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, automatically. Offsets are read from your browser's own time zone database for the specific date you enter, so a July date and a January date give different answers for the same pair of cities. That is also why you should always enter a date rather than assuming a fixed number of hours' difference."}}, {"@type": "Question", "name": "Why is the time difference sometimes not a whole number of hours?", "acceptedAnswer": {"@type": "Answer", "text": "Because several zones use a half-hour or three-quarter-hour offset. India is UTC+5:30, Nepal is UTC+5:45, and parts of Australia are UTC+9:30. The converter shows fractional differences as decimals, so India against London reads as 5.5 h in winter."}}, {"@type": "Question", "name": "What is UTC and why use it?", "acceptedAnswer": {"@type": "Answer", "text": "UTC (Coordinated Universal Time) is the reference clock the whole world's time zones are defined against — a zone is described by how far it is ahead of or behind UTC. Aviation, shipping, servers and international contracts all use it precisely because it has no daylight saving and never shifts."}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lazytools.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "Time Zone Converter", "item": "https://lazytools.pages.dev/tools/time-zone-converter"}]}</script>
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "acfbc9d4873643d981ed1837233ae31c"}'></script>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><a class="logo" href="../index.html"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0f1e"/><path d="M42 10a21 21 0 1 0 12.5 33.5A17 17 0 1 1 42 10z" fill="#f5b53f"/><circle cx="19" cy="46" r="4.5" fill="#8fa4ff"/><path d="M22.2 42.8l8.6-8.6" stroke="#8fa4ff" stroke-width="4.5" stroke-linecap="round"/></svg><span>Lazy<span class="dot">Tools</span></span></a><nav class="nav"><a href="../index.html" class="nav-a-active">All Tools</a><a href="../about.html" class="">About</a><button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark / light theme" aria-label="Toggle theme">☀️</button></nav></div></header><main class="container">
+<nav class="breadcrumb"><a href="../index.html">Home</a> › Utilities › Time Zone Converter</nav>
+<div class="tool-hero">
+  <span class="badge">Utilities</span>
+  <h1>🌍 Time Zone Converter</h1>
+  <p class="lead">Convert a meeting, a flight or a call between any two time zones — with daylight saving applied automatically and the day shift spelled out.</p>
+</div>
+<div class="ad-slot" data-slot="top" data-w="728" data-h="90" aria-label="Advertisement"></div>
+
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="tz-date">Date</label><input type="date" id="tz-date"></div>
+    <div class="field"><label for="tz-time">Time</label><input type="time" id="tz-time" value="12:00"></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="field"><label for="tz-from">From</label><select id="tz-from"></select></div>
+    <div class="field"><label for="tz-to">To</label><select id="tz-to"></select></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-primary" type="button" onclick="runTZ()">Convert</button>
+    <button class="btn-ghost" type="button" onclick="tzSwap()">⇄ Swap zones</button>
+    <button class="btn-ghost" type="button" onclick="tzNow()">Use current time</button>
+  </div>
+  <div class="results" id="tz-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="tz-out">—</b><span>Local time at destination</span></div>
+      <div class="stat"><b id="tz-day">—</b><span>Day shift</span></div>
+      <div class="stat"><b id="tz-diff">—</b><span>Time difference</span></div>
+    </div>
+    <p class="note" id="tz-detail">—</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">The same moment around the world</h3>
+  <table class="simple" id="tz-table">
+    <thead><tr><th>City</th><th>Local time</th><th>Day</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p class="note">Daylight saving is applied from your browser's own time zone database, so summer and winter dates are handled correctly — no manual adjustment needed.</p>
+</div>
+
+<div class="ad-slot" data-slot="middle" data-w="300" data-h="250" aria-label="Advertisement"></div>
+<section class="content">
+  <h2 class="section">About the Time Zone Converter</h2>
+  <p>Converting time between zones looks like simple subtraction and is almost never that. The gap between two cities is not fixed: it depends on the date, because each country switches to and from daylight saving on its own schedule, and a handful of zones sit on half-hour or quarter-hour offsets. A 12:00 call between New York and London is a five-hour difference in January and a five-hour difference in July, but only because the two countries change their clocks within a week of each other — shift the date to late March and the answer changes.</p><p>That is why a fixed 'hours apart' table is unreliable and why this converter asks for a date. It reads the real offset for both zones on the exact day you specify, from the time zone database your own browser ships with, so the daylight saving transition is handled without you thinking about it.</p>
+</section>
+<section>
+  <h2 class="section">Frequently asked questions</h2>
+  <div class="faq"><details><summary>How do I convert a time from one time zone to another?</summary><p>Find the offset of each zone from UTC at that exact date, then shift the time by the difference. A 12:00 meeting in New York on 15 January is 17:00 in London, because New York is UTC-5 in winter and London is UTC+0. This converter does that arithmetic for you and also shows the day shift when the two zones land on different calendar dates.</p></details><details><summary>Does the converter handle daylight saving time?</summary><p>Yes, automatically. Offsets are read from your browser's own time zone database for the specific date you enter, so a July date and a January date give different answers for the same pair of cities. That is also why you should always enter a date rather than assuming a fixed number of hours' difference.</p></details><details><summary>Why is the time difference sometimes not a whole number of hours?</summary><p>Because several zones use a half-hour or three-quarter-hour offset. India is UTC+5:30, Nepal is UTC+5:45, and parts of Australia are UTC+9:30. The converter shows fractional differences as decimals, so India against London reads as 5.5 h in winter.</p></details><details><summary>What is UTC and why use it?</summary><p>UTC (Coordinated Universal Time) is the reference clock the whole world's time zones are defined against — a zone is described by how far it is ahead of or behind UTC. Aviation, shipping, servers and international contracts all use it precisely because it has no daylight saving and never shifts.</p></details></div>
+</section>
+
+<section class="related">
+  <h2 class="section">Related tools</h2>
+  <div class="tool-grid"><a class="tool-card" href="../tools/password-generator.html" data-slug="password-generator" data-cat="Utilities" data-name="Password Generator" data-keywords="Strong random passwords generated locally with crypto-grade randomness. password generator, strong password, random password, secure password generator, create password"><span class="ico">🔐</span><h3>Password Generator</h3><p>Strong random passwords generated locally with crypto-grade randomness.</p></a><a class="tool-card" href="../tools/unit-converter.html" data-slug="unit-converter" data-cat="Utilities" data-name="Unit Converter" data-keywords="Length, weight, volume, area, speed, data and temperature conversions. unit converter, metric to imperial, length converter, weight converter, temperature converter, data storage converter"><span class="ico">🔄</span><h3>Unit Converter</h3><p>Length, weight, volume, area, speed, data and temperature conversions.</p></a><a class="tool-card" href="../tools/percentage-calculator.html" data-slug="percentage-calculator" data-cat="Everyday" data-name="Percentage Calculator" data-keywords="Percent of a number, what percent X is of Y, and percentage increase or decrease. percentage calculator, percent of a number, percentage change, percent increase, percent decrease, what percent of"><span class="ico">💯</span><h3>Percentage Calculator</h3><p>Percent of a number, what percent X is of Y, and percentage increase or decrease.</p></a><a class="tool-card" href="../tools/age-calculator.html" data-slug="age-calculator" data-cat="Everyday" data-name="Age Calculator" data-keywords="Your exact age in years, months and days — plus a countdown to your next birthday. age calculator, how old am i, calculate age from date of birth, age in days, next birthday countdown"><span class="ico">🎂</span><h3>Age Calculator</h3><p>Your exact age in years, months and days — plus a countdown to your next birthday.</p></a></div>
+</section>
+<div class="ad-slot" data-slot="bottom" data-w="300" data-h="250" aria-label="Advertisement"></div>
+</main>
+<script>
+var TZ_LIST = [
+  ['UTC', 'UTC'],
+  ['America/Los_Angeles', 'Los Angeles'],
+  ['America/Denver', 'Denver'],
+  ['America/Chicago', 'Chicago'],
+  ['America/New_York', 'New York'],
+  ['America/Sao_Paulo', 'São Paulo'],
+  ['Europe/London', 'London'],
+  ['Europe/Paris', 'Paris'],
+  ['Europe/Berlin', 'Berlin'],
+  ['Africa/Lagos', 'Lagos'],
+  ['Africa/Cairo', 'Cairo'],
+  ['Europe/Moscow', 'Moscow'],
+  ['Asia/Dubai', 'Dubai'],
+  ['Asia/Karachi', 'Karachi'],
+  ['Asia/Kolkata', 'Kolkata'],
+  ['Asia/Dhaka', 'Dhaka'],
+  ['Asia/Bangkok', 'Bangkok'],
+  ['Asia/Shanghai', 'Shanghai'],
+  ['Asia/Singapore', 'Singapore'],
+  ['Asia/Tokyo', 'Tokyo'],
+  ['Australia/Sydney', 'Sydney'],
+  ['Pacific/Auckland', 'Auckland']
+];
+function tzPad(n){ return (n < 10 ? '0' : '') + n; }
+function tzParts(date, tz){
+  var dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  var p = {};
+  dtf.formatToParts(date).forEach(function(x){ if(x.type !== 'literal') p[x.type] = x.value; });
+  return p;
+}
+function tzOffsetMin(date, tz){
+  var p = tzParts(date, tz);
+  var asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+  return Math.round((asUTC - date.getTime()) / 60000);
+}
+/* Build the exact instant that reads as this wall-clock time in tz. The second pass
+   corrects the offset across a daylight-saving boundary. */
+function tzInstant(y, mo, d, h, mi, tz){
+  var guess = Date.UTC(y, mo - 1, d, h, mi, 0);
+  var off = tzOffsetMin(new Date(guess), tz);
+  var ts = guess - off * 60000;
+  off = tzOffsetMin(new Date(ts), tz);
+  return new Date(guess - off * 60000);
+}
+function tzTime(date, tz){
+  var p = tzParts(date, tz);
+  return p.hour + ':' + p.minute;
+}
+function tzDateLabel(date, tz){
+  return new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short',
+    day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
+function tzDayDiff(date, fromTz, toTz){
+  var a = tzParts(date, fromTz), b = tzParts(date, toTz);
+  return Math.round((Date.UTC(+b.year, +b.month - 1, +b.day) - Date.UTC(+a.year, +a.month - 1, +a.day)) / 86400000);
+}
+function tzOffLabel(min){
+  var sign = min < 0 ? '-' : '+', a = Math.abs(min);
+  return 'UTC' + sign + tzPad(Math.floor(a / 60)) + ':' + tzPad(a % 60);
+}
+function tzName(code){
+  for(var i = 0; i < TZ_LIST.length; i++){ if(TZ_LIST[i][0] === code) return TZ_LIST[i][1]; }
+  return code;
+}
+function tzFillSelects(){
+  var opts = TZ_LIST.map(function(z){ return '<option value="' + z[0] + '">' + z[1] + '</option>'; }).join('');
+  $id('tz-from').innerHTML = opts;
+  $id('tz-to').innerHTML = opts;
+  $id('tz-from').value = 'America/New_York';
+  $id('tz-to').value = 'Europe/London';
+}
+function tzSwap(){
+  var a = $id('tz-from').value;
+  $id('tz-from').value = $id('tz-to').value;
+  $id('tz-to').value = a;
+  runTZ();
+}
+function tzNow(){
+  var now = new Date();
+  $id('tz-date').value = localISO(now);
+  $id('tz-time').value = tzPad(now.getHours()) + ':' + tzPad(now.getMinutes());
+  runTZ();
+}
+function runTZ(){
+  var dv = $id('tz-date').value, tv = $id('tz-time').value;
+  if(!dv || !tv){ alert('Please choose both a date and a time.'); return; }
+  var from = $id('tz-from').value, to = $id('tz-to').value;
+  var dp = dv.split('-'), tp = tv.split(':');
+  var instant = tzInstant(+dp[0], +dp[1], +dp[2], +tp[0], +tp[1], from);
+  var shift = tzDayDiff(instant, from, to);
+  var diff = tzOffsetMin(instant, to) - tzOffsetMin(instant, from);
+  var hours = Math.abs(diff) / 60;
+  var hoursTxt = (hours % 1 === 0) ? String(hours) : hours.toFixed(1).replace('.0', '');
+  $id('tz-out').textContent = tzTime(instant, to);
+  $id('tz-day').textContent = shift === 0 ? 'Same day' : (shift > 0 ? '+' + shift + ' day' : shift + ' day');
+  $id('tz-diff').textContent = hoursTxt + ' h';
+  $id('tz-detail').textContent = tzDateLabel(instant, from) + ' at ' + tzTime(instant, from) + ' in ' +
+    tzName(from) + ' (' + tzOffLabel(tzOffsetMin(instant, from)) + ') is ' +
+    tzDateLabel(instant, to) + ' at ' + tzTime(instant, to) + ' in ' + tzName(to) +
+    ' (' + tzOffLabel(tzOffsetMin(instant, to)) + ').';
+  var body = '';
+  TZ_LIST.forEach(function(z){
+    var s = tzDayDiff(instant, from, z[0]);
+    var mark = s === 0 ? 'same day' : (s > 0 ? '+' + s + ' day' : s + ' day');
+    body += '<tr><td>' + z[1] + '</td><td>' + tzTime(instant, z[0]) + '</td><td>' + mark + '</td></tr>';
+  });
+  $id('tz-table').querySelector('tbody').innerHTML = body;
+  showRes('tz-res');
+}
+tzFillSelects();
+$id('tz-date').value = localISO(new Date());
+runTZ();
+</script>
+</body>
+</html>

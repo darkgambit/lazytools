@@ -369,7 +369,7 @@ function runWater(){
 ],
 "about": [
 "Hydration needs are not one-size-fits-all: they scale with body mass, sweat losses from activity, and climate — which is why a one-line “8 glasses a day” rule fails desert dwellers and office workers alike.",
-"This calculator starts from the widely used weight-based guideline (about 35 ml per kg), adds sweat replacement for exercise, and layers on a climate adjustment — then translates the result into glasses and bottles, the units people actually track."
+"This calculator starts from the widely used weight-based guideline (about 35 ml per kg), adds sweat replacement for exercise, and layers on a climate adjustment — then translates the result into glasses and bottles, the units people actually track. Water is only half of the intake picture, though; the <a href=\"calorie-calculator.html\">calorie calculator</a> covers the energy side with your BMR and daily calorie needs."
 ],
 "gear": [
 {"query": "insulated water bottle 1 litre", "label": "Insulated 1 L water bottle", "why": "Keeping it visible and full on your desk does more for your intake than any reminder app."},
@@ -659,7 +659,7 @@ runHours();
 ],
 "about": [
 "An hours calculator is one of the most searched tools on the web because timesheets are still filled in by hand. The arithmetic is deceptively awkward: clock time is base-60, payroll is base-10, and any shift that crosses midnight breaks a naive subtraction.",
-"This tool handles all three problems at once. It returns the duration between two times with unpaid breaks deducted, converts that answer into decimal hours, and then totals a whole week the way a payroll system would — overnight shifts included."
+"This tool handles all three problems at once. It returns the duration between two times with unpaid breaks deducted, converts that answer into decimal hours, and then totals a whole week the way a payroll system would — overnight shifts included. If the people you bill or schedule are in different countries, the <a href=\"time-zone-converter.html\">time zone converter</a> settles what “09:00” actually means on each side."
 ]
 },
 
@@ -833,6 +833,408 @@ function runST2(){
 "about": [
 "Sales tax, VAT and GST are all consumption taxes, and the single most common mistake is working backwards. People subtract the rate from the tax-inclusive total, which always understates the tax and overstates the pre-tax price, because the tax was charged on the smaller pre-tax amount rather than on the total.",
 "This calculator does both directions properly: forward to add tax to a net price, and reverse to divide it back out of a gross total. Rates are free-form, so it works for a US state sales tax, UK VAT, Australian GST, or any other percentage."
+]
+},
+
+# ---------------------------------------------------------------- GPA
+{
+"slug": "gpa-calculator", "name": "GPA Calculator", "icon": "🎓", "cat": "Everyday", "popular": True,
+"short": "Credit-weighted GPA from your course grades and credit hours, on the 4.0 scale.",
+"title": "GPA Calculator — Weighted Grade Point Average (4.0 Scale)",
+"desc": "Free GPA calculator: enter each course's grade and credit hours for your weighted GPA on the 4.0 scale, then combine it with your previous record for a cumulative GPA.",
+"keywords": "gpa calculator, weighted gpa, grade point average, cumulative gpa calculator, college gpa, 4.0 scale gpa, high school gpa",
+"lead": "Enter your courses, grades and credit hours to get the credit-weighted GPA that actually goes on a transcript — then fold it into your cumulative GPA.",
+"body": """
+<div class="panel">
+  <h3 class="panel-title">This term's courses</h3>
+  <ul class="sleep-list" id="gpa-rows"></ul>
+  <div class="btn-row">
+    <button class="btn-primary" type="button" onclick="runGPA()">Calculate GPA</button>
+    <button class="btn-ghost" type="button" onclick="gpaAddRow()">+ Add course</button>
+    <button class="btn-ghost" type="button" onclick="gpaClear()">Clear all</button>
+  </div>
+  <div class="results" id="gpa-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="gpa-val">—</b><span>Term GPA</span></div>
+      <div class="stat"><b id="gpa-credits">—</b><span>Credit hours</span></div>
+      <div class="stat"><b id="gpa-points">—</b><span>Quality points</span></div>
+    </div>
+    <p class="note">GPA is credit-weighted, not a plain average of your grades: a 3-credit course counts three times as much as a 1-credit one. Only graded courses count — pass/fail, credit/no-credit and withdrawn courses carry no grade points.</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">Cumulative GPA</h3>
+  <div class="grid-2">
+    <div class="field"><label for="cg-gpa">Current cumulative GPA</label><input type="number" id="cg-gpa" value="3.2" min="0" max="5" step="any"></div>
+    <div class="field"><label for="cg-cr">Credits earned so far</label><input type="number" id="cg-cr" value="60" min="0" step="any"></div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runCGPA()">Combine with this term</button></div>
+  <div class="results" id="cg-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="cg-new">—</b><span>New cumulative GPA</span></div>
+      <div class="stat"><b id="cg-total">—</b><span>Total credits</span></div>
+      <div class="stat"><b id="cg-change">—</b><span>Change</span></div>
+    </div>
+    <p class="note">This uses the term result from above, so calculate the term first. Old grades never leave the average — which is why one weak semester is hard to undo late in a degree, and why adding credits is usually faster than chasing perfect grades.</p>
+  </div>
+</div>
+""",
+"js": """
+var GPA_GRADES = [
+  ['A+', 4.0], ['A', 4.0], ['A-', 3.7],
+  ['B+', 3.3], ['B', 3.0], ['B-', 2.7],
+  ['C+', 2.3], ['C', 2.0], ['C-', 1.7],
+  ['D+', 1.3], ['D', 1.0], ['D-', 0.7],
+  ['F', 0.0]
+];
+function gpaOpts(sel){
+  return GPA_GRADES.map(function(g){
+    return '<option value="' + g[1] + '"' + (g[0] === sel ? ' selected' : '') + '>' + g[0] + '</option>';
+  }).join('');
+}
+function gpaAddRow(name, grade, credits){
+  var li = document.createElement('li');
+  li.innerHTML = '<input type="text" class="gpa-name" value="' + (name || '') +
+    '" placeholder="Course name" aria-label="Course name" style="flex:1 1 130px;min-width:120px">' +
+    '<select class="gpa-grade" aria-label="Grade">' + gpaOpts(grade === undefined ? 'A' : grade) + '</select>' +
+    '<input type="number" class="gpa-cr mini" value="' + (credits === undefined ? 3 : credits) +
+    '" min="0" step="any" aria-label="Credit hours" title="Credit hours">';
+  $id('gpa-rows').appendChild(li);
+}
+function gpaClear(){
+  $id('gpa-rows').innerHTML = '';
+  gpaAddRow('', 'A', 3);
+}
+function gpaTotals(){
+  var credits = 0, points = 0, n = 0;
+  [].slice.call(document.querySelectorAll('#gpa-rows li')).forEach(function(li){
+    var g = parseFloat(li.querySelector('.gpa-grade').value);
+    var c = parseFloat(li.querySelector('.gpa-cr').value);
+    if(isNaN(g) || isNaN(c) || c <= 0) return;
+    credits += c; points += g * c; n++;
+  });
+  return { credits: credits, points: points, n: n, gpa: credits > 0 ? points / credits : 0 };
+}
+function runGPA(){
+  var t = gpaTotals();
+  if(t.n === 0){ alert('Enter at least one course with credit hours greater than zero.'); return; }
+  $id('gpa-val').textContent = t.gpa.toFixed(2);
+  $id('gpa-credits').textContent = fmt(t.credits, 2);
+  $id('gpa-points').textContent = fmt(t.points, 2);
+  showRes('gpa-res');
+}
+function runCGPA(){
+  var t = gpaTotals();
+  if(t.n === 0){ alert('Add your courses above first — this figure uses the term result.'); return; }
+  var prev = readNum('cg-gpa', 'your current cumulative GPA'); if(prev === null) return;
+  var prevCr = readNum('cg-cr', 'credits earned so far'); if(prevCr === null) return;
+  if(prev < 0 || prevCr < 0){ alert('GPA and credit hours cannot be negative.'); return; }
+  var totalCr = prevCr + t.credits;
+  if(totalCr <= 0){ alert('Total credit hours must be greater than zero.'); return; }
+  var combined = ((prev * prevCr) + t.points) / totalCr;
+  var diff = combined - prev;
+  $id('cg-new').textContent = combined.toFixed(2);
+  $id('cg-total').textContent = fmt(totalCr, 2);
+  $id('cg-change').textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2);
+  $id('cg-change').style.color = diff >= 0 ? '#4ade80' : '#f87171';
+  showRes('cg-res');
+}
+gpaAddRow('Course 1', 'A', 3);
+gpaAddRow('Course 2', 'B', 3);
+gpaAddRow('Course 3', 'A-', 3);
+gpaAddRow('Course 4', 'B+', 3);
+runGPA();
+""",
+"faqs": [
+("How is GPA calculated?", "Multiply each course's grade points by its credit hours, add all of those products together, then divide by the total credit hours. That sum of products is the 'quality points'. A 3-credit A (4.0) contributes 12 quality points and a 1-credit A contributes 4 — so credit hours, not the number of courses, decide the result."),
+("What is the difference between weighted and unweighted GPA?", "An unweighted GPA puts every course on the same 4.0 scale. A weighted GPA adds extra points for honours, AP or IB classes, often out to 5.0, so a hard course can lift the number above 4.0. This calculator produces the unweighted, credit-weighted figure that most universities report; if your school weights honours classes, enter the adjusted grade points your registrar uses instead."),
+("Does a pass/fail course affect my GPA?", "No. Pass/fail, credit/no-credit and withdrawn courses carry no grade points, so leave them out entirely. Entering them as an F or a 0 would drag the average down incorrectly."),
+("How much can one bad semester lower my cumulative GPA?", "Less than you fear, as long as you keep earning credits. The cumulative average is credit-weighted, so 60 existing credits plus a weak 12-credit term moves the number only slightly. The same maths means recovery is slow and steady rather than instant.")
+],
+"about": [
+"A grade point average is a credit-weighted mean of your grades. The weighting is the whole point: universities use it to stop a single hard 4-credit course from counting the same as a light 1-credit elective, and employers and graduate schools read it as a single comparable number across very different transcripts.",
+"Working out the term figure by hand is where most people go wrong, because it is not an average of the letter grades you can see. You have to convert each grade to grade points, multiply by the credit hours, total both, and divide. That is exactly what this calculator does, and it then folds the result into your existing cumulative GPA — the number that actually appears on a transcript."
+]
+},
+
+# ---------------------------------------------------------------- CALORIE / BMR / TDEE
+{
+"slug": "calorie-calculator", "name": "Calorie Calculator", "icon": "🔥", "cat": "Health", "popular": True,
+"short": "Your BMR and daily calorie needs (TDEE), plus targets for losing or gaining weight.",
+"title": "Calorie Calculator — BMR & Daily Calorie Needs (TDEE)",
+"desc": "Free calorie calculator using the Mifflin-St Jeor equation. Get your BMR, your daily maintenance calories (TDEE) and safe targets for losing or gaining weight, in metric or imperial units.",
+"keywords": "calorie calculator, bmr calculator, tdee calculator, daily calorie needs, maintenance calories, weight loss calories, mifflin st jeor",
+"lead": "Work out how many calories you actually burn in a day — your BMR and your TDEE — and what that means for losing or gaining weight.",
+"body": """
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="cal-units">Units</label>
+      <select id="cal-units" onchange="calUnits()">
+        <option value="metric">Metric (cm, kg)</option>
+        <option value="imperial">Imperial (ft/in, lb)</option>
+      </select>
+    </div>
+    <div class="field"><label for="cal-sex">Sex</label>
+      <select id="cal-sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid-2" id="cal-metric" style="margin-top:14px">
+    <div class="field"><label for="cal-h">Height (cm)</label><input type="number" id="cal-h" value="180" min="0" step="any"></div>
+    <div class="field"><label for="cal-w">Weight (kg)</label><input type="number" id="cal-w" value="80" min="0" step="any"></div>
+    <div class="field"><label for="cal-age">Age (years)</label><input type="number" id="cal-age" value="30" min="0" step="1"></div>
+  </div>
+  <div class="grid-2" id="cal-imperial" style="display:none;margin-top:14px">
+    <div class="field"><label for="cal-ft">Height (feet)</label><input type="number" id="cal-ft" value="5" min="0" step="any"></div>
+    <div class="field"><label for="cal-in">Height (inches)</label><input type="number" id="cal-in" value="11" min="0" step="any"></div>
+    <div class="field"><label for="cal-lb">Weight (pounds)</label><input type="number" id="cal-lb" value="176" min="0" step="any"></div>
+    <div class="field"><label for="cal-age-i">Age (years)</label><input type="number" id="cal-age-i" value="30" min="0" step="1"></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="field"><label for="cal-act">Activity level</label>
+      <select id="cal-act">
+        <option value="1.2">Sedentary — little or no exercise</option>
+        <option value="1.375">Lightly active — 1–3 days a week</option>
+        <option value="1.55" selected>Moderately active — 3–5 days a week</option>
+        <option value="1.725">Very active — 6–7 days a week</option>
+        <option value="1.9">Extra active — physical job or twice a day</option>
+      </select>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn-primary" type="button" onclick="runCal()">Calculate calories</button></div>
+  <div class="results" id="cal-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="cal-bmr">—</b><span>BMR (at rest)</span></div>
+      <div class="stat"><b id="cal-tdee">—</b><span>Maintenance</span></div>
+      <div class="stat"><b id="cal-cut">—</b><span>Lose ~0.5 kg/week</span></div>
+      <div class="stat"><b id="cal-bulk">—</b><span>Gain ~0.25 kg/week</span></div>
+    </div>
+    <p class="note">BMR is what your body burns at complete rest. Maintenance (TDEE) multiplies that by how active you are. A deficit of about 500 kcal a day is the usual target for roughly 0.5 kg (1 lb) of fat loss a week — but do not eat below your BMR, and speak to a doctor before aggressive dieting.</p>
+  </div>
+</div>
+""",
+"js": """
+function calUnits(){
+  var imp = $id('cal-units').value === 'imperial';
+  $id('cal-metric').style.display = imp ? 'none' : '';
+  $id('cal-imperial').style.display = imp ? '' : 'none';
+}
+function runCal(){
+  var unit = $id('cal-units').value;
+  var male = $id('cal-sex').value === 'male';
+  var hcm, wkg, age;
+  if(unit === 'metric'){
+    hcm = readNum('cal-h', 'height'); wkg = readNum('cal-w', 'weight');
+    age = readNum('cal-age', 'age');
+  } else {
+    var ft = readNum('cal-ft', 'feet'); var inch = parseFloat($id('cal-in').value) || 0;
+    wkg = readNum('cal-lb', 'weight'); age = readNum('cal-age-i', 'age');
+    if(ft === null) return;
+    hcm = (ft * 12 + inch) * 2.54;
+    if(wkg !== null) wkg = wkg * 0.45359237;
+  }
+  if(hcm === null || wkg === null || age === null) return;
+  if(hcm <= 0 || wkg <= 0 || age <= 0){ alert('Height, weight and age must all be positive numbers.'); return; }
+  if(age < 15 || age > 100){ alert('This formula is validated for adults. Use a paediatric calculator for under-15s.'); return; }
+  /* Mifflin-St Jeor: the most accurate simple BMR equation for the general population. */
+  var bmr = (10 * wkg) + (6.25 * hcm) - (5 * age) + (male ? 5 : -161);
+  var factor = parseFloat($id('cal-act').value);
+  var tdee = bmr * factor;
+  var cut = tdee - 500;
+  var bulk = tdee + 250;
+  /* never present a target below the floor of 1,200 kcal */
+  if(cut < 1200) cut = 1200;
+  $id('cal-bmr').textContent = fmt(bmr, 0) + ' kcal';
+  $id('cal-tdee').textContent = fmt(tdee, 0) + ' kcal';
+  $id('cal-cut').textContent = fmt(cut, 0) + ' kcal';
+  $id('cal-bulk').textContent = fmt(bulk, 0) + ' kcal';
+  showRes('cal-res');
+}
+runCal();
+""",
+"faqs": [
+("What is the difference between BMR and TDEE?", "BMR (basal metabolic rate) is the energy you would burn lying still all day — it covers breathing, circulation, temperature control and cell repair. TDEE (total daily energy expenditure) is BMR multiplied by an activity factor, and it is the number that predicts whether you gain, lose or hold weight. If you eat roughly your TDEE, your weight stays put."),
+("How many calories should I eat to lose weight?", "A deficit of about 500 kcal a day below your maintenance level is the standard target, and it produces roughly 0.5 kg (1 lb) of loss a week — which is also what this calculator's weight-loss figure shows. Larger deficits lose weight faster but cost muscle and are harder to sustain."),
+("How accurate is the Mifflin-St Jeor equation?", "It is the equation most dietitians use, and studies find it lands within about 10% of measured resting energy expenditure for most adults. That still means a few hundred calories either way. Treat the result as a starting point, watch your weight over two to three weeks, and adjust."),
+("Is it safe to eat only 1,200 calories a day?", "1,200 kcal is generally treated as the floor below which you should not go without medical supervision, because it becomes very hard to hit your protein, vitamin and mineral needs. This calculator will not show a weight-loss target below that level.")
+],
+"about": [
+"Every calorie target starts with one number: how much energy your body uses in a day. That figure has two parts. The first is your basal metabolic rate, the cost of simply staying alive, which depends mostly on body size, sex and age. The second is everything you do on top of that — walking, working, training — expressed as a multiplier on the first.",
+"Multiplying the two gives your total daily energy expenditure, or maintenance calories. Eat around that number and your weight holds steady; eat below it and you lose; eat above it and you gain. The arithmetic here uses the Mifflin-St Jeor equation, the formula most clinical dietitians default to because it is more accurate than the older Harris-Benedict equation across a wide range of body types."
+]
+},
+
+# ---------------------------------------------------------------- TIME ZONE CONVERTER
+{
+"slug": "time-zone-converter", "name": "Time Zone Converter", "icon": "🌍", "cat": "Utilities", "popular": False,
+"short": "Convert a date and time between any two time zones, with daylight saving handled.",
+"title": "Time Zone Converter — Convert Time Between Any Two Zones",
+"desc": "Free time zone converter: turn a date and time in one city into the local time in another, with daylight saving handled automatically and the day shift shown clearly.",
+"keywords": "time zone converter, world clock, time difference calculator, meeting time converter, daylight saving converter, utc converter",
+"lead": "Convert a meeting, a flight or a call between any two time zones — with daylight saving applied automatically and the day shift spelled out.",
+"body": """
+<div class="panel">
+  <div class="grid-2">
+    <div class="field"><label for="tz-date">Date</label><input type="date" id="tz-date"></div>
+    <div class="field"><label for="tz-time">Time</label><input type="time" id="tz-time" value="12:00"></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="field"><label for="tz-from">From</label><select id="tz-from"></select></div>
+    <div class="field"><label for="tz-to">To</label><select id="tz-to"></select></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-primary" type="button" onclick="runTZ()">Convert</button>
+    <button class="btn-ghost" type="button" onclick="tzSwap()">⇄ Swap zones</button>
+    <button class="btn-ghost" type="button" onclick="tzNow()">Use current time</button>
+  </div>
+  <div class="results" id="tz-res">
+    <div class="stat-grid">
+      <div class="stat"><b id="tz-out">—</b><span>Local time at destination</span></div>
+      <div class="stat"><b id="tz-day">—</b><span>Day shift</span></div>
+      <div class="stat"><b id="tz-diff">—</b><span>Time difference</span></div>
+    </div>
+    <p class="note" id="tz-detail">—</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:18px">
+  <h3 class="panel-title">The same moment around the world</h3>
+  <table class="simple" id="tz-table">
+    <thead><tr><th>City</th><th>Local time</th><th>Day</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p class="note">Daylight saving is applied from your browser's own time zone database, so summer and winter dates are handled correctly — no manual adjustment needed.</p>
+</div>
+""",
+"js": """
+var TZ_LIST = [
+  ['UTC', 'UTC'],
+  ['America/Los_Angeles', 'Los Angeles'],
+  ['America/Denver', 'Denver'],
+  ['America/Chicago', 'Chicago'],
+  ['America/New_York', 'New York'],
+  ['America/Sao_Paulo', 'São Paulo'],
+  ['Europe/London', 'London'],
+  ['Europe/Paris', 'Paris'],
+  ['Europe/Berlin', 'Berlin'],
+  ['Africa/Lagos', 'Lagos'],
+  ['Africa/Cairo', 'Cairo'],
+  ['Europe/Moscow', 'Moscow'],
+  ['Asia/Dubai', 'Dubai'],
+  ['Asia/Karachi', 'Karachi'],
+  ['Asia/Kolkata', 'Kolkata'],
+  ['Asia/Dhaka', 'Dhaka'],
+  ['Asia/Bangkok', 'Bangkok'],
+  ['Asia/Shanghai', 'Shanghai'],
+  ['Asia/Singapore', 'Singapore'],
+  ['Asia/Tokyo', 'Tokyo'],
+  ['Australia/Sydney', 'Sydney'],
+  ['Pacific/Auckland', 'Auckland']
+];
+function tzPad(n){ return (n < 10 ? '0' : '') + n; }
+function tzParts(date, tz){
+  var dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  var p = {};
+  dtf.formatToParts(date).forEach(function(x){ if(x.type !== 'literal') p[x.type] = x.value; });
+  return p;
+}
+function tzOffsetMin(date, tz){
+  var p = tzParts(date, tz);
+  var asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+  return Math.round((asUTC - date.getTime()) / 60000);
+}
+/* Build the exact instant that reads as this wall-clock time in tz. The second pass
+   corrects the offset across a daylight-saving boundary. */
+function tzInstant(y, mo, d, h, mi, tz){
+  var guess = Date.UTC(y, mo - 1, d, h, mi, 0);
+  var off = tzOffsetMin(new Date(guess), tz);
+  var ts = guess - off * 60000;
+  off = tzOffsetMin(new Date(ts), tz);
+  return new Date(guess - off * 60000);
+}
+function tzTime(date, tz){
+  var p = tzParts(date, tz);
+  return p.hour + ':' + p.minute;
+}
+function tzDateLabel(date, tz){
+  return new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short',
+    day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
+function tzDayDiff(date, fromTz, toTz){
+  var a = tzParts(date, fromTz), b = tzParts(date, toTz);
+  return Math.round((Date.UTC(+b.year, +b.month - 1, +b.day) - Date.UTC(+a.year, +a.month - 1, +a.day)) / 86400000);
+}
+function tzOffLabel(min){
+  var sign = min < 0 ? '-' : '+', a = Math.abs(min);
+  return 'UTC' + sign + tzPad(Math.floor(a / 60)) + ':' + tzPad(a % 60);
+}
+function tzName(code){
+  for(var i = 0; i < TZ_LIST.length; i++){ if(TZ_LIST[i][0] === code) return TZ_LIST[i][1]; }
+  return code;
+}
+function tzFillSelects(){
+  var opts = TZ_LIST.map(function(z){ return '<option value="' + z[0] + '">' + z[1] + '</option>'; }).join('');
+  $id('tz-from').innerHTML = opts;
+  $id('tz-to').innerHTML = opts;
+  $id('tz-from').value = 'America/New_York';
+  $id('tz-to').value = 'Europe/London';
+}
+function tzSwap(){
+  var a = $id('tz-from').value;
+  $id('tz-from').value = $id('tz-to').value;
+  $id('tz-to').value = a;
+  runTZ();
+}
+function tzNow(){
+  var now = new Date();
+  $id('tz-date').value = localISO(now);
+  $id('tz-time').value = tzPad(now.getHours()) + ':' + tzPad(now.getMinutes());
+  runTZ();
+}
+function runTZ(){
+  var dv = $id('tz-date').value, tv = $id('tz-time').value;
+  if(!dv || !tv){ alert('Please choose both a date and a time.'); return; }
+  var from = $id('tz-from').value, to = $id('tz-to').value;
+  var dp = dv.split('-'), tp = tv.split(':');
+  var instant = tzInstant(+dp[0], +dp[1], +dp[2], +tp[0], +tp[1], from);
+  var shift = tzDayDiff(instant, from, to);
+  var diff = tzOffsetMin(instant, to) - tzOffsetMin(instant, from);
+  var hours = Math.abs(diff) / 60;
+  var hoursTxt = (hours % 1 === 0) ? String(hours) : hours.toFixed(1).replace('.0', '');
+  $id('tz-out').textContent = tzTime(instant, to);
+  $id('tz-day').textContent = shift === 0 ? 'Same day' : (shift > 0 ? '+' + shift + ' day' : shift + ' day');
+  $id('tz-diff').textContent = hoursTxt + ' h';
+  $id('tz-detail').textContent = tzDateLabel(instant, from) + ' at ' + tzTime(instant, from) + ' in ' +
+    tzName(from) + ' (' + tzOffLabel(tzOffsetMin(instant, from)) + ') is ' +
+    tzDateLabel(instant, to) + ' at ' + tzTime(instant, to) + ' in ' + tzName(to) +
+    ' (' + tzOffLabel(tzOffsetMin(instant, to)) + ').';
+  var body = '';
+  TZ_LIST.forEach(function(z){
+    var s = tzDayDiff(instant, from, z[0]);
+    var mark = s === 0 ? 'same day' : (s > 0 ? '+' + s + ' day' : s + ' day');
+    body += '<tr><td>' + z[1] + '</td><td>' + tzTime(instant, z[0]) + '</td><td>' + mark + '</td></tr>';
+  });
+  $id('tz-table').querySelector('tbody').innerHTML = body;
+  showRes('tz-res');
+}
+tzFillSelects();
+$id('tz-date').value = localISO(new Date());
+runTZ();
+""",
+"faqs": [
+("How do I convert a time from one time zone to another?", "Find the offset of each zone from UTC at that exact date, then shift the time by the difference. A 12:00 meeting in New York on 15 January is 17:00 in London, because New York is UTC-5 in winter and London is UTC+0. This converter does that arithmetic for you and also shows the day shift when the two zones land on different calendar dates."),
+("Does the converter handle daylight saving time?", "Yes, automatically. Offsets are read from your browser's own time zone database for the specific date you enter, so a July date and a January date give different answers for the same pair of cities. That is also why you should always enter a date rather than assuming a fixed number of hours' difference."),
+("Why is the time difference sometimes not a whole number of hours?", "Because several zones use a half-hour or three-quarter-hour offset. India is UTC+5:30, Nepal is UTC+5:45, and parts of Australia are UTC+9:30. The converter shows fractional differences as decimals, so India against London reads as 5.5 h in winter."),
+("What is UTC and why use it?", "UTC (Coordinated Universal Time) is the reference clock the whole world's time zones are defined against — a zone is described by how far it is ahead of or behind UTC. Aviation, shipping, servers and international contracts all use it precisely because it has no daylight saving and never shifts.")
+],
+"about": [
+"Converting time between zones looks like simple subtraction and is almost never that. The gap between two cities is not fixed: it depends on the date, because each country switches to and from daylight saving on its own schedule, and a handful of zones sit on half-hour or quarter-hour offsets. A 12:00 call between New York and London is a five-hour difference in January and a five-hour difference in July, but only because the two countries change their clocks within a week of each other — shift the date to late March and the answer changes.",
+"That is why a fixed 'hours apart' table is unreliable and why this converter asks for a date. It reads the real offset for both zones on the exact day you specify, from the time zone database your own browser ships with, so the daylight saving transition is handled without you thinking about it."
 ]
 },
 ]

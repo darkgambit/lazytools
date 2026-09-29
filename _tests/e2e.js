@@ -42,6 +42,9 @@ const fill = {
   'tools/hours-calculator.html': {},
   'tools/discount-calculator.html': { 'd1-price': '120' },
   'tools/sales-tax-calculator.html': { 'st1-net': '250' },
+  'tools/gpa-calculator.html': {},
+  'tools/calorie-calculator.html': {},
+  'tools/time-zone-converter.html': { 'tz-date': '2026-01-15' },
 };
 
 const resultSel = {
@@ -62,6 +65,9 @@ const resultSel = {
   'tools/hours-calculator.html': '#hc-hm',
   'tools/discount-calculator.html': '#d1-final',
   'tools/sales-tax-calculator.html': '#st1-gross',
+  'tools/gpa-calculator.html': '#gpa-val',
+  'tools/calorie-calculator.html': '#cal-tdee',
+  'tools/time-zone-converter.html': '#tz-out',
 };
 
 let pass = 0, fail = 0;
@@ -251,6 +257,84 @@ let pass = 0, fail = 0;
       'sales tax (reverse)', `270.63 incl 8.25% -> net=${net} tax=${tax} errs=${errs.length}`);
     await page.close();
   } catch (e) { report(false, 'sales tax (reverse)', e.message.split('\n')[0]); }
+
+  // ---------- GPA: credit-weighted maths and the cumulative combine ----------
+  try {
+    const { page, errs } = await newPage();
+    await page.goto(nav('tools/gpa-calculator.html'), { waitUntil: 'load' });
+    // A(3) + B(4) + A-(3) + B+(3) -> (12 + 12 + 11.1 + 9.9) / 13 = 3.4615... -> 3.46
+    const rows = page.locator('#gpa-rows li');
+    const grades = ['4', '3', '3.7', '3.3'];
+    const credits = ['3', '4', '3', '3'];
+    for (let i = 0; i < 4; i++) {
+      await rows.nth(i).locator('.gpa-grade').selectOption(grades[i]);
+      await rows.nth(i).locator('.gpa-cr').fill(credits[i]);
+    }
+    await page.locator('button[onclick="runGPA()"]').click();
+    await page.waitForTimeout(200);
+    const gpa = ((await page.locator('#gpa-val').textContent()) || '').trim();
+    const cr = ((await page.locator('#gpa-credits').textContent()) || '').trim();
+    // 3.2 over 60 credits + 45.0 quality points over 13 -> 237/73 = 3.2466 -> 3.25
+    await page.locator('button[onclick="runCGPA()"]').click();
+    await page.waitForTimeout(200);
+    const cum = ((await page.locator('#cg-new').textContent()) || '').trim();
+    const change = ((await page.locator('#cg-change').textContent()) || '').trim();
+    report(gpa === '3.46' && cr === '13' && cum === '3.25' && change === '+0.05' && errs.length === 0,
+      'gpa (weighted)', `gpa=${gpa} credits=${cr} cumulative=${cum} change=${change} errs=${errs.length}`);
+    await page.close();
+  } catch (e) { report(false, 'gpa (weighted)', e.message.split('\n')[0]); }
+
+  // ---------- calorie: BMR / TDEE checked against the formula by hand ----------
+  try {
+    const { page, errs } = await newPage();
+    await page.goto(nav('tools/calorie-calculator.html'), { waitUntil: 'load' });
+    // male, 30 y, 180 cm, 80 kg, moderately active (1.55)
+    // Mifflin-St Jeor: 10*80 + 6.25*180 - 5*30 + 5 = 1780 ; TDEE = 1780 * 1.55 = 2759
+    await page.selectOption('#cal-sex', 'male');
+    await page.fill('#cal-h', '180');
+    await page.fill('#cal-w', '80');
+    await page.fill('#cal-age', '30');
+    await page.selectOption('#cal-act', '1.55');
+    await page.locator('button[onclick="runCal()"]').click();
+    await page.waitForTimeout(200);
+    // the figures carry a thousands separator, so compare digits only
+    const digits = async (sel) => (((await page.locator(sel).textContent()) || '').replace(/[^0-9]/g, ''));
+    const bmr = await digits('#cal-bmr');
+    const tdee = await digits('#cal-tdee');
+    const cut = await digits('#cal-cut');
+    const bulk = await digits('#cal-bulk');
+    report(bmr === '1780' && tdee === '2759' && cut === '2259' && bulk === '3009' && errs.length === 0,
+      'calorie (bmr/tdee)', `bmr=${bmr} tdee=${tdee} cut=${cut} bulk=${bulk} errs=${errs.length}`);
+    await page.close();
+  } catch (e) { report(false, 'calorie (bmr/tdee)', e.message.split('\n')[0]); }
+
+  // ---------- time zone: DST-aware, and across a day boundary ----------
+  try {
+    const { page, errs } = await newPage();
+    await page.goto(nav('tools/time-zone-converter.html'), { waitUntil: 'load' });
+    // January: New York is UTC-5, London UTC+0 -> 12:00 NY = 17:00 London, same day, 5 h apart
+    await page.fill('#tz-date', '2026-01-15');
+    await page.fill('#tz-time', '12:00');
+    await page.selectOption('#tz-from', 'America/New_York');
+    await page.selectOption('#tz-to', 'Europe/London');
+    await page.locator('button[onclick="runTZ()"]').click();
+    await page.waitForTimeout(250);
+    const t1 = ((await page.locator('#tz-out').textContent()) || '').trim();
+    const d1 = ((await page.locator('#tz-day').textContent()) || '').trim();
+    const f1 = ((await page.locator('#tz-diff').textContent()) || '').trim();
+    // 23:00 NY -> Tokyo (UTC+9) is +14 h, so 13:00 the NEXT day
+    await page.fill('#tz-time', '23:00');
+    await page.selectOption('#tz-to', 'Asia/Tokyo');
+    await page.locator('button[onclick="runTZ()"]').click();
+    await page.waitForTimeout(250);
+    const t2 = ((await page.locator('#tz-out').textContent()) || '').trim();
+    const d2 = ((await page.locator('#tz-day').textContent()) || '').trim();
+    const f2 = ((await page.locator('#tz-diff').textContent()) || '').trim();
+    report(t1 === '17:00' && d1 === 'Same day' && f1 === '5 h' &&
+           t2 === '13:00' && d2 === '+1 day' && f2 === '14 h' && errs.length === 0,
+      'time zone (dst)', `NY->London ${t1} ${d1} ${f1} | NY->Tokyo ${t2} ${d2} ${f2} errs=${errs.length}`);
+    await page.close();
+  } catch (e) { report(false, 'time zone (dst)', e.message.split('\n')[0]); }
 
   // ---------- affiliate links: the revenue path, end to end ----------
   // The static guard already proves the tag and disclosure are in the HTML. This proves the

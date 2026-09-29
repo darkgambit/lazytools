@@ -967,4 +967,37 @@ deploy contract **PASSED**.
 will truncate both. That costs click-through, not ranking — worth a pass once there is traffic data
 to judge which pages matter.
 
+### 2026-09-29 — indexation audit: no blockers, but the sitemap had no `<lastmod>`
+
+Checked the things that would make every other effort pointless if they were wrong.
+
+**No indexation blockers.** No `X-Robots-Tag` on any response, no stray `noindex` (only `404.html`
+carries it, deliberately), sitemap is well-formed XML in the correct namespace with 23 unique
+absolute URLs, all 61 JSON-LD blocks parse as valid JSON with an `@context`, and — the one worth
+actually testing — **Googlebot's own User-Agent gets a 200 on `/`, a tool page, `/sitemap.xml` and
+`/robots.txt`**, so no bot protection is silently turning Google away.
+
+**The gap:** `sitemap()` emitted `<loc>`, `<changefreq>` and `<priority>` — and **no `<lastmod>` at
+all**, on any of the 23 URLs.
+
+That matters more than it looks. `<lastmod>` is the one field Google actually uses from a sitemap,
+to decide when to recrawl; Google states plainly that it ignores `<changefreq>` and `<priority>`.
+So the file was carrying two fields that do nothing and omitting the single field that does. A
+brand-new site that changed twice in one day was telling every crawler nothing about when anything
+had changed.
+
+**Fixed:** every URL now carries `<lastmod>` set to the build date, which is honest because the
+build regenerates every page. The two ignored fields are kept — they cost nothing and some other
+engines still read them.
+
+**Guarded and negative-tested:** `check_static.py` now fails if the sitemap has no `<loc>`, if the
+`<lastmod>` count does not match the `<loc>` count, or if any `<lastmod>` is not a valid ISO date.
+Negative test — stripping the tags from the generated file — fired with
+`23 <loc> but 0 <lastmod>`; restoring returned it to zero issues.
+
+**Verified:** static 0 issues · deploy contract **PASSED** live · live sitemap now shows 23
+`<lastmod>` values · IndexNow re-accepted 23 URLs. No HTML changed in this pass, so the previously
+verified 32/32 × 5 browser runs and 10/10 ad checks still hold byte-for-byte.
+
+
 

@@ -7,6 +7,7 @@ Walks every generated .html, verifies every local href/src resolves, and checks
 each page carries a canonical, title, meta description, JSON-LD and ad slots.
 Exits non-zero on any problem.
 """
+import datetime
 import os
 import re
 import subprocess
@@ -136,6 +137,26 @@ for rel in html_files:
     txt = open(os.path.join(ROOT, rel), encoding="utf-8").read()
     for token in sorted(set(PLACEHOLDER.findall(txt))):
         issues.append("%s -> unsubstituted template token %s" % (rel, token))
+
+# sitemap.xml must carry a valid ISO <lastmod> on every URL. <lastmod> is the only freshness
+# signal the file has — Google ignores <changefreq> and <priority> — and it is what tells a
+# crawler to come back. The original sitemap omitted it entirely, so a brand-new site that
+# changed daily was announcing nothing at all.
+sitemap_path = os.path.join(ROOT, "sitemap.xml")
+if os.path.exists(sitemap_path):
+    sm = open(sitemap_path, encoding="utf-8").read()
+    locs = re.findall(r"<loc>(.*?)</loc>", sm)
+    mods = re.findall(r"<lastmod>(.*?)</lastmod>", sm)
+    if not locs:
+        issues.append("sitemap.xml -> no <loc> entries")
+    if len(mods) != len(locs):
+        issues.append("sitemap.xml -> %d <loc> but %d <lastmod>; every URL needs one"
+                      % (len(locs), len(mods)))
+    for m in mods:
+        try:
+            datetime.date.fromisoformat(m.strip())
+        except ValueError:
+            issues.append("sitemap.xml -> <lastmod> %r is not a valid ISO date" % m)
 
 # Amazon Associates invariants. Both failure modes are silent and one is fatal:
 #   * An untagged link still sends the visitor to Amazon but earns NOTHING. There is no

@@ -7,11 +7,18 @@
    HOW (Adsterra example — works from any country, payouts from $5, incl. crypto):
      1. Create a publisher account: https://adsterra.com  (Publishers → Sign up)
      2. Websites → Add your website → wait for approval (usually < 48h)
-     3. Ad Units → Create 3 units, e.g.:
+     3. Ad Units → Create 3 SEPARATE units (one per slot — see the warning below):
           - 728x90 / 320x50 banner        → copy the code → paste in "top"
           - 300x250 banner                → paste in "middle"
           - 300x250 or native banner      → paste in "bottom"
      4. Paste each code between the quotes below, save, redeploy. Done.
+
+   ONE AD UNIT KEY = ONE SLOT.  Do NOT paste the same snippet into two slots.
+   Adsterra's snippet works by assigning a GLOBAL variable, `atOptions`, and then loading
+   a script that reads it back. Put the same snippet on a page twice and the second
+   assignment overwrites the first, while invoke.js is initialised twice — the documented
+   outcome is that only ONE of the two ever renders. So a duplicate costs you a slot and
+   earns nothing. If you want three ads, create three ad units in the Adsterra dashboard.
 
    Google AdSense works too (create the units, paste the loader in headCode and
    each unit in its slot). Add your ads.txt line in /ads.txt as well.
@@ -59,22 +66,50 @@ window.LAZYTOOLS_ADS = {
 
   slots: {
     top:    "",   /* banner above the tool  */
-    middle: "",   /* unit below the tool    */
+    middle:       /* unit below the tool    */
+      "<script>\n" +
+      "atOptions = {\n" +
+      "'key' : '0bab55ec2855e74946a5c24ac4862018',\n" +
+      "'format' : 'iframe',\n" +
+      "'height' : 250,\n" +
+      "'width' : 300,\n" +
+      "'params' : {}\n" +
+      "};\n" +
+      "</script>\n" +
+      "<script src=\"https://www.highrevenueformat.com/0bab55ec2855e74946a5c24ac4862018/invoke.js\"></script>",
     bottom: ""    /* footer banner          */
   },
 
   /* true  = always render slots in an isolation iframe
      false = only when the code actually needs it (document.write present)  */
-  forceIsolate: false
+  forceIsolate: false,
+
+  /* true  = an unfilled slot shows a dashed "add code in assets/ads.js" box.
+     Leave false in production: that box is a note to YOU, not to a visitor, and with
+     two of three slots still empty it would otherwise appear on every page of the site.
+     Turn it on locally when you want to see where the ads will land.  */
+  showPlaceholders: false
 };
 
 /* ---- injector: replaces placeholder boxes with your code, safely re-running scripts ---- */
 (function () {
-  /* A document.write anywhere in the snippet, or an Adsterra-style invoke.js that is
-     documented to write one, means the code must not run in the top-level document. */
+  /* Every Adsterra snippet loads <host>/<key>/invoke.js, and Adsterra rotates that host
+     over time — highperformanceformat.com, highrevenueformat.com and the
+     profitabledisplay* / effectivegatecpm names are all the same product on different
+     domains. Matching a fixed host list alone is therefore fragile, and the cost of a miss
+     is asymmetric: over-isolating merely renders a banner in an iframe, while
+     under-isolating hands the visitor a blank page. So this matches both the hosts seen in
+     the wild AND the /invoke.js path itself, which is the one shape all of them share. */
+  var AD_SCRIPT = new RegExp(
+    'highperformanceformat\\.com' +
+    '|highrevenueformat\\.com' +
+    '|profitabledisplayformat\\.com' +
+    '|profitabledisplaynetwork\\.com' +
+    '|effectivegatecpm\\.com' +
+    '|/invoke\\.js', 'i');
+
   function needsIsolation(code) {
-    return /document\s*\.\s*write/i.test(code) ||
-           /highperformanceformat\.com|effectivegatecpm\.com|profitabledisplaynetwork\.com/i.test(code);
+    return /document\s*\.\s*write/i.test(code) || AD_SCRIPT.test(code);
   }
 
   function sizeOf(slot) {
@@ -145,8 +180,12 @@ window.LAZYTOOLS_ADS = {
           reviveScripts(slot);
         }
         slot.classList.add('live');
-      } else {
+      } else if (cfg.showPlaceholders) {
+        /* Local development only — see showPlaceholders above. */
         slot.innerHTML = '<span class="ad-demo">Ad space — add code in assets/ads.js</span>';
+      } else {
+        /* Unfilled slot: collapse it, so it leaves no gap and no marker on the page. */
+        slot.classList.add('empty');
       }
     });
   }

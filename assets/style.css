@@ -185,6 +185,9 @@ h2.section{margin:38px 0 10px;font-size:1.28rem;font-weight:800}
 }
 .ad-slot .ad-demo{opacity:.65}
 .ad-slot.live{border:none;min-height:0;display:block}
+/* An unfilled slot collapses completely. Without this the dashed placeholder box and its
+   "add code in assets/ads.js" caption would render on every page of the live site. */
+.ad-slot.empty{display:none}
 
 /* ---------- footer ---------- */
 .site-footer{border-top:1px solid var(--border);margin-top:56px;padding:38px 0 30px}

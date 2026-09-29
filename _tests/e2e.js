@@ -94,6 +94,8 @@ let pass = 0, fail = 0;
   const THIRD_PARTY = [
     'cloudflareinsights.com',      // Cloudflare Web Analytics
     'highperformanceformat.com',   // Adsterra banner / native tags
+    'highrevenueformat.com',       // Adsterra — the host the site's own unit uses
+    'profitabledisplayformat.com',
     'profitabledisplaynetwork.com',
     'effectivegatecpm.com',
   ];
@@ -129,6 +131,8 @@ let pass = 0, fail = 0;
     const title = await page.title();
     const cards = await page.locator('.tool-card[data-slug]').count();
     const slots = await page.locator('.ad-slot[data-slot]').count();
+    // Same invariant as the tool pages: no slot may advertise itself to a visitor.
+    const homeDemo = await page.locator('.ad-slot .ad-demo').count();
     const beacon = await page.locator("script[src*='cloudflareinsights.com/beacon.min.js']").count();
     await page.fill('#tool-search', 'bmi');
     await page.waitForTimeout(150);
@@ -146,8 +150,8 @@ let pass = 0, fail = 0;
     const t1 = await page.evaluate(() => document.documentElement.classList.contains('light'));
     report(title.includes('LazyTools') && cards >= 14 && slots >= 1 && visible === 1 &&
            first === 'bmi-calculator' && noResults && fin >= 3 && t0 !== t1 && errs.length === 0 &&
-           homeDirect && beacon === 1,
-      'home', `cards=${cards} search->${first} noResults=${noResults} finance=${fin} theme=${t0}->${t1} direct=${homeDirect} beacon=${beacon} errs=${errs.length} 3rdparty=${noise.length}`);
+           homeDirect && beacon === 1 && homeDemo === 0,
+      'home', `cards=${cards} search->${first} noResults=${noResults} finance=${fin} theme=${t0}->${t1} direct=${homeDirect} beacon=${beacon} demo=${homeDemo} errs=${errs.length} 3rdparty=${noise.length}`);
     errs.forEach((e) => console.log('        ' + e));
     noise.forEach((e) => console.log('        (third-party, ignored) ' + e));
     await page.close();
@@ -175,7 +179,18 @@ let pass = 0, fail = 0;
       await page.waitForTimeout(250);
       const val = ((await page.locator(resultSel[rel]).first().textContent()) || '').trim();
       const slots = await page.locator('.ad-slot[data-slot]').count();
-      const demo = await page.locator('.ad-slot .ad-demo').count();
+      // Every ad slot must be either FILLED (live) or COLLAPSED (hidden). The state this
+      // forbids is the one that actually shipped: an unfilled slot rendering its dashed
+      // "add code in assets/ads.js" placeholder to visitors on every page of the site.
+      const slotState = await page.evaluate(() => {
+        const all = [].slice.call(document.querySelectorAll('.ad-slot[data-slot]'));
+        return {
+          total: all.length,
+          live: all.filter((s) => s.classList.contains('live')).length,
+          hidden: all.filter((s) => getComputedStyle(s).display === 'none').length,
+          demo: document.querySelectorAll('.ad-slot .ad-demo').length,
+        };
+      });
       const related = await page.locator('.related .tool-card').count();
       const faqs = await page.locator('.faq details').count();
       const ld = await page.locator('script[type="application/ld+json"]').count();
@@ -186,10 +201,11 @@ let pass = 0, fail = 0;
       // The site footer is the only place /about and /privacy are linked from a tool page,
       // and tool_page() once forgot to render it entirely. Asserted per page, in a browser.
       const footLinks = await page.locator('.site-footer a').count();
-      report(!/NaN|undefined|Infinity|^—$|^$/.test(val) && slots === 3 && demo + (slots - demo) === 3 &&
+      report(!/NaN|undefined|Infinity|^—$|^$/.test(val) && slots === 3 &&
+             slotState.live + slotState.hidden === slotState.total && slotState.demo === 0 &&
              related >= 1 && faqs >= 3 && ld === 3 && !!canonical && errs.length === 0 && initialErrs === 0 &&
              direct && beacon === 1 && footLinks >= 8,
-        label, `result="${val.slice(0, 24)}" ads=${slots} related=${related} faq=${faqs} ld=${ld} foot=${footLinks} direct=${direct} beacon=${beacon} errs=${errs.length}`);
+        label, `result="${val.slice(0, 24)}" ads=${slots} live=${slotState.live} hidden=${slotState.hidden} demo=${slotState.demo} related=${related} faq=${faqs} ld=${ld} foot=${footLinks} direct=${direct} beacon=${beacon} errs=${errs.length}`);
       errs.forEach((e) => console.log('        ' + e));
       noise.forEach((e) => console.log('        (third-party, ignored) ' + e));
       await page.close();

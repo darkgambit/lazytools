@@ -24,12 +24,15 @@
    the page is untouched.
 
    This suite therefore asserts BOTH halves — page intact AND ad rendered — and
-   includes two negative controls that disable the isolation branch to prove the
+   includes negative controls that disable the detection branch to prove the
    suite actually detects the bugs it exists to catch. A suite that cannot fail
    proves nothing.
 
    The ad config is injected by intercepting the ads.js request rather than by
    editing the file, so the test can never leave fake ad code behind in the repo.
+   That interception also NEUTRALISES the real slots in ads.js, so the suite never
+   depends on a live third-party ad network and the ad under test is the only one
+   on the page.
 ============================================================================ */
 const { chromium } = require('playwright-core');
 const fs = require('fs');
@@ -39,7 +42,16 @@ const CHROME = process.env.LT_CHROME ||
   'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const BASE = (process.env.LT_BASE || 'http://127.0.0.1:8788').replace(/\/$/, '');
 const ADS_JS = path.join(__dirname, '..', 'assets', 'ads.js');
-const AD_HOST = '**/www.highperformanceformat.com/**';
+
+/* The host Adsterra serves invoke.js from, as seen in the wild. Two are exercised: the
+   historical one the suite has always used, and the one the site actually ships today. */
+const HOST_LEGACY = 'www.highperformanceformat.com';
+const HOST_LIVE = 'www.highrevenueformat.com';
+
+/* Any Adsterra-family host must be aborted outright. Belt and braces: the slot config is
+   neutralised below, but if a future edit reintroduces real code into ads.js, this keeps
+   the suite hermetic instead of silently letting it hit the network. */
+const AD_HOSTS_RE = /(highperformanceformat|highrevenueformat|profitabledisplayformat|profitabledisplaynetwork|effectivegatecpm)\.com/i;
 
 let pass = 0, fail = 0;
 function check(label, ok, detail) {
@@ -53,11 +65,12 @@ const PAYLOAD = '<div id="ad-payload" style="width:728px;height:90px">AD PAYLOAD
 /* The snippet the publisher pastes: a config block plus the cross-origin invoke.js.
    Note there is no literal document.write in THIS string — the write happens inside
    invoke.js — so detection cannot rely on scanning for "document.write" alone. */
-function adsterraAd(key) {
+function adsterraAd(key, host) {
+  host = host || HOST_LEGACY;
   return '<script type="text/javascript">\n' +
     "  atOptions = { 'key': '" + key + "', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };\n" +
     '</script>\n' +
-    '<script type="text/javascript" src="//www.highperformanceformat.com/' + key + '/invoke.js"></script>';
+    '<script type="text/javascript" src="//' + host + '/' + key + '/invoke.js"></script>';
 }
 
 /* invoke.js, two timings. Instant = fast network / warm cache. Late = the write
@@ -78,10 +91,25 @@ const DOCWRITE_AD =
 const PLAIN_AD =
   '<div id="plain-ad" style="width:300px;height:250px;background:#eee">plain unit</div>';
 
-function patchAdsJs(adCode) {
+/* Put the ad under test in `top`, and blank the other two slots.
+
+   This is not tidiness — ads.js ships a REAL Adsterra unit in `middle`. If the suite left it
+   in place, every scenario would (a) fetch a live third-party script, making the suite fail
+   whenever Adsterra has a bad day, and (b) put a second ad on the page that could interfere
+   with the one under test. So the whole slots block is replaced, and the absence of
+   `middle`/`bottom` is what makes the empty-slot assertions below meaningful. */
+function patchAdsJs(adCode, opts) {
+  opts = opts || {};
   const src = fs.readFileSync(ADS_JS, 'utf8');
-  const out = src.replace('top:    "",', 'top: ' + JSON.stringify(adCode) + ',');
-  if (out === src) throw new Error('could not inject test ad code into ads.js');
+  const replacement = 'slots: {\n    top: ' + JSON.stringify(adCode) +
+    ',\n    middle: "",\n    bottom: ""\n  },';
+  const out = src.replace(/slots:\s*\{[\s\S]*?\n  \},/, replacement);
+  if (out === src) throw new Error('could not replace the slots block in ads.js');
+  if (opts.showPlaceholders) {
+    const flipped = out.replace('showPlaceholders: false', 'showPlaceholders: true');
+    if (flipped === out) throw new Error('could not flip showPlaceholders in ads.js');
+    return flipped;
+  }
   return out;
 }
 
@@ -95,7 +123,20 @@ function patchAdsJsUnisolated(adCode) {
   return src.replace(marker, 'if (false) {');
 }
 
-async function scenario(browser, { adCode, invokeBody, unisolated, settle = 2000 }) {
+/* Negative control: blind the ad-script detection, so a snippet that writes is treated as
+   inline. Proves the detection — the host list AND the /invoke.js path — is load-bearing
+   rather than decorative. Note this must blind BOTH layers: the host list alone is
+   defence-in-depth, because /invoke.js already matches this snippet. */
+function patchAdsJsDetectionBlind(adCode) {
+  const src = patchAdsJs(adCode);
+  const marker = 'AD_SCRIPT.test(code)';
+  if (!src.includes(marker)) throw new Error('AD_SCRIPT marker not found');
+  return src.replace(marker, 'false');
+}
+
+async function scenario(browser, o) {
+  const adCode = o.adCode, invokeBody = o.invokeBody, settle = o.settle || 2000;
+  const host = o.host || HOST_LEGACY;
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   const errs = [];
@@ -114,12 +155,17 @@ async function scenario(browser, { adCode, invokeBody, unisolated, settle = 2000
      behaviour, and never depends on a third party being up. */
   await page.route('**cloudflareinsights.com/**', r => r.abort());
 
+  /* Hermeticity net: no scenario may reach a real ad network, whatever the slot config says. */
+  await page.route(AD_HOSTS_RE, r => r.abort());
+
   await page.route('**/assets/ads.js', r => r.fulfill({
     status: 200, contentType: 'application/javascript',
-    body: unisolated ? patchAdsJsUnisolated(adCode) : patchAdsJs(adCode)
+    body: o.unisolated ? patchAdsJsUnisolated(adCode)
+        : o.detectionBlind ? patchAdsJsDetectionBlind(adCode)
+        : patchAdsJs(adCode, { showPlaceholders: o.showPlaceholders })
   }));
   if (invokeBody) {
-    await page.route(AD_HOST, r => r.fulfill({
+    await page.route('**/' + host + '/**', r => r.fulfill({
       status: 200, contentType: 'application/javascript', body: invokeBody
     }));
   }
@@ -131,6 +177,7 @@ async function scenario(browser, { adCode, invokeBody, unisolated, settle = 2000
   await page.waitForTimeout(settle);
 
   let out = { bodyLen: -1, h1: -1, iframes: -1, slotLive: -1, plainInline: -1,
+              emptySlots: -1, hiddenUnfilled: -1, demoText: -1,
               payloadTop: null, payloadInFrame: null, errs };
   try {
     out = Object.assign(out, await page.evaluate(() => {
@@ -142,12 +189,17 @@ async function scenario(browser, { adCode, invokeBody, unisolated, settle = 2000
           payloadInFrame = !!(d && d.querySelector('#ad-payload'));
         } catch (e) { payloadInFrame = 'ERR'; }
       }
+      const unfilled = [].slice.call(
+        document.querySelectorAll('.ad-slot[data-slot="middle"], .ad-slot[data-slot="bottom"]'));
       return {
         bodyLen: document.body ? document.body.innerHTML.length : -1,
         h1: document.querySelectorAll('h1').length,
         iframes: document.querySelectorAll('.ad-slot[data-slot="top"] iframe').length,
         slotLive: document.querySelectorAll('.ad-slot[data-slot="top"].live').length,
         plainInline: document.querySelectorAll('.ad-slot[data-slot="top"] #plain-ad').length,
+        emptySlots: document.querySelectorAll('.ad-slot.empty').length,
+        hiddenUnfilled: unfilled.filter(s => getComputedStyle(s).display === 'none').length,
+        demoText: document.querySelectorAll('.ad-demo').length,
         payloadTop: !!document.querySelector('#ad-payload'),
         payloadInFrame
       };
@@ -194,7 +246,19 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
         r.iframes === 1 && alive(r),
         'iframes=' + r.iframes + ' bodyLen=' + r.bodyLen);
 
-  /* ---- 4. Plain markup — must stay inline, because some networks require the
+  /* ---- 4. THE PRODUCTION HOST. The site ships an Adsterra unit served from
+             highrevenueformat.com. Detection there must not rest on the literal
+             document.write branch, because the pasted snippet has none. ---- */
+  r = await scenario(browser, {
+    adCode: adsterraAd('0bab55ec2855e74946a5c24ac4862018', HOST_LIVE),
+    host: HOST_LIVE, invokeBody: INVOKE_LATE
+  });
+  check('production host (highrevenueformat.com) ad is isolated and renders',
+        r.iframes === 1 && r.payloadInFrame === true && alive(r),
+        'iframes=' + r.iframes + ' payloadInFrame=' + r.payloadInFrame +
+        ' bodyLen=' + r.bodyLen);
+
+  /* ---- 5. Plain markup — must stay inline, because some networks require the
              top-level document and an iframe would break their measurement. ---- */
   r = await scenario(browser, { adCode: PLAIN_AD });
   check('plain ad code stays inline (no iframe)',
@@ -203,7 +267,27 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
   check('plain ad code does not break the page',
         alive(r), 'bodyLen=' + r.bodyLen + ' h1=' + r.h1);
 
-  /* ---- 5. NEGATIVE CONTROL A — the page-wipe bug.
+  /* ---- 6. UNFILLED SLOTS MUST NOT ADVERTISE THEMSELVES.
+             With only one of three slots sold, the other two are what a visitor would
+             otherwise see: a dashed "Ad space — add code in assets/ads.js" box, on every
+             page of the site. That was live before this test existed. ---- */
+  r = await scenario(browser, { adCode: adsterraAd('testkey'), invokeBody: INVOKE_LATE });
+  check('unfilled slots are collapsed, not shown',
+        r.emptySlots === 2 && r.hiddenUnfilled === 2,
+        'empty=' + r.emptySlots + ' hidden=' + r.hiddenUnfilled);
+  check('no "add code in assets/ads.js" text reaches the page',
+        r.demoText === 0, 'demoText=' + r.demoText);
+
+  /* ---- 7. ...but the placeholder must still be available for local development,
+             otherwise the flag that hides it is just dead code. ---- */
+  r = await scenario(browser, {
+    adCode: adsterraAd('testkey'), invokeBody: INVOKE_LATE, showPlaceholders: true
+  });
+  check('showPlaceholders:true still renders the dev placeholder',
+        r.demoText === 2 && r.emptySlots === 0,
+        'demoText=' + r.demoText + ' empty=' + r.emptySlots);
+
+  /* ---- 8. NEGATIVE CONTROL A — the page-wipe bug.
              Isolation off + late write must DESTROY the page. The assertion is
              inverted on purpose: this test is expected to "fail" as a check. ---- */
   r = await scenario(browser, {
@@ -212,7 +296,7 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
   check('NEGATIVE CONTROL: without isolation the late write DOES wipe the page',
         !alive(r), 'bodyLen=' + r.bodyLen + ' h1=' + r.h1);
 
-  /* ---- 6. NEGATIVE CONTROL B — the silent-revenue-loss bug.
+  /* ---- 9. NEGATIVE CONTROL B — the silent-revenue-loss bug.
              Isolation off + instant write survives the page but the ad never
              renders. Proves isolation is load-bearing for revenue, not just
              for safety. ---- */
@@ -222,6 +306,18 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
   check('NEGATIVE CONTROL: without isolation the instant write silently loses the ad',
         alive(r) && r.payloadTop === false && r.iframes === 0,
         'bodyLen=' + r.bodyLen + ' payloadTop=' + r.payloadTop + ' iframes=' + r.iframes);
+
+  /* ---- 10. NEGATIVE CONTROL C — blind the ad-script detection entirely.
+              The pasted snippet contains no literal document.write, so with detection
+              blinded nothing marks it as unsafe, it runs inline, and the late write
+              erases the document. Proves the host list / invoke.js matching is
+              load-bearing rather than decorative. ---- */
+  r = await scenario(browser, {
+    adCode: adsterraAd('0bab55ec2855e74946a5c24ac4862018', HOST_LIVE),
+    host: HOST_LIVE, invokeBody: INVOKE_LATE, detectionBlind: true
+  });
+  check('NEGATIVE CONTROL: with detection blinded the production ad wipes the page',
+        !alive(r), 'bodyLen=' + r.bodyLen + ' h1=' + r.h1);
 
   await browser.close();
   console.log('');

@@ -92,9 +92,10 @@ let pass = 0, fail = 0;
      Known third-party noise is still collected and printed, never hidden — and the beacon's
      presence is asserted positively below, so filtering the noise does not lose the coverage. */
   const THIRD_PARTY = [
-    'cloudflareinsights.com',      // Cloudflare Web Analytics
-    'highperformanceformat.com',   // Adsterra banner / native tags
-    'highrevenueformat.com',       // Adsterra — the host the site's own unit uses
+    'cloudflareinsights.com',        // Cloudflare Web Analytics
+    'highperformanceformat.com',     // Adsterra banner / native tags
+    'highrevenueformat.com',         // Adsterra — the host the site's banners use
+    'profitableratecpmnetwork.com',  // Adsterra — native banner (and popunder, if ever added)
     'profitabledisplayformat.com',
     'profitabledisplaynetwork.com',
     'effectivegatecpm.com',

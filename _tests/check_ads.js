@@ -43,15 +43,16 @@ const CHROME = process.env.LT_CHROME ||
 const BASE = (process.env.LT_BASE || 'http://127.0.0.1:8788').replace(/\/$/, '');
 const ADS_JS = path.join(__dirname, '..', 'assets', 'ads.js');
 
-/* The host Adsterra serves invoke.js from, as seen in the wild. Two are exercised: the
-   historical one the suite has always used, and the one the site actually ships today. */
+/* The hosts Adsterra serves from, as seen in the wild. Three are exercised: the historical
+   banner host, the one the site actually ships banners from, and the native-banner host. */
 const HOST_LEGACY = 'www.highperformanceformat.com';
 const HOST_LIVE = 'www.highrevenueformat.com';
+const HOST_NATIVE = 'pl31559854.profitableratecpmnetwork.com';
 
 /* Any Adsterra-family host must be aborted outright. Belt and braces: the slot config is
    neutralised below, but if a future edit reintroduces real code into ads.js, this keeps
    the suite hermetic instead of silently letting it hit the network. */
-const AD_HOSTS_RE = /(highperformanceformat|highrevenueformat|profitabledisplayformat|profitabledisplaynetwork|effectivegatecpm)\.com/i;
+const AD_HOSTS_RE = /(highperformanceformat|highrevenueformat|profitableratecpmnetwork|profitabledisplayformat|profitabledisplaynetwork|effectivegatecpm)\.com/i;
 
 let pass = 0, fail = 0;
 function check(label, ok, detail) {
@@ -65,10 +66,13 @@ const PAYLOAD = '<div id="ad-payload" style="width:728px;height:90px">AD PAYLOAD
 /* The snippet the publisher pastes: a config block plus the cross-origin invoke.js.
    Note there is no literal document.write in THIS string — the write happens inside
    invoke.js — so detection cannot rely on scanning for "document.write" alone. */
-function adsterraAd(key, host) {
+function adsterraAd(key, host, w, h) {
   host = host || HOST_LEGACY;
+  w = w || 728;
+  h = h || 90;
   return '<script type="text/javascript">\n' +
-    "  atOptions = { 'key': '" + key + "', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };\n" +
+    "  atOptions = { 'key': '" + key + "', 'format': 'iframe', 'height': " + h +
+    ", 'width': " + w + ", 'params': {} };\n" +
     '</script>\n' +
     '<script type="text/javascript" src="//' + host + '/' + key + '/invoke.js"></script>';
 }
@@ -137,10 +141,14 @@ function patchAdsJsDetectionBlind(adCode) {
 async function scenario(browser, o) {
   const adCode = o.adCode, invokeBody = o.invokeBody, settle = o.settle || 2000;
   const host = o.host || HOST_LEGACY;
-  const ctx = await browser.newContext();
+  /* The `top` slot ships a 728x90 / 320x50 pair and picks one by viewport, so a scenario
+     has to be able to say which side of the breakpoint it is testing. */
+  const ctx = await browser.newContext(o.viewport ? { viewport: o.viewport } : {});
   const page = await ctx.newPage();
   const errs = [];
+  const adReqs = [];
   page.on('pageerror', e => errs.push(String(e.message)));
+  page.on('request', r => { if (AD_HOSTS_RE.test(r.url())) adReqs.push(r.url()); });
 
   /* This suite is about ad slots, not analytics, so the analytics beacon is aborted outright.
 
@@ -178,7 +186,8 @@ async function scenario(browser, o) {
 
   let out = { bodyLen: -1, h1: -1, iframes: -1, slotLive: -1, plainInline: -1,
               emptySlots: -1, hiddenUnfilled: -1, demoText: -1,
-              payloadTop: null, payloadInFrame: null, errs };
+              iframeW: -1, iframeH: -1,
+              payloadTop: null, payloadInFrame: null, errs, adReqs };
   try {
     out = Object.assign(out, await page.evaluate(() => {
       const frame = document.querySelector('.ad-slot[data-slot="top"] iframe');
@@ -200,6 +209,8 @@ async function scenario(browser, o) {
         emptySlots: document.querySelectorAll('.ad-slot.empty').length,
         hiddenUnfilled: unfilled.filter(s => getComputedStyle(s).display === 'none').length,
         demoText: document.querySelectorAll('.ad-demo').length,
+        iframeW: frame ? Math.round(frame.getBoundingClientRect().width) : -1,
+        iframeH: frame ? Math.round(frame.getBoundingClientRect().height) : -1,
         payloadTop: !!document.querySelector('#ad-payload'),
         payloadInFrame
       };
@@ -287,7 +298,48 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
         r.demoText === 2 && r.emptySlots === 0,
         'demoText=' + r.demoText + ' empty=' + r.emptySlots);
 
-  /* ---- 8. NEGATIVE CONTROL A — the page-wipe bug.
+  /* ---- 8. THE NATIVE BANNER HOST. The native unit carries no atOptions and no declared
+             size — it is a script plus a container div — so nothing about it looks like a
+             banner. It must still be isolated, because this family of tags writes. ---- */
+  const NATIVE_AD =
+    '<script async="async" data-cfasync="false" src="https://' + HOST_NATIVE +
+    '/0c1cdb3f8eac447dfc4b82a0243e3fda/invoke.js"></script>\n' +
+    '<div id="container-0c1cdb3f8eac447dfc4b82a0243e3fda"></div>';
+  r = await scenario(browser, { adCode: NATIVE_AD, host: HOST_NATIVE, invokeBody: INVOKE_LATE });
+  check('native banner tag is isolated and renders',
+        r.iframes === 1 && r.payloadInFrame === true && alive(r),
+        'iframes=' + r.iframes + ' payloadInFrame=' + r.payloadInFrame +
+        ' bodyLen=' + r.bodyLen);
+
+  /* ---- 9. THE 728x90 / 320x50 PAIR. `top` carries both units and picks by viewport.
+             Both halves matter: pick the wrong one and the frame is sized for the other
+             unit, which clips the ad. Assert the SIZE and that the matching key was the one
+             actually requested — a size-only check would pass even if the wrong creative
+             loaded, and a key-only check would pass on a wrongly-sized frame. ---- */
+  const PAIR = {
+    wide:   { w: 728, h: 90, code: adsterraAd('widekey', HOST_LIVE, 728, 90) },
+    narrow: { w: 320, h: 50, code: adsterraAd('narrowkey', HOST_LIVE, 320, 50) }
+  };
+
+  r = await scenario(browser, {
+    adCode: PAIR, host: HOST_LIVE, invokeBody: INVOKE_LATE,
+    viewport: { width: 1280, height: 900 }
+  });
+  check('wide viewport picks the 728x90 unit and sizes the frame to match',
+        r.iframeW === 728 && r.iframeH === 90 && r.adReqs.some(u => u.includes('widekey')),
+        'w=' + r.iframeW + ' h=' + r.iframeH + ' reqs=' + r.adReqs.join(','));
+
+  r = await scenario(browser, {
+    adCode: PAIR, host: HOST_LIVE, invokeBody: INVOKE_LATE,
+    viewport: { width: 400, height: 800 }
+  });
+  check('narrow viewport picks the 320x50 unit, sizes the frame, and does NOT load the wide one',
+        r.iframeW === 320 && r.iframeH === 50 &&
+        r.adReqs.some(u => u.includes('narrowkey')) &&
+        !r.adReqs.some(u => u.includes('widekey')),
+        'w=' + r.iframeW + ' h=' + r.iframeH + ' reqs=' + r.adReqs.join(','));
+
+  /* ---- 10. NEGATIVE CONTROL A — the page-wipe bug.
              Isolation off + late write must DESTROY the page. The assertion is
              inverted on purpose: this test is expected to "fail" as a check. ---- */
   r = await scenario(browser, {
@@ -296,7 +348,7 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
   check('NEGATIVE CONTROL: without isolation the late write DOES wipe the page',
         !alive(r), 'bodyLen=' + r.bodyLen + ' h1=' + r.h1);
 
-  /* ---- 9. NEGATIVE CONTROL B — the silent-revenue-loss bug.
+  /* ---- 11. NEGATIVE CONTROL B — the silent-revenue-loss bug.
              Isolation off + instant write survives the page but the ad never
              renders. Proves isolation is load-bearing for revenue, not just
              for safety. ---- */
@@ -307,7 +359,7 @@ const alive = r => r.bodyLen > 3000 && r.h1 > 0;
         alive(r) && r.payloadTop === false && r.iframes === 0,
         'bodyLen=' + r.bodyLen + ' payloadTop=' + r.payloadTop + ' iframes=' + r.iframes);
 
-  /* ---- 10. NEGATIVE CONTROL C — blind the ad-script detection entirely.
+  /* ---- 12. NEGATIVE CONTROL C — blind the ad-script detection entirely.
               The pasted snippet contains no literal document.write, so with detection
               blinded nothing marks it as unsafe, it runs inline, and the late write
               erases the document. Proves the host list / invoke.js matching is

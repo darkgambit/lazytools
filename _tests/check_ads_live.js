@@ -27,9 +27,17 @@ const { chromium } = require('playwright-core');
 const CHROME = process.env.LT_CHROME ||
   'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const BASE = (process.env.LT_BASE || 'http://127.0.0.1:8788').replace(/\/$/, '');
-const PAGES = ['/tools/bmi-calculator', '/', '/tools/compound-interest-calculator'];
+const PAGES = [
+  { path: '/tools/bmi-calculator' },
+  { path: '/' },
+  { path: '/tools/compound-interest-calculator' },
+  /* The forced-navigation reports are a MOBILE problem, and `top` serves a different unit
+     at this width, so one page is checked phone-sized with a mobile UA rather than assumed
+     to behave like the desktop pass. */
+  { path: '/tools/bmi-calculator', mobile: true }
+];
 
-const AD_REQ = /highrevenueformat|highperformanceformat|profitabledisplay|effectivegatecpm|adsterra|invoke\.js/i;
+const AD_REQ = /highrevenueformat|highperformanceformat|profitableratecpmnetwork|profitabledisplay|effectivegatecpm|adsterra|invoke\.js/i;
 
 (async () => {
   const browser = await chromium.launch({
@@ -37,13 +45,28 @@ const AD_REQ = /highrevenueformat|highperformanceformat|profitabledisplay|effect
   });
   let bad = 0, note = 0;
 
-  for (const p of PAGES) {
-    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  for (const entry of PAGES) {
+    const p = entry.path + (entry.mobile ? '  [mobile 390x844]' : '');
+    const ctx = await browser.newContext(entry.mobile
+      ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+          userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) ' +
+                     'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 ' +
+                     'Safari/604.1' }
+      : { viewport: { width: 1280, height: 900 } });
     const page = await ctx.newPage();
     const adReqs = [];
     page.on('request', r => { if (AD_REQ.test(r.url())) adReqs.push(r.url()); });
+    /* Adsterra banner units are reported to force navigation on mobile even when no
+       redirect format is configured, and this project's own policy says to re-test for
+       exactly that once codes are live. A visitor who taps a calculator and lands
+       somewhere else is the worst failure this site can have, and it would never show up
+       as a console error — so it gets its own assertion rather than a footnote. */
+    const popups = [];
+    ctx.on('page', pg => popups.push(pg.url() || '(about:blank)'));
+    let loadedUrl = '';
     try {
-      await page.goto(BASE + p, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.goto(BASE + entry.path, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      loadedUrl = page.url();
       /* The isolation iframe is `loading="lazy"`, so a slot below the fold genuinely does
          not load until it is scrolled near. Scroll first, or this reports "no request"
          for a page whose ad is in fact fine. */
@@ -74,11 +97,18 @@ const AD_REQ = /highrevenueformat|highperformanceformat|profitabledisplay|effect
         };
       });
 
+      const hijack = page.url() !== loadedUrl || popups.length > 0;
       const detail = `slots=${out.slots} live=${out.live} hidden=${out.hidden} demo=${out.demo} ` +
                      `slot=${out.filledSlot} iframe=${out.iframe} inner=[${out.innerTags}] ` +
-                     `adReq=${adReqs.length}`;
+                     `adReq=${adReqs.length} popups=${popups.length} ` +
+                     `nav=${page.url() !== loadedUrl}`;
 
-      if (!out.alive || out.demo > 0) {
+      if (hijack) {
+        bad++;
+        console.log('BAD  ' + p + '  UNEXPECTED NAVIGATION  ' + detail);
+        if (page.url() !== loadedUrl) console.log('       -> ' + page.url());
+        popups.forEach(u => console.log('       popup: ' + u));
+      } else if (!out.alive || out.demo > 0) {
         bad++;
         console.log('BAD  ' + p + '  ' + detail);
       } else if (!out.filledSlot) {

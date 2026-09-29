@@ -213,6 +213,52 @@ if AMZ_TAG:
                 issues.append("%s -> gear block contains a price/rating (%r); that is an "
                               "Amazon closure trigger" % (rel, hit.group(0)))
 
+# --------------------------------------------------------------------------- #
+#  ad config guards (assets/ads.js)
+# --------------------------------------------------------------------------- #
+# Two traps in the ad config that are invisible in a browser until they cost money, and
+# one policy line that is easy to cross by pasting the wrong snippet from the dashboard.
+ADS_JS = os.path.join(ROOT, "assets", "ads.js")
+ads_src = open(ADS_JS, encoding="utf-8").read()
+
+# 1. ONE KEY = ONE SLOT. Adsterra's banner snippet assigns the GLOBAL `atOptions` and then
+#    loads a script that reads it back, so the same unit pasted into two slots means the
+#    second assignment overwrites the first and only ONE of the two ever renders. The
+#    duplicate is silent: the slot still gets its iframe, it just never fills.
+ad_keys = re.findall(r"'key'\s*:\s*'([0-9a-f]+)'", ads_src)
+dupes = sorted({k for k in ad_keys if ad_keys.count(k) > 1})
+if dupes:
+    issues.append("assets/ads.js -> ad unit key reused (%s); atOptions is a global, so only "
+                  "ONE of them will render — one unit per slot"
+                  % ", ".join("%s x%d" % (k, ad_keys.count(k)) for k in dupes))
+
+# 2. BANNER AND NATIVE BANNER ONLY. Popunder / Social Bar tags hijack clicks site-wide and
+#    Direct Links are a bare URL with nowhere on the page to live; both are excluded by
+#    policy. They are recognisable by PATH SHAPE, not by host — the native banner sits on
+#    the same profitableratecpmnetwork.com host as the popunder and differs only in path.
+#
+#    The character class excludes a backslash as well as quotes: these URLs live inside
+#    escaped JS string literals (`src=\"https://…/invoke.js\"`), so a naive match ends with
+#    a trailing `\` and the legitimate native unit reads as unrecognised. That false
+#    positive was caught by negative-testing this guard, not by running it on the real file.
+for url in re.findall(r"https?://[^\s\"'<>\\]+", ads_src):
+    if "profitableratecpmnetwork.com" not in url:
+        continue
+    path = re.sub(r"^https?://[^/]+", "", url)
+    if re.match(r"^/[0-9a-f]{32}/invoke\.js$", path):
+        continue                                   # the native banner — allowed
+    if re.match(r"^/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]+\.js$", path):
+        issues.append("assets/ads.js -> Popunder/Social Bar tag (%s): excluded by policy, it "
+                      "hijacks clicks site-wide" % url)
+    elif "key=" in url:
+        issues.append("assets/ads.js -> Direct Link / Smartlink (%s): excluded by policy, there "
+                      "is nowhere on the page for it to live" % url)
+    else:
+        issues.append("assets/ads.js -> unrecognised profitableratecpmnetwork.com tag (%s); if "
+                      "this is a new banner/native unit, teach this guard its path shape" % url)
+
+print("Ad units           : %d keys, %d distinct (banner/native only)"
+      % (len(ad_keys), len(set(ad_keys))))
 print("HTML files checked : %d" % len(html_files))
 print("Local refs checked : %d" % checked)
 print("Inline JS blocks   : %d (syntax-checked)" % js_count)
